@@ -76,6 +76,8 @@ static int modkey(void)
         alt    = 1;
         b[n++] = c = SLang_getkey();
     }
+    if (!alt && (c == 0177 || c == '\b'))
+        return KEY_ABS; /* Alt-Backspace */
     if (c != '[' && c != 'O')
         goto back;
     while (n < (int)sizeof(b) - 1 && SLang_input_pending(1) > 0) {

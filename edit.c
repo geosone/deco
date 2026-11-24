@@ -1,12 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "deco.h"
 #include "rec.h"
 #include "scr.h"
 
 static int editmodflg;
+
+/* the text deleted last, for Ctrl-U; undelline: a whole line */
+static char *undel;
+static int undellen, undelline;
+
+static void keepdel(const char *s, int n, int line)
+{
+    free(undel);
+    undel     = n > 0 ? malloc(n) : 0;
+    undellen  = undel ? n : 0;
+    undelline = line;
+    if (undel)
+        memcpy(undel, s, n);
+}
 
 extern char viewsrch[SEARCHSZ]; /* search string */
 extern int viewraw;             /* raw mode */
@@ -55,6 +70,8 @@ static void edithead(char *filename, int line, int col, int off)
     VMove(0, 0);
     for (i = COLS; --i >= 0; VPutChar(' '))
         ;
+    if (editmodflg) /* changed since saved */
+        VMPutString(0, 0, "*");
     VMPutString(0, 1, _("File "));
     VPutString(filename);
     VPrint(_("  Lines %d"), viewrec->len);
@@ -114,6 +131,9 @@ void editfile(int d, char *filename, char *basename)
 
 static void edit1(int d, char *filename, char *basename)
 {
+    static char asname[1024]; /* the name saved under, Shift-F2 */
+    LINE *lp;
+    int i, n;
     register int baseline, basecol;
     int stepud = LINES - 3; /* step up-down */
     int sline, soff;        /* search position */
@@ -174,7 +194,54 @@ static void edit1(int d, char *filename, char *basename)
                 VSync();
                 c = KeyGetChar();
                 goto inschar;
+            case KEY_ABS: /* Alt-Backspace: the word left */
+                if (!soff)
+                    goto backspace;
+                lp = RecGet(viewrec, sline);
+                i  = wordbeg(lp, soff);
+                n  = soff - i;
+                keepdel(lp->ptr + i, n, 0);
+                while (n-- > 0)
+                    RecDelChar(viewrec, sline, i);
+                soff       = i;
+                ccol       = column(sline, soff);
+                editmodflg = 1;
+                viewline(sline, basecol, sline - baseline + 1);
+                continue;
+            case KEY_CDEL: /* Ctrl-Del: the word right */
+                if (soff >= lastpos(sline))
+                    goto delchar;
+                lp = RecGet(viewrec, sline);
+                n  = wordend(lp, soff) - soff;
+                keepdel(lp->ptr + soff, n, 0);
+                while (n-- > 0)
+                    RecDelChar(viewrec, sline, soff);
+                editmodflg = 1;
+                viewline(sline, basecol, sline - baseline + 1);
+                continue;
+            case cntrl('U'): /* undelete */
+                if (!undellen && !undelline)
+                    continue;
+                editmodflg = 1;
+                if (viewrec->len <= 0)
+                    RecInsLine(viewrec, 0);
+                if (undelline) { /* the line back above */
+                    RecInsLine(viewrec, sline);
+                    if (undellen && (lp = RecGet(viewrec, sline))) {
+                        lp->ptr = malloc(undellen);
+                        memcpy(lp->ptr, undel, undellen);
+                        RecPut(lp, undellen);
+                    }
+                    ccol = 0;
+                    break;
+                }
+                for (i = 0; i < undellen; ++i)
+                    RecInsChar(viewrec, sline, soff + i, undel[i] & 0xff);
+                ccol = column(sline, soff + undellen);
+                viewline(sline, basecol, sline - baseline + 1);
+                continue;
             case meta('b'): /* back space */
+            backspace:
                 if (soff) {
                     soff       = charstart(sline, soff - 1);
                     ccol       = column(sline, soff);
@@ -221,6 +288,7 @@ static void edit1(int d, char *filename, char *basename)
                 viewline(sline, basecol, LINES - 2);
                 continue;
             case cntrl('G'): /* delete char */
+            delchar:
                 if (soff == lastpos(sline)) {
                     if (sline == viewrec->len - 1)
                         continue;
@@ -235,12 +303,17 @@ static void edit1(int d, char *filename, char *basename)
                 if (soff == lastpos(sline))
                     continue;
                 editmodflg = 1;
+                lp         = RecGet(viewrec, sline);
+                keepdel(lp->ptr + soff, lp->len - soff, 0);
                 cleartoeoln(viewrec, sline, soff);
                 viewline(sline, basecol, sline - baseline + 1);
                 continue;
             case cntrl('Y'): /* delete line */
                 editmodflg = 1;
                 ccol       = 0;
+                if ((lp = RecGet(viewrec, sline)))
+                    /* the last line is only cleared: Ctrl-U fills it again */
+                    keepdel(lp->ptr, lp->len, sline < viewrec->len - 1);
                 if (sline == viewrec->len - 1) {
                     clearline(viewrec, sline);
                     viewline(sline, basecol, sline - baseline + 1);
@@ -292,10 +365,30 @@ static void edit1(int d, char *filename, char *basename)
                 continue;
             case meta('B'): /* f2 - save */
                 message(_(" Save "), _("Saving file '%s'..."), basename);
-                RecSave(viewrec, filename);
-                editmodflg = 0;
+                if (RecSave(viewrec, filename) == 0)
+                    editmodflg = 0;
                 endmesg();
                 continue;
+            case KEY_SF(2): { /* shift-f2 - save as */
+                char *p = getstring(60, filename, _(" Save as "), _("Save the file as"));
+
+                if (!p || !*p)
+                    continue;
+                if (strcmp(p, filename) && !access(p, F_OK) &&
+                    getchoice(1, _(" Save as "), _("File exists"), p, _(" Overwrite "),
+                              _(" Cancel "), 0))
+                    continue;
+                snprintf(asname, sizeof(asname), "%s", p);
+                message(_(" Save "), _("Saving file '%s'..."), asname);
+                i = strcmp(asname, filename) ? RecSaveAs(viewrec, asname)
+                                             : RecSave(viewrec, asname);
+                endmesg();
+                if (i < 0)
+                    continue;
+                filename = basename = asname;
+                editmodflg          = 0;
+                continue;
+            }
             case meta('C'): /* f3 - raw */
                 viewraw ^= 1;
                 break;
@@ -308,12 +401,16 @@ static void edit1(int d, char *filename, char *basename)
                 sline = baseline;
                 ccol  = 0;
                 break;
+            case KEY_CHOME:
+            case KEY_CPGUP:
             case meta('E'): /* f5 - top */
                 if (sline == 0 && baseline == 0 && ccol == 0)
                     continue;
                 sline = baseline = 0;
                 ccol             = 0;
                 break;
+            case KEY_CEND:
+            case KEY_CPGDN:
             case meta('F'): /* f6 - bottom */
                 if (soff == lastpos(sline) && sline >= viewrec->len - 1)
                     continue;
@@ -328,6 +425,10 @@ static void edit1(int d, char *filename, char *basename)
                 if (ccol < basecol || ccol >= basecol + COLS)
                     basecol = ccol < 40 ? 0 : ((ccol - 40) / 40 * 40);
                 break;
+            case KEY_SF(10): /* shift-f10 - save and quit */
+                if (editmodflg && RecSave(viewrec, filename) < 0)
+                    continue;
+                goto leave;
             case cntrl('C'):
             case cntrl('['):
             case meta('J'): /* f0 - quit */
@@ -342,15 +443,20 @@ static void edit1(int d, char *filename, char *basename)
                     default:
                         continue;
                     }
+            leave:
                 VClearBox(1, 0, LINES - 2, COLS);
                 RecClose(viewrec);
                 return;
+            case KEY_SF(7):   /* shift-f7 - search again */
             case meta('G'): { /* f7 - search */
-                register char *p;
+                register char *p = viewsrch;
 
-                if (!(p = getstring(40, viewsrch, _(" Search "), _("Search for the string"))))
-                    continue;
-                snprintf(viewsrch, sizeof(viewsrch), "%s", p);
+                if (c == meta('G') || !*viewsrch) {
+                    if (!(p = getstring(40, viewsrch, _(" Search "), _("Search for the string"))))
+                        continue;
+                    snprintf(viewsrch, sizeof(viewsrch), "%s", p);
+                    p = viewsrch;
+                }
                 if (!search(p, sline, soff + 1, &sline, &soff))
                     continue;
                 if (baseline > sline || baseline + LINES - 2 <= sline)
@@ -387,10 +493,12 @@ static void edit1(int d, char *filename, char *basename)
                 VInsLine(LINES - 2);
                 viewline(baseline + LINES - 3, basecol, LINES - 2);
                 continue;
+            case KEY_CRIGHT:
             case cntrl('F'): /* word right */
                 soff = wordend(RecGet(viewrec, sline), soff);
                 ccol = column(sline, soff);
                 continue;
+            case KEY_CLEFT:
             case cntrl('W'): /* word left */
                 soff = wordbeg(RecGet(viewrec, sline), soff);
                 ccol = column(sline, soff);

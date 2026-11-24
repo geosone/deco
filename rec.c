@@ -35,12 +35,14 @@
  *              - delete char from line
  */
 
+#include "rec.h"
+
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
+
 #include "deco.h"
-#include "rec.h"
 
 #define BUFSIZ   512
 #define TEMPCELL 16 /* minimal size of temp space */
@@ -163,6 +165,7 @@ REC *RecOpen(int fd, int wmode)
     r        = (REC *)malloc(sizeof(REC));
     r->fd    = fd;
     r->bakfd = -1;
+    r->nobak = 0;
     if (wmode) {
         if (!tfilename)
             tfilename = tfilepattern;
@@ -237,20 +240,54 @@ void RecClose(REC *r)
         close(r->tfd);
     if (r->bakfd >= 0)
         close(r->bakfd);
+    free(r);
 }
 
+/* the lines into the file name; -1 when it cannot be written */
+static int recwrite(REC *r, char *filename)
+{
+    register int i, fd, err = 0;
+    register LINE *p;
+
+    fd = creat(filename, 0664);
+    if (fd < 0) {
+        error(_("Cannot create %s"), filename);
+        return (-1);
+    }
+    for (i = 0; i < r->len && !err; ++i) {
+        p = RecGet(r, i);
+        if (p->len && write(fd, p->ptr, (unsigned)p->len) != p->len)
+            err = 1;
+        else if (write(fd, "\n", 1) != 1)
+            err = 1;
+    }
+    if (close(fd) < 0)
+        err = 1;
+    if (err) {
+        error(_("Cannot write %s"), filename);
+        return (-1);
+    }
+    return (0);
+}
+
+/*
+ * The file saved; the first time the old one is kept as the name with
+ * BAKSUFFIX, and the lines not yet read are read from there.
+ */
 int RecSave(REC *r, char *filename)
 {
-    register int i, fd;
-    register LINE *p;
-    char bak[40];
+    char *bak;
 
-    if (r->bakfd < 0) {
+    if (r->bakfd < 0 && !r->nobak) {
+        bak = malloc(strlen(filename) + sizeof(BAKSUFFIX));
+        if (!bak)
+            return (-1);
         strcpy(bak, filename);
         strcat(bak, BAKSUFFIX);
         r->bakfd = creat(bak, 0600);
         if (r->bakfd < 0) {
             error(_("Cannot create %s"), bak);
+            free(bak);
             return (-1);
         }
         lseek(r->fd, 0L, 0);
@@ -258,6 +295,7 @@ int RecSave(REC *r, char *filename)
             close(r->bakfd);
             r->bakfd = -1;
             unlink(bak);
+            free(bak);
             return (-1);
         }
         close(r->bakfd);
@@ -265,24 +303,26 @@ int RecSave(REC *r, char *filename)
         if (r->bakfd < 0) {
             error(_("Cannot open %s"), bak);
             unlink(bak);
+            free(bak);
             return (-1);
         }
+        free(bak);
         close(r->fd);
         r->fd = r->bakfd;
     }
-    fd = creat(filename, 0664);
-    if (fd < 0) {
-        error(_("Cannot create %s"), filename);
-        unlink(bak);
+    return recwrite(r, filename);
+}
+
+/*
+ * The file saved under another name: the one it was read from stays as
+ * it is (the lines not yet read are read from there), and saving again
+ * makes no backup of it under the new name.
+ */
+int RecSaveAs(REC *r, char *filename)
+{
+    if (recwrite(r, filename) < 0)
         return (-1);
-    }
-    for (i = 0; i < r->len; ++i) {
-        p = RecGet(r, i);
-        if (p->len)
-            write(fd, p->ptr, (unsigned)p->len);
-        write(fd, "\n", 1);
-    }
-    close(fd);
+    r->nobak = 1;
     return (0);
 }
 

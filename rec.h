@@ -39,11 +39,13 @@ typedef struct {
     short tfd;              /* temp file descriptor */
     short len;              /* length of file in lines */
     short broken;           /* there are broken lines */
+    short nobak;            /* saved under another name: no backup */
 } REC;
 
 REC *RecOpen(int fd, int wmode);
 void RecClose(REC *r);
 int RecSave(REC *r, char *filename);
+int RecSaveAs(REC *r, char *filename);
 void RecBreak(REC *r);
 LINE *RecGet(REC *r, int n);
 void RecPut(LINE *p, int newlen);

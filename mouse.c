@@ -199,6 +199,8 @@ int xtermkey(int final, int num, int mod)
             return KEY_CUP;
         case meta('d'):
             return KEY_CDOWN;
+        case cntrl('G'):
+            return KEY_CDEL;
         }
     return k; /* with Shift or Alt: the key itself */
 }
@@ -232,6 +234,8 @@ int xtermseq(const unsigned char *s, int n)
 
     if (n > 0 && s[0] == 033)
         alt = 1, ++s, --n;
+    if (n == 1 && (s[0] == 0177 || s[0] == '\b'))
+        return KEY_ABS; /* Alt-Backspace */
     if (n < 2 || n >= (int)sizeof(buf))
         return -1;
     memcpy(buf, s, n);

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: GonWare Commander 4.0\n"
 "Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/deco/"
 "issues\n"
-"POT-Creation-Date: 2026-11-24 21:21+0100\n"
+"POT-Creation-Date: 2026-11-24 22:37+0100\n"
 "PO-Revision-Date: 2026-11-24 21:00+0100\n"
 "Last-Translator: Mario Fetka\n"
 "Language-Team: none\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid " Error "
 msgstr " Erreur "
 
-#: choice.c:43 cmd.c:880
+#: choice.c:43 cmd.c:890
 msgid " Ok "
 msgstr " OK "
 
@@ -33,380 +33,380 @@ msgstr " Changer de répertoire "
 msgid "Change directory to"
 msgstr "Aller dans"
 
-#: cmd.c:141 cmd.c:1259 com.c:464 dir.c:122 dir.c:160
+#: cmd.c:141 cmd.c:1269 com.c:489 dir.c:122 dir.c:160
 #, c-format
 msgid "Cannot chdir to %s"
 msgstr "Impossible d'aller dans %s"
 
-#: cmd.c:233 cmd.c:242
+#: cmd.c:243 cmd.c:252
 msgid " View "
 msgstr " Voir "
 
-#: cmd.c:233
+#: cmd.c:243
 msgid "Select which viewer to use for F3:"
 msgstr "Visionneuse à utiliser pour F3 :"
 
-#: cmd.c:233 cmd.c:265
+#: cmd.c:243 cmd.c:275
 msgid " Built-in "
 msgstr " Intégrée "
 
-#: cmd.c:234 cmd.c:266
+#: cmd.c:244 cmd.c:276
 msgid " External "
 msgstr " Externe "
 
-#: cmd.c:242
+#: cmd.c:252
 msgid "Viewer to use"
 msgstr "Visionneuse"
 
-#: cmd.c:250
+#: cmd.c:260
 msgid " Shell "
 msgstr " Shell "
 
-#: cmd.c:250
+#: cmd.c:260
 msgid "Select which shell to use:"
 msgstr "Shell à utiliser :"
 
-#: cmd.c:251
+#: cmd.c:261
 msgid " Cshell "
 msgstr " Cshell "
 
-#: cmd.c:265 cmd.c:274 cmd.c:384 edit.c:128 edit.c:335
+#: cmd.c:275 cmd.c:284 cmd.c:394 edit.c:148 edit.c:436
 msgid " Edit "
 msgstr " Éditer "
 
-#: cmd.c:265
+#: cmd.c:275
 msgid "Select which editor to use for F4:"
 msgstr "Éditeur à utiliser pour F4 :"
 
-#: cmd.c:274
+#: cmd.c:284
 msgid "Editor to use"
 msgstr "Éditeur"
 
-#: cmd.c:299 cmd.c:326 rec.c:266
+#: cmd.c:309 cmd.c:336 rec.c:304
 #, c-format
 msgid "Cannot open %s"
 msgstr "Impossible d'ouvrir %s"
 
-#: cmd.c:342
+#: cmd.c:352
 msgid "Cannot edit special files"
 msgstr "Impossible d'éditer les fichiers spéciaux"
 
-#: cmd.c:348 ex.c:834 rec.c:253 rec.c:275
+#: cmd.c:358 ex.c:834 rec.c:254 rec.c:289
 #, c-format
 msgid "Cannot create %s"
 msgstr "Impossible de créer %s"
 
-#: cmd.c:366
+#: cmd.c:376
 #, c-format
 msgid "Cannot open %s for writing"
 msgstr "Impossible d'ouvrir %s en écriture"
 
-#: cmd.c:384
+#: cmd.c:394
 msgid "Enter name of file to edit"
 msgstr "Nom du fichier à éditer"
 
-#: cmd.c:406
+#: cmd.c:416
 msgid " Menu Edit "
 msgstr " Éditer le menu "
 
-#: cmd.c:406
+#: cmd.c:416
 msgid "Select which menu to edit:"
 msgstr "Menu à éditer :"
 
-#: cmd.c:406
+#: cmd.c:416
 msgid " Current menu "
 msgstr " Menu courant "
 
-#: cmd.c:407
+#: cmd.c:417
 msgid " Home menu "
 msgstr " Menu personnel "
 
-#: cmd.c:433
+#: cmd.c:443
 #, c-format
 msgid "Do you want to quit the %s ?"
 msgstr "Voulez-vous quitter le %s ?"
 
-#: cmd.c:435
+#: cmd.c:445
 msgid "Do you want to log out ?"
 msgstr "Voulez-vous vous déconnecter ?"
 
-#: cmd.c:436
+#: cmd.c:446
 msgid " Yes "
 msgstr " Oui "
 
-#: cmd.c:436
+#: cmd.c:446
 msgid " No "
 msgstr " Non "
 
-#: cmd.c:436
+#: cmd.c:446
 msgid " Exec shell "
 msgstr " Lancer le shell "
 
-#: cmd.c:516
+#: cmd.c:526
 #, c-format
 msgid "Copy %d file to"
 msgid_plural "Copy %d files to"
 msgstr[0] "Copier %d fichier vers"
 msgstr[1] "Copier %d fichiers vers"
 
-#: cmd.c:517 cmd.c:528 cmd.c:554 cmd.c:559 cmd.c:570 cmd.c:576
+#: cmd.c:527 cmd.c:538 cmd.c:564 cmd.c:569 cmd.c:580 cmd.c:586
 msgid " Copy "
 msgstr " Copier "
 
-#: cmd.c:528 cmd.c:576 cmd.c:615 cmd.c:647 cmd.c:687 cmd.c:719 cmd.c:761
-#: cmd.c:798 cmd.c:819
+#: cmd.c:538 cmd.c:586 cmd.c:625 cmd.c:657 cmd.c:697 cmd.c:729 cmd.c:771
+#: cmd.c:808 cmd.c:829 edit.c:378
 msgid "File exists"
 msgstr "Le fichier existe"
 
-#: cmd.c:529 cmd.c:577 cmd.c:616 cmd.c:648 cmd.c:688 cmd.c:720 cmd.c:762
-#: cmd.c:799 cmd.c:820
+#: cmd.c:539 cmd.c:587 cmd.c:626 cmd.c:658 cmd.c:698 cmd.c:730 cmd.c:772
+#: cmd.c:809 cmd.c:830 edit.c:378
 msgid " Overwrite "
 msgstr " Écraser "
 
-#: cmd.c:529 cmd.c:762
+#: cmd.c:539 cmd.c:772
 msgid " All "
 msgstr " Tous "
 
-#: cmd.c:529 cmd.c:577 cmd.c:616 cmd.c:648 cmd.c:688 cmd.c:720 cmd.c:762
-#: cmd.c:799 cmd.c:820 cmd.c:874 cmd.c:880 cmd.c:889 cmd.c:899
+#: cmd.c:539 cmd.c:587 cmd.c:626 cmd.c:658 cmd.c:698 cmd.c:730 cmd.c:772
+#: cmd.c:809 cmd.c:830 cmd.c:884 cmd.c:890 cmd.c:899 cmd.c:909 edit.c:379
 msgid " Cancel "
 msgstr " Annuler "
 
-#: cmd.c:544 cmd.c:580 cmd.c:619 cmd.c:651 cmd.c:691 cmd.c:723 cmd.c:772
-#: cmd.c:823
+#: cmd.c:554 cmd.c:590 cmd.c:629 cmd.c:661 cmd.c:701 cmd.c:733 cmd.c:782
+#: cmd.c:833
 #, c-format
 msgid "%s is a directory"
 msgstr "%s est un répertoire"
 
-#: cmd.c:554
+#: cmd.c:564
 #, c-format
 msgid "Copying %d file to %s ..."
 msgid_plural "Copying %d files to %s ..."
 msgstr[0] "Copie de %d fichier vers %s ..."
 msgstr[1] "Copie de %d fichiers vers %s ..."
 
-#: cmd.c:559 cmd.c:630 cmd.c:702 cmd.c:782
+#: cmd.c:569 cmd.c:640 cmd.c:712 cmd.c:792
 msgid "Done"
 msgstr "Terminé"
 
-#: cmd.c:561
+#: cmd.c:571
 #, c-format
 msgid "Error while copying %d file to %s"
 msgid_plural "Error while copying %d files to %s"
 msgstr[0] "Erreur en copiant %d fichier vers %s"
 msgstr[1] "Erreur en copiant %d fichiers vers %s"
 
-#: cmd.c:584
+#: cmd.c:594
 #, c-format
 msgid "Cannot copy %s to %s"
 msgstr "Impossible de copier %s vers %s"
 
-#: cmd.c:605
+#: cmd.c:615
 #, c-format
 msgid "Link %d file to"
 msgid_plural "Link %d files to"
 msgstr[0] "Lier %d fichier vers"
 msgstr[1] "Lier %d fichiers vers"
 
-#: cmd.c:606 cmd.c:615 cmd.c:625 cmd.c:630 cmd.c:641 cmd.c:647
+#: cmd.c:616 cmd.c:625 cmd.c:635 cmd.c:640 cmd.c:651 cmd.c:657
 msgid " Link "
 msgstr " Lien "
 
-#: cmd.c:625 cmd.c:697
+#: cmd.c:635 cmd.c:707
 #, c-format
 msgid "Linking %d file to %s ..."
 msgid_plural "Linking %d files to %s ..."
 msgstr[0] "Liaison de %d fichier vers %s ..."
 msgstr[1] "Liaison de %d fichiers vers %s ..."
 
-#: cmd.c:632 cmd.c:704
+#: cmd.c:642 cmd.c:714
 #, c-format
 msgid "Error while linking %d file to %s"
 msgid_plural "Error while linking %d files to %s"
 msgstr[0] "Erreur en liant %d fichier vers %s"
 msgstr[1] "Erreur en liant %d fichiers vers %s"
 
-#: cmd.c:655
+#: cmd.c:665
 #, c-format
 msgid "Cannot link %s to %s"
 msgstr "Impossible de lier %s vers %s"
 
-#: cmd.c:677
+#: cmd.c:687
 #, c-format
 msgid "Symlink %d file to"
 msgid_plural "Symlink %d files to"
 msgstr[0] "Lien symbolique de %d fichier vers"
 msgstr[1] "Liens symboliques de %d fichiers vers"
 
-#: cmd.c:678 cmd.c:687 cmd.c:697 cmd.c:702 cmd.c:713 cmd.c:719
+#: cmd.c:688 cmd.c:697 cmd.c:707 cmd.c:712 cmd.c:723 cmd.c:729
 msgid " Symlink "
 msgstr " Lien symbolique "
 
-#: cmd.c:727
+#: cmd.c:737
 #, c-format
 msgid "Cannot symlink %s to %s"
 msgstr "Impossible de créer un lien symbolique de %s vers %s"
 
-#: cmd.c:749
+#: cmd.c:759
 #, c-format
 msgid "Rename or move %d file to"
 msgid_plural "Rename or move %d files to"
 msgstr[0] "Renommer ou déplacer %d fichier vers"
 msgstr[1] "Renommer ou déplacer %d fichiers vers"
 
-#: cmd.c:750 cmd.c:761 cmd.c:792 cmd.c:798 cmd.c:813 cmd.c:819
+#: cmd.c:760 cmd.c:771 cmd.c:802 cmd.c:808 cmd.c:823 cmd.c:829
 msgid " Rename "
 msgstr " Renommer "
 
-#: cmd.c:777 cmd.c:782
+#: cmd.c:787 cmd.c:792
 msgid " Move "
 msgstr " Déplacer "
 
-#: cmd.c:777
+#: cmd.c:787
 #, c-format
 msgid "Moving %d file to %s ..."
 msgid_plural "Moving %d files to %s ..."
 msgstr[0] "Déplacement de %d fichier vers %s ..."
 msgstr[1] "Déplacement de %d fichiers vers %s ..."
 
-#: cmd.c:784
+#: cmd.c:794
 #, c-format
 msgid "Error while moving %d file to %s"
 msgid_plural "Error while moving %d files to %s"
 msgstr[0] "Erreur en déplaçant %d fichier vers %s"
 msgstr[1] "Erreur en déplaçant %d fichiers vers %s"
 
-#: cmd.c:802
+#: cmd.c:812
 #, c-format
 msgid "Directory %s exists"
 msgstr "Le répertoire %s existe"
 
-#: cmd.c:806 cmd.c:827
+#: cmd.c:816 cmd.c:837
 #, c-format
 msgid "Cannot move %s to %s"
 msgstr "Impossible de déplacer %s vers %s"
 
-#: cmd.c:841
+#: cmd.c:851
 msgid " Make directory "
 msgstr " Créer un répertoire "
 
-#: cmd.c:841
+#: cmd.c:851
 msgid "Create the directory"
 msgstr "Créer le répertoire"
 
-#: cmd.c:846
+#: cmd.c:856
 #, c-format
 msgid "File %s exists"
 msgstr "Le fichier %s existe"
 
-#: cmd.c:849
+#: cmd.c:859
 #, c-format
 msgid "Directory %s already exists"
 msgstr "Le répertoire %s existe déjà"
 
-#: cmd.c:853
+#: cmd.c:863
 #, c-format
 msgid "Cannot create directory %s"
 msgstr "Impossible de créer le répertoire %s"
 
-#: cmd.c:873
+#: cmd.c:883
 #, c-format
 msgid "You have selected %d file."
 msgid_plural "You have selected %d files."
 msgstr[0] "Vous avez sélectionné %d fichier."
 msgstr[1] "Vous avez sélectionné %d fichiers."
 
-#: cmd.c:874 cmd.c:880 cmd.c:888 cmd.c:889 cmd.c:898 help.c:54 help.c:129
+#: cmd.c:884 cmd.c:890 cmd.c:898 cmd.c:899 cmd.c:908 help.c:54 help.c:130
 msgid " Delete "
 msgstr " Supprimer "
 
-#: cmd.c:877
+#: cmd.c:887
 #, c-format
 msgid "You are DELETING %d selected file from"
 msgid_plural "You are DELETING %d selected files from"
 msgstr[0] "Vous SUPPRIMEZ %d fichier sélectionné de"
 msgstr[1] "Vous SUPPRIMEZ %d fichiers sélectionnés de"
 
-#: cmd.c:884 cmd.c:902
+#: cmd.c:894 cmd.c:912
 #, c-format
 msgid "Cannot delete %s"
 msgstr "Impossible de supprimer %s"
 
-#: cmd.c:888
+#: cmd.c:898
 msgid "Do you wish to delete directory"
 msgstr "Voulez-vous supprimer le répertoire"
 
-#: cmd.c:892
+#: cmd.c:902
 #, c-format
 msgid "Cannot delete directory %s"
 msgstr "Impossible de supprimer le répertoire %s"
 
-#: cmd.c:898
+#: cmd.c:908
 msgid "Do you wish to delete"
 msgstr "Voulez-vous supprimer"
 
-#: cmd.c:916
+#: cmd.c:926
 msgid " Find file "
 msgstr " Chercher un fichier "
 
-#: cmd.c:916
+#: cmd.c:926
 msgid "Enter file name"
 msgstr "Nom du fichier"
 
-#: cmd.c:937
+#: cmd.c:947
 msgid "File not found"
 msgstr "Fichier introuvable"
 
-#: cmd.c:948
+#: cmd.c:958
 msgid " Select "
 msgstr " Sélectionner "
 
-#: cmd.c:948
+#: cmd.c:958
 msgid "Select the files"
 msgstr "Sélectionner les fichiers"
 
-#: cmd.c:965
+#: cmd.c:975
 msgid " Unselect "
 msgstr " Désélectionner "
 
-#: cmd.c:965
+#: cmd.c:975
 msgid "Unselect the files"
 msgstr "Désélectionner les fichiers"
 
-#: cmd.c:979
+#: cmd.c:989
 msgid " Set pattern "
 msgstr " Définir le filtre "
 
-#: cmd.c:979
+#: cmd.c:989
 msgid "Set pattern for files"
 msgstr "Filtre des fichiers"
 
-#: cmd.c:1140
+#: cmd.c:1150
 #, c-format
 msgid "%s: Too many arguments"
 msgstr "%s : trop d'arguments"
 
-#: cmd.c:1255
+#: cmd.c:1265
 msgid " Drive "
 msgstr " Lecteur "
 
-#: com.c:569
+#: com.c:594
 msgid "No background jobs"
 msgstr "Aucune tâche de fond"
 
-#: com.c:586
+#: com.c:611
 msgid " Jobs "
 msgstr " Tâches "
 
-#: com.c:691
+#: com.c:716
 msgid "History is empty"
 msgstr "L'historique est vide"
 
-#: com.c:708
+#: com.c:733
 msgid " History "
 msgstr " Historique "
 
-#: com.c:710
+#: com.c:735
 msgid " ^B - Jobs "
 msgstr " ^B - Tâches "
 
@@ -423,7 +423,7 @@ msgstr "Le Commander ne fonctionne pas sur ce système -- au revoir !"
 msgid "Cannot read '.' -- good bye !"
 msgstr "Impossible de lire '.' -- au revoir !"
 
-#: draw.c:212 draw.c:216 edit.c:138 hexview.c:39 view.c:64
+#: draw.c:212 draw.c:216 edit.c:158 hexview.c:39 view.c:64
 msgctxt "keybar"
 msgid "Help"
 msgstr "Aide"
@@ -468,7 +468,7 @@ msgctxt "keybar"
 msgid "Menu"
 msgstr "Barre"
 
-#: draw.c:215 draw.c:217 edit.c:142 hexview.c:48 menu.c:106 view.c:68
+#: draw.c:215 draw.c:217 edit.c:162 hexview.c:48 menu.c:107 view.c:68
 msgctxt "keybar"
 msgid "Quit"
 msgstr "Quit"
@@ -528,98 +528,106 @@ msgstr "%s dans %s correspondants"
 msgid "%s in %s selected"
 msgstr "%s dans %s sélectionnés"
 
-#: edit.c:58 hexview.c:164 view.c:214
+#: edit.c:75 hexview.c:164 view.c:214
 msgid "File "
 msgstr "Fichier "
 
-#: edit.c:60
+#: edit.c:77
 #, c-format
 msgid "  Lines %d"
 msgstr "  Lignes %d"
 
-#: edit.c:63
+#: edit.c:80
 #, c-format
 msgid "Char U+%04X"
 msgstr "Car U+%04X"
 
-#: edit.c:64 view.c:218
+#: edit.c:81 view.c:218
 #, c-format
 msgid "Line %-5d Col %d"
 msgstr "Ligne %-5d Col %d"
 
-#: edit.c:128
+#: edit.c:148
 msgid "File contains too long lines."
 msgstr "Le fichier contient des lignes trop longues."
 
-#: edit.c:129
+#: edit.c:149
 msgid " Break lines "
 msgstr " Couper les lignes "
 
-#: edit.c:129
+#: edit.c:149
 msgid " Cancel editing "
 msgstr " Annuler l'édition "
 
-#: edit.c:138
+#: edit.c:158
 msgctxt "keybar"
 msgid "Save"
 msgstr "Sauver"
 
-#: edit.c:139 hexview.c:41 view.c:65
+#: edit.c:159 hexview.c:41 view.c:65
 msgctxt "keybar"
 msgid "Raw"
 msgstr "Brut"
 
-#: edit.c:140 hexview.c:43 view.c:66
+#: edit.c:160 hexview.c:43 view.c:66
 msgctxt "keybar"
 msgid "Top"
 msgstr "Début"
 
-#: edit.c:140 hexview.c:44 view.c:66
+#: edit.c:160 hexview.c:44 view.c:66
 msgctxt "keybar"
 msgid "Bottom"
 msgstr "Fin"
 
-#: edit.c:141 hexview.c:45 view.c:67
+#: edit.c:161 hexview.c:45 view.c:67
 msgctxt "keybar"
 msgid "Search"
 msgstr "Cherch"
 
-#: edit.c:141
+#: edit.c:161
 msgctxt "keybar"
 msgid "Home"
 msgstr "Début"
 
-#: edit.c:142 view.c:68
+#: edit.c:162 view.c:68
 msgctxt "keybar"
 msgid "Spaces"
 msgstr "Espace"
 
-#: edit.c:294 edit.c:336
+#: edit.c:367 edit.c:382 edit.c:437
 msgid " Save "
 msgstr " Enregistrer "
 
-#: edit.c:294
+#: edit.c:367 edit.c:382
 #, c-format
 msgid "Saving file '%s'..."
 msgstr "Enregistrement de '%s'..."
 
-#: edit.c:335
+#: edit.c:373 edit.c:378
+msgid " Save as "
+msgstr " Enregistrer sous "
+
+#: edit.c:373
+msgid "Save the file as"
+msgstr "Enregistrer le fichier sous"
+
+#: edit.c:436
 msgid "You've made changes since the last save."
 msgstr "Vous avez fait des modifications depuis le dernier enregistrement."
 
-#: edit.c:336
+#: edit.c:437
 msgid " Don't save "
 msgstr " Ne pas enregistrer "
 
-#: edit.c:336
+#: edit.c:437
 msgid " Continue editing "
 msgstr " Continuer l'édition "
 
-#: edit.c:351 help.c:127 help.c:167 help.c:202 hexview.c:130 view.c:110
+#: edit.c:455 help.c:127 help.c:173 help.c:208 hexview.c:130 view.c:110
 msgid " Search "
 msgstr " Chercher "
 
-#: edit.c:351 hexview.c:130 view.c:110
+#: edit.c:455 hexview.c:130 view.c:110
 msgid "Search for the string"
 msgstr "Chercher le texte"
 
@@ -652,11 +660,11 @@ msgstr "Enregistrement de la configuration dans %s ..."
 msgid " Cursor Arrows "
 msgstr " Flèches "
 
-#: help.c:39 mh.c:142
+#: help.c:39 mh.c:138
 msgid "Left"
 msgstr "Gauche"
 
-#: help.c:40 mh.c:146
+#: help.c:40 mh.c:142
 msgid "Right"
 msgstr "Droite"
 
@@ -669,11 +677,11 @@ msgid "Down"
 msgstr "Bas"
 
 #
-#: help.c:43 help.c:113 help.c:158 help.c:193
+#: help.c:43 help.c:113 help.c:164 help.c:199
 msgid " Cursor Movement "
 msgstr " Déplacement "
 
-#: help.c:44 help.c:55 help.c:130
+#: help.c:44 help.c:55 help.c:131
 msgid "Char left"
 msgstr "Car. à gauche"
 
@@ -686,7 +694,7 @@ msgstr "Car. à droite"
 msgid " Panels "
 msgstr " Panneaux "
 
-#: help.c:47 mh.c:123
+#: help.c:47 mh.c:119
 msgid "Switch panels"
 msgstr "Changer de panneau"
 
@@ -694,7 +702,7 @@ msgstr "Changer de panneau"
 msgid "Panels on/off"
 msgstr "Panneaux on/off"
 
-#: help.c:49 mh.c:124
+#: help.c:49 mh.c:120
 msgid "Swap panels"
 msgstr "Échanger les panneaux"
 
@@ -702,11 +710,11 @@ msgstr "Échanger les panneaux"
 msgid "Toggle status"
 msgstr "Panneau d'état"
 
-#: help.c:51 mh.c:125
+#: help.c:51 mh.c:121
 msgid "Full screen"
 msgstr "Plein écran"
 
-#: help.c:52 mh.c:126
+#: help.c:52 mh.c:122
 msgid "Double width"
 msgstr "Double largeur"
 
@@ -715,23 +723,23 @@ msgid "The \"+\" and \"-\" keys select and unselect groups of files."
 msgstr ""
 "Les touches \"+\" et \"-\" sélectionnent et désélectionnent des groupes."
 
-#: help.c:56 help.c:131
+#: help.c:56 help.c:132
 msgid "Under cursor"
 msgstr "Sous le curseur"
 
-#: help.c:57 help.c:132
+#: help.c:57 help.c:135
 msgid "Line"
 msgstr "Ligne"
 
-#: help.c:58 help.c:134 help.c:169 help.c:204
+#: help.c:58 help.c:138 help.c:175 help.c:210
 msgid " Other "
 msgstr " Autres "
 
-#: help.c:59 mh.c:109
+#: help.c:59 mh.c:105
 msgid "History"
 msgstr "Historique"
 
-#: help.c:60 mh.c:111
+#: help.c:60 mh.c:107
 msgid "Home directory"
 msgstr "Répertoire personnel"
 
@@ -783,11 +791,11 @@ msgstr "Car. à gauche"
 msgid "Char Right"
 msgstr "Car. à droite"
 
-#: help.c:116 help.c:161 help.c:196
+#: help.c:116 help.c:167 help.c:202
 msgid "Line Up"
 msgstr "Ligne haut"
 
-#: help.c:117 help.c:162 help.c:197
+#: help.c:117 help.c:168 help.c:203
 msgid "Line Down"
 msgstr "Ligne bas"
 
@@ -801,11 +809,11 @@ msgstr "Mot à gauche"
 msgid "Word Right"
 msgstr "Mot à droite"
 
-#: help.c:120 help.c:163 help.c:198
+#: help.c:120 help.c:169 help.c:204
 msgid "Prev Page"
 msgstr "Page préc."
 
-#: help.c:121 help.c:164 help.c:199
+#: help.c:121 help.c:170 help.c:205
 msgid "Next Page"
 msgstr "Page suiv."
 
@@ -818,12 +826,12 @@ msgid "End of line"
 msgstr "Fin de ligne"
 
 #
-#: help.c:124 help.c:165 help.c:200
+#: help.c:124 help.c:171 help.c:206
 msgid "Top of file"
 msgstr "Début du fichier"
 
 #
-#: help.c:125 help.c:166 help.c:201
+#: help.c:125 help.c:172 help.c:207
 msgid "End of file"
 msgstr "Fin du fichier"
 
@@ -832,80 +840,107 @@ msgid "Top of screen"
 msgstr "Haut d'écran"
 
 #
-#: help.c:128 help.c:168 help.c:203
+#: help.c:128 help.c:174 help.c:209
 msgid "Search string"
 msgstr "Chercher"
 
 #
+#: help.c:129
+msgid "Search again"
+msgstr "Chercher encore"
+
+#
 #: help.c:133
+msgid "Word left"
+msgstr "Mot à gauche"
+
+#
+#: help.c:134
+msgid "Word right"
+msgstr "Mot à droite"
+
+#
+#: help.c:136
 msgid "To end of line"
 msgstr "Jusqu'à la fin"
 
-#: help.c:135 help.c:170 help.c:205 mh.c:113
+#: help.c:137
+msgid "Undelete"
+msgstr "Restaurer"
+
+#: help.c:139 help.c:176 help.c:211 mh.c:109
 msgid "Redraw screen"
 msgstr "Redessiner l'écran"
 
-#: help.c:136
+#: help.c:140
 msgid "Quote next char"
 msgstr "Car. littéral"
 
 #
-#: help.c:137
+#: help.c:141
 msgid "Save file"
 msgstr "Enregistrer"
 
-#: help.c:138 help.c:171 help.c:206
+#: help.c:142
+msgid "Save as"
+msgstr "Enregistrer sous"
+
+#: help.c:143
+msgid "Save and exit"
+msgstr "Enreg. et quitter"
+
+#: help.c:144 help.c:177 help.c:212
 msgid "Exit"
 msgstr "Quitter"
 
-#: help.c:139 help.c:172 help.c:207
-msgid " Modes "
-msgstr " Modes "
-
-#: help.c:140 help.c:173 help.c:208
+#: help.c:145 help.c:179 help.c:214
 msgid "Raw mode"
 msgstr "Mode brut"
 
-#: help.c:141 help.c:174 help.c:209
+#: help.c:146 help.c:180 help.c:215
 msgid "Visible spaces"
 msgstr "Espaces visibles"
 
 #
-#: help.c:159 help.c:194
+#: help.c:165 help.c:200
 msgid "Page Left"
 msgstr "Page à gauche"
 
 #
-#: help.c:160 help.c:195
+#: help.c:166 help.c:201
 msgid "Page Right"
 msgstr "Page à droite"
 
-#: help.c:175
+#: help.c:178 help.c:213
+msgid " Modes "
+msgstr " Modes "
+
+#: help.c:181
 msgid "Lines longer than 1024 bytes"
 msgstr "Les lignes de plus de 1024 octets"
 
-#: help.c:176
+#: help.c:182
 msgid "are broken and marked with \"\\\""
 msgstr "sont coupées et marquées de \"\\\""
 
-#: help.c:177 help.c:210
+#: help.c:183 help.c:216
 msgid "Spaces are displayed as \".\""
 msgstr "Les espaces s'affichent en \".\""
 
-#: help.c:178 help.c:211
+#: help.c:184 help.c:217
 msgid "and tabs as \"_\""
 msgstr "et les tabulations en \"_\""
 
-#: help.c:212
+#: help.c:218
 msgid "For hexadecimal search"
 msgstr "Pour chercher en hexadécimal"
 
-#: help.c:213
+#: help.c:219
 msgid "type char codes as \"\\xx\""
 msgstr "tapez les codes en \"\\xx\""
 
 #
-#: help.c:274
+#: help.c:280
 msgid " Help "
 msgstr " Aide "
 
@@ -928,240 +963,245 @@ msgstr "Octet %ld"
 msgid "String not found"
 msgstr "Texte introuvable"
 
-#: main.c:678
+#: main.c:732
 msgid " Language "
 msgstr " Langue "
 
-#: mh.c:31 mh.c:56
+#: mh.c:27 mh.c:52
 msgid "Brief"
 msgstr "Bref"
 
-#: mh.c:32 mh.c:57
+#: mh.c:28 mh.c:53
 msgid "Long"
 msgstr "Long"
 
-#: mh.c:33 mh.c:58
+#: mh.c:29 mh.c:54
 msgid "Wide"
 msgstr "Large"
 
-#: mh.c:34 mh.c:59
+#: mh.c:30 mh.c:55
 msgid "Full"
 msgstr "Complet"
 
-#: mh.c:35 mh.c:60
+#: mh.c:31 mh.c:56
 msgid "Info"
 msgstr "Info"
 
-#: mh.c:36 mh.c:61
+#: mh.c:32 mh.c:57
 msgid "Status"
 msgstr "État"
 
-#: mh.c:37 mh.c:62
+#: mh.c:33 mh.c:58
 msgid "Align extensions"
 msgstr "Aligner les extensions"
 
-#: mh.c:39 mh.c:64
+#: mh.c:35 mh.c:60
 msgid "Sort by name"
 msgstr "Trier par nom"
 
-#: mh.c:40 mh.c:65
+#: mh.c:36 mh.c:61
 msgid "Extension"
 msgstr "Par extension"
 
-#: mh.c:41 mh.c:66
+#: mh.c:37 mh.c:62
 msgid "Time"
 msgstr "Par date"
 
-#: mh.c:42 mh.c:67
+#: mh.c:38 mh.c:63
 msgid "Size"
 msgstr "Par taille"
 
-#: mh.c:43 mh.c:68
+#: mh.c:39 mh.c:64
 msgid "Unsorted"
 msgstr "Non trié"
 
-#: mh.c:44 mh.c:69
+#: mh.c:40 mh.c:65
 msgid "Reverse"
 msgstr "Inversé"
 
-#: mh.c:45 mh.c:70
+#: mh.c:41 mh.c:66
 msgid "Sort by type"
 msgstr "Par type"
 
-#: mh.c:47 mh.c:72
+#: mh.c:43 mh.c:68
 msgid "Re-read"
 msgstr "Relire"
 
-#: mh.c:48 mh.c:73
+#: mh.c:44 mh.c:69
 msgid "Pattern"
 msgstr "Filtre"
 
-#: mh.c:49 mh.c:74
+#: mh.c:45 mh.c:70
 msgid "Drive..."
 msgstr "Lecteur..."
 
-#: mh.c:81
+#: mh.c:77
 msgid "Help"
 msgstr "Aide"
 
-#: mh.c:82
+#: mh.c:78
 msgid "User menu"
 msgstr "Menu utilisateur"
 
-#: mh.c:83
+#: mh.c:79
 msgid "View"
 msgstr "Voir"
 
-#: mh.c:84
+#: mh.c:80
 msgid "View info"
 msgstr "Voir l'info"
 
-#: mh.c:85
+#: mh.c:81
 msgid "Edit"
 msgstr "Éditer"
 
-#: mh.c:86
+#: mh.c:82
 msgid "Edit info"
 msgstr "Éditer l'info"
 
-#: mh.c:87
+#: mh.c:83
 msgid "Copy"
 msgstr "Copier"
 
-#: mh.c:88
+#: mh.c:84
 msgid "Link"
 msgstr "Lien"
 
-#: mh.c:90
+#: mh.c:86
 msgid "Symlink"
 msgstr "Lien symbolique"
 
-#: mh.c:92
+#: mh.c:88
 msgid "Rename/move"
 msgstr "Renommer/déplacer"
 
-#: mh.c:93
+#: mh.c:89
 msgid "Make directory"
 msgstr "Créer un répertoire"
 
-#: mh.c:94
+#: mh.c:90
 msgid "Delete"
 msgstr "Supprimer"
 
-#: mh.c:96
+#: mh.c:92
 msgid "Select group"
 msgstr "Sélectionner un groupe"
 
-#: mh.c:97
+#: mh.c:93
 msgid "Unselect group"
 msgstr "Désélectionner un groupe"
 
-#: mh.c:99
+#: mh.c:95
 msgid "Quit"
 msgstr "Quitter"
 
-#: mh.c:106
+#: mh.c:102
 msgid "Run subshell"
 msgstr "Lancer un shell"
 
-#: mh.c:107
+#: mh.c:103
 msgid "Compare directories"
 msgstr "Comparer les répertoires"
 
-#: mh.c:108
+#: mh.c:104
 msgid "Find file"
 msgstr "Chercher un fichier"
 
-#: mh.c:112
+#: mh.c:108
 msgid "Root directory"
 msgstr "Répertoire racine"
 
-#: mh.c:115
+#: mh.c:111
 msgid "Menu file edit"
 msgstr "Éditer le fichier de menu"
 
-#: mh.c:116
+#: mh.c:112
 msgid "Extensions file edit"
 msgstr "Éditer le fichier des extensions"
 
-#: mh.c:127
+#: mh.c:123
 msgid "Command line mode"
 msgstr "Mode ligne de commande"
 
-#: mh.c:128
+#: mh.c:124
 msgid "Show hidden files"
 msgstr "Montrer les fichiers cachés"
 
-#: mh.c:130
+#: mh.c:126
 msgid "Language..."
 msgstr "Langue..."
 
-#: mh.c:131
+#: mh.c:127
 msgid "Viewer..."
 msgstr "Visionneuse..."
 
-#: mh.c:132
+#: mh.c:128
 msgid "Editor..."
 msgstr "Éditeur..."
 
-#: mh.c:133
+#: mh.c:129
 msgid "Shell..."
 msgstr "Shell..."
 
-#: mh.c:135
+#: mh.c:131
 msgid "Save setup"
 msgstr "Enregistrer la configuration"
 
-#: mh.c:143
+#: mh.c:139
 msgid "Files"
 msgstr "Fichiers"
 
-#: mh.c:144
+#: mh.c:140
 msgid "Commands"
 msgstr "Commandes"
 
-#: mh.c:145
+#: mh.c:141
 msgid "Options"
 msgstr "Options"
 
-#: rec.c:72
+#: rec.c:74
 msgid "Cannot read file"
 msgstr "Impossible de lire le fichier"
 
-#: rec.c:81
+#: rec.c:83
 msgid "Cannot write file"
 msgstr "Impossible d'écrire le fichier"
 
-#: rec.c:114
+#: rec.c:116
 msgid "No temp space"
 msgstr "Pas d'espace temporaire"
 
-#: rec.c:130
+#: rec.c:132
 msgid "Cannot lseek on writing temp file"
 msgstr "lseek impossible en écrivant le fichier temporaire"
 
-#: rec.c:132
+#: rec.c:134
 msgid "Cannot write temporary file"
 msgstr "Impossible d'écrire le fichier temporaire"
 
-#: rec.c:171
+#: rec.c:174
 msgid "Cannot open temporary file"
 msgstr "Impossible d'ouvrir le fichier temporaire"
 
-#: rec.c:177
+#: rec.c:180
 msgid "Cannot reopen temporary file"
 msgstr "Impossible de rouvrir le fichier temporaire"
 
-#: rec.c:216
+#: rec.c:219
 msgid "file too long"
 msgstr "fichier trop long"
 
-#: rec.c:312
+#: rec.c:267
+#, c-format
+msgid "Cannot write %s"
+msgstr "Impossible d'écrire %s"
+
+#: rec.c:352
 #, c-format
 msgid "Cannot lseek on reading fd=%d, seek=%ld"
 msgstr "lseek impossible en lecture, fd=%d, seek=%ld"
 
-#: rec.c:316
+#: rec.c:356
 msgid "Cannot read line"
 msgstr "Impossible de lire la ligne"
 

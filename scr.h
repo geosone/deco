@@ -15,6 +15,8 @@
 #define KEY_CPGDN   01105
 #define KEY_CUP     01106
 #define KEY_CDOWN   01107
+#define KEY_CDEL    01110     /* Ctrl-Del */
+#define KEY_ABS     01111     /* Alt-Backspace */
 #define MOUSEREPORT meta('@') /* the key table: ESC [ <, a mouse report follows */
 #endif
 
