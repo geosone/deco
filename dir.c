@@ -400,7 +400,7 @@ int exist(char *name)
     }
 }
 
-long modtime(char *name)
+time_t modtime(char *name)
 {
     struct stat st;
 
