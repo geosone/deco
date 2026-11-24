@@ -287,6 +287,12 @@ int VInit()
 
     CapGet(outtab);
 
+    /* a terminal in UTF-8 (the locale says so): Unicode box drawing */
+    if (!((p = EnvGet("LC_ALL")) && *p) && !((p = EnvGet("LC_CTYPE")) && *p))
+        p = EnvGet("LANG");
+    VUnicode =
+        p && (strstr(p, "UTF-8") || strstr(p, "utf8") || strstr(p, "UTF8") || strstr(p, "utf-8"));
+
     p = EnvGet("LINES");
     if (p && *p)
         LINES = strtol(p, 0, 0);
@@ -1586,8 +1592,98 @@ void VCorner(int r, int c, int n)
     pokechr(r, c, n | VScreen.flgs);
 }
 
+/*
+ * Lines of Unicode box drawing, single or double (LINE_SINGLE,
+ * LINE_DOUBLE), when the screen speaks UTF-8 (VUnicode); else the line
+ * drawing of the terminal, single only.
+ */
+int VUnicode;
+
+/* the box drawing character with arms up, down, left, right, each none,
+ * single or double: [u * 27 + d * 9 + l * 3 + r], 0 where Unicode has
+ * none (an axis of two kinds) */
+static const unsigned short boxchars[81] = {
+    0x0000, 0x2576, 0x0000, 0x2574, 0x2500, 0x0000, 0x0000, 0x0000, 0x2550, 0x2577, 0x250c, 0x2552,
+    0x2510, 0x252c, 0x0000, 0x2555, 0x0000, 0x2564, 0x0000, 0x2553, 0x2554, 0x2556, 0x2565, 0x0000,
+    0x2557, 0x0000, 0x2566, 0x2575, 0x2514, 0x2558, 0x2518, 0x2534, 0x0000, 0x255b, 0x0000, 0x2567,
+    0x2502, 0x251c, 0x255e, 0x2524, 0x253c, 0x0000, 0x2561, 0x0000, 0x256a, 0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x2559, 0x255a, 0x255c, 0x2568, 0x0000,
+    0x255d, 0x0000, 0x2569, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x2551, 0x255f, 0x2560, 0x2562, 0x256b, 0x0000, 0x2563, 0x0000, 0x256c,
+};
+
+static int boxchar(int u, int d, int l, int r)
+{
+    int ch = boxchars[u * 27 + d * 9 + l * 3 + r];
+
+    if (!ch) { /* an axis of two kinds: the stronger one for both arms */
+        if (l && r)
+            l = r = l > r ? l : r;
+        if (u && d)
+            u = d = u > d ? u : d;
+        ch = boxchars[u * 27 + d * 9 + l * 3 + r];
+    }
+    return ch ? ch : '+';
+}
+
+/* the terminal's own line drawing for a joint: VCorner's numbers, by
+ * which arms there are (as the keypad: 1 lower left ... 9 upper right) */
+static int acsjoint(int u, int d, int l, int r)
+{
+    static const signed char corner[16] = {
+        /* u d l r as bits 8 4 2 1 */
+        -1, -1, -1, -1, -1, 1, 3, 2, -1, 7, 9, 8, -1, 4, 6, 5,
+    };
+    int n = corner[(u ? 8 : 0) | (d ? 4 : 0) | (l ? 2 : 0) | (r ? 1 : 0)];
+
+    if (n < 0) /* a line end or a straight line */
+        return (u || d) ? (linedraw[1] & CHARMASK) | GRAPH : (linedraw[0] & CHARMASK) | GRAPH;
+    {
+        static const short map[9] = { 8, 9, 10, 5, 6, 7, 2, 3, 4 };
+
+        return (linedraw[map[n - 1]] & CHARMASK) | GRAPH;
+    }
+}
+
+/* a joint of lines at r, c: the arms up, down, left, right */
+void VJoint(int r, int c, int u, int d, int l, int rt)
+{
+    pokechr(r, c, (VUnicode ? boxchar(u, d, l, rt) : acsjoint(u, d, l, rt)) | VScreen.flgs);
+}
+
+/* a line of n cells from r, c: across (vert 0) or down (vert 1) */
+void VLine(int r, int c, int n, int vert, int kind)
+{
+    int sym = VUnicode ? (vert ? boxchar(kind, kind, 0, 0) : boxchar(0, 0, kind, kind))
+                       : (linedraw[vert] & CHARMASK) | GRAPH;
+
+    sym |= VScreen.flgs;
+    while (--n >= 0)
+        if (vert)
+            pokechr(r++, c, sym);
+        else
+            pokechr(r, c++, sym);
+}
+
+/* a box of nr x nc cells, its frame single or double */
+void VFrame(int r, int c, int nr, int nc, int kind)
+{
+    VLine(r, c + 1, nc - 2, 0, kind);
+    VLine(r + nr - 1, c + 1, nc - 2, 0, kind);
+    VLine(r + 1, c, nr - 2, 1, kind);
+    VLine(r + 1, c + nc - 1, nr - 2, 1, kind);
+    VJoint(r, c, 0, kind, 0, kind);
+    VJoint(r, c + nc - 1, 0, kind, kind, 0);
+    VJoint(r + nr - 1, c, kind, 0, 0, kind);
+    VJoint(r + nr - 1, c + nc - 1, kind, 0, kind, 0);
+}
+
 void VDrawBox(int r, int c, int nr, int nc)
 {
+    if (VUnicode) { /* dialogs, menus and lists: double, as VC */
+        VFrame(r, c, nr, nc, LINE_DOUBLE);
+        return;
+    }
     VHorLine(r, c + 1, nc - 2);
     VHorLine(r + nr - 1, c + 1, nc - 2);
     VVertLine(c, r + 1, nr - 2);
@@ -1788,8 +1884,10 @@ int VInit()
     newtGetScreenSize(&COLS, &LINES);
     if (LINES <= 6 || COLS <= 30)
         return (0);
-    /* the line drawing characters in S-Lang's alternate set */
+    /* the line drawing characters in S-Lang's alternate set; Unicode
+     * box drawing when S-Lang speaks UTF-8 */
     memcpy(linedraw, "qxmvjtnulwk", 11);
+    VUnicode = SLutf8_enable(-1) > 0;
     SO = NR = BS = DS = "";
     VSetPalette(7, 0, 0, 7, 15, 0, 15, 12, 3, 0, 0, 6);
     if (curscr.y)

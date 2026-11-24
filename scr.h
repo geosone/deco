@@ -98,6 +98,11 @@ void VHorLine(int r, int c, int nc);
 void VVertLine(int c, int r, int nr);
 void VCorner(int r, int c, int n);
 void VDrawBox(int r, int c, int nr, int nc);
+enum { LINE_NONE, LINE_SINGLE, LINE_DOUBLE };
+extern int VUnicode; /* the screen speaks UTF-8: Unicode box drawing */
+void VLine(int r, int c, int n, int vert, int kind);
+void VJoint(int r, int c, int u, int d, int l, int rt);
+void VFrame(int r, int c, int nr, int nc, int kind);
 void VExpandString(char *s, char *d);
 void _prscreen(void);
 

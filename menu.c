@@ -234,8 +234,16 @@ static void drawmenu(struct menu *m)
     VDrawBox(1, m->col, m->hgh + 2, m->wid + 2);
     VSetDim();
     for (i = 0; m->submenu[i].name; ++i)
-        if (!m->submenu[i].name[0])
-            VHorLine(i + 2, m->col + 2, m->wid - 2);
+        if (!m->submenu[i].name[0]) {
+            if (!VUnicode) {
+                VHorLine(i + 2, m->col + 2, m->wid - 2);
+                continue;
+            }
+            /* as VC: from frame to frame, single in the double one */
+            VLine(i + 2, m->col + 1, m->wid, 0, LINE_SINGLE);
+            VJoint(i + 2, m->col, LINE_DOUBLE, LINE_DOUBLE, 0, LINE_SINGLE);
+            VJoint(i + 2, m->col + m->wid + 1, LINE_DOUBLE, LINE_DOUBLE, LINE_SINGLE, 0);
+        }
     VSetNormal();
     for (i = 0; m->submenu[i].name; ++i) {
         if (!m->submenu[i].name[0])

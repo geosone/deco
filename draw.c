@@ -265,14 +265,13 @@ static void draw1dir(struct dir *c) /* redraw window */
 
     /* reprint dir name */
     VSetDim();
-    VHorLine(1, BASECOL(c) + 1, PAGEWID - 2);
-    VHorLine(H + 2, BASECOL(c) + 1, PAGEWID - 2);
-    VHorLine(H + 4, BASECOL(c) + 1, PAGEWID - 2);
+    VLine(1, BASECOL(c) + 1, PAGEWID - 2, 0, LINE_DOUBLE);
+    VLine(H + 2, BASECOL(c) + 1, PAGEWID - 2, 0, LINE_SINGLE);
+    VLine(H + 4, BASECOL(c) + 1, PAGEWID - 2, 0, LINE_DOUBLE);
     n = ncolumns(c->view);
-    for (k = 1; k < n; ++k) {
-        if (widewin)
-            VCorner(1, colsep(k, c->view), 2);
-        VCorner(H + 2, BASECOL(c) + colsep(k, c->view), 8);
+    for (k = 1; k < n; ++k) { /* the columns meet the frame and the status line */
+        VJoint(1, BASECOL(c) + colsep(k, c->view), 0, LINE_SINGLE, LINE_DOUBLE, LINE_DOUBLE);
+        VJoint(H + 2, BASECOL(c) + colsep(k, c->view), LINE_SINGLE, 0, LINE_SINGLE, LINE_SINGLE);
     }
     drawcwd(c->basecol, c->shortcwd);
     if (c->pattern[0])
@@ -360,38 +359,30 @@ static void drawframe(int c, int view, int stawin)
 {
     /* the whole panel in its colours, then the lines */
     VClearBox(1, widewin ? 0 : c, H + 4, PAGEWID);
+    /* as VC: the frame double, the lines inside single */
+    const int D = LINE_DOUBLE, S = LINE_SINGLE, r = c + PAGEWID - 1;
+
     VSetDim();
     if (stawin) {
-        VHorLine(4, c + 1, PAGEWID - 2);
-        VHorLine(11, c + 1, PAGEWID - 2);
-        VVertLine(c, 2, H + 2);
-        VVertLine(c + PAGEWID - 1, 2, H + 2);
-        VCorner(1, c, 1);
-        VCorner(1, c + PAGEWID - 1, 3);
-        VCorner(4, c, 4);
-        VCorner(4, c + PAGEWID - 1, 6);
-        VCorner(11, c, 4);
-        VCorner(11, c + PAGEWID - 1, 6);
-        VCorner(H + 4, c, 7);
-        VCorner(H + 4, c + PAGEWID - 1, 9);
+        VFrame(1, c, H + 4, PAGEWID, D);
+        VLine(4, c + 1, PAGEWID - 2, 0, S);
+        VLine(11, c + 1, PAGEWID - 2, 0, S);
+        VJoint(4, c, D, D, 0, S);
+        VJoint(4, r, D, D, S, 0);
+        VJoint(11, c, D, D, 0, S);
+        VJoint(11, r, D, D, S, 0);
     } else {
-        int k, n = ncolumns(view);
+        int k, n = ncolumns(view), x = widewin ? 0 : c;
 
-        if (widewin)
-            c = 0;
-        VHorLine(H + 2, c + 1, PAGEWID - 2);
-        VVertLine(c, 2, H + 2);
-        VVertLine(c + PAGEWID - 1, 2, H + 2);
+        VFrame(1, x, H + 4, PAGEWID, D);
+        VLine(H + 2, x + 1, PAGEWID - 2, 0, S);
         for (k = 1; k < n; ++k) {
-            VVertLine(c + colsep(k, view), 2, H);
-            VCorner(H + 2, c + colsep(k, view), 8);
+            VLine(2, x + colsep(k, view), H, 1, S);
+            VJoint(1, x + colsep(k, view), 0, S, D, D);
+            VJoint(H + 2, x + colsep(k, view), S, 0, S, S);
         }
-        VCorner(1, c, 1);
-        VCorner(1, c + PAGEWID - 1, 3);
-        VCorner(H + 2, c, 4);
-        VCorner(H + 2, c + PAGEWID - 1, 6);
-        VCorner(H + 4, c, 7);
-        VCorner(H + 4, c + PAGEWID - 1, 9);
+        VJoint(H + 2, x, D, D, 0, S);
+        VJoint(H + 2, x + PAGEWID - 1, D, D, S, 0);
     }
     VSetNormal();
 }
@@ -437,9 +428,9 @@ static void drawsdir(struct dir *c) /* draw status window */
 
     /* print window name " Status " */
     VSetDim();
-    VHorLine(1, BASECOL(c) + 1, PAGEWID - 2);
-    drawcwd(c->basecol, " Status ");
-    VHorLine(H + 4, BASECOL(c) + 1, PAGEWID - 2);
+    VLine(1, BASECOL(c) + 1, PAGEWID - 2, 0, LINE_DOUBLE);
+    drawcwd(c->basecol, _(" Status "));
+    VLine(H + 4, BASECOL(c) + 1, PAGEWID - 2, 0, LINE_DOUBLE);
     VSetNormal();
     VClearBox(2, BASECOL(c) + 1, 2, PAGEWID - 2);
     VClearBox(5, BASECOL(c) + 1, 6, PAGEWID - 2);
