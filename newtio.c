@@ -56,45 +56,67 @@ void KeyInit(struct KeyMap *map, void (*flushproc)(void))
 }
 
 /*
- * A key with a modifier as xterm sends it, which newt does not know:
- * ESC [ 1 ; m P..S (F1-F4), ESC [ n ; m ~ (F5-F12); m - 1 the modifiers
- * (1 Shift, 2 Alt, 4 Ctrl). After the ESC newt gave back, the rest is
- * read here: Alt-F1/Alt-F2 and Shift-F1/Shift-F2 choose the drive of
- * the left and right panel (on GonWare Alt-F1... switch the screens);
- * other such keys are dropped. Not one of them: the bytes go back, the
- * ESC stays an ESC.
+ * F1/F2 with Alt or Shift, which newt does not know, after the ESC newt
+ * gave back:
+ *   ESC [ 1 ; m P, ESC [ 1 1 ; m ~   xterm, VTE, Konsole (m - 1: 1 Shift, 2 Alt)
+ *   ESC O m P                         older xterm and Konsole
+ *   ESC ESC O P, ESC ESC [ 1 1 ~, ESC ESC [ [ A
+ *                                     Alt as an ESC before the key (rxvt,
+ *                                     "meta sends escape", the Linux console)
+ * Alt-F1/Alt-F2, Shift-F1/Shift-F2 choose the drive of the left and right
+ * panel (on GonWare Alt-F1... switch the screens). Other keys of this form
+ * are dropped; anything else goes back and the ESC stays an ESC.
  */
 static int modkey(void)
 {
     unsigned char b[16];
-    int n = 0, num = 0, mod = 0, c, f;
+    int n = 0, alt = 0, num = 0, mod = 1, c, f = 0, i;
 
     if (SLang_input_pending(0) <= 0)
         return -1;
     b[n++] = c = SLang_getkey();
-    if (c != '[') {
-        SLang_ungetkey(c);
-        return -1;
+    if (c == 033 && SLang_input_pending(1) > 0) { /* Alt as a leading ESC */
+        alt    = 1;
+        b[n++] = c = SLang_getkey();
     }
+    if (c != '[' && c != 'O')
+        goto back;
     while (n < (int)sizeof(b) && SLang_input_pending(1) > 0) {
         b[n++] = c = SLang_getkey();
-        if (c >= 0x40 && c <= 0x7e)
+        if (c >= 0x40 && c <= 0x7e && !(c == '[' && b[n - 2] == '['))
             break;
     }
-    c = b[n - 1];
-    if (sscanf((char *)b + 1, "%d;%d", &num, &mod) != 2 || !(c == '~' || (c >= 'P' && c <= 'S'))) {
-        while (n > 0)
-            SLang_ungetkey(b[--n]);
-        return -1;
+    i = alt + 1; /* the parameters after [ or O */
+    if (b[i] == '[' && b[alt] == '[') {
+        if (c >= 'A' && c <= 'E') /* Linux console: ESC [ [ A */
+            f = c - 'A' + 1;
+    } else {
+        if (b[alt] == 'O')
+            sscanf((char *)b + i, "%d", &mod); /* ESC O m P */
+        else
+            sscanf((char *)b + i, "%d;%d", &num, &mod);
+        if (c >= 'P' && c <= 'S')
+            f = c - 'P' + 1;
+        else if (c == '~' && num >= 11 && num <= 15)
+            f = num - 10;
+        else
+            goto back;
     }
-    f = c == '~' ? 0 : c - 'P' + 1; /* F1-F4; F5-F12 by their number */
-    if ((mod - 1) & 3) {            /* Shift or Alt */
+    if (mod < 1)
+        mod = 1;
+    if (alt)
+        mod = ((mod - 1) | 2) + 1; /* with Alt */
+    if ((mod - 1) & 3) {
         if (f == 1)
             return meta('1');
         if (f == 2)
             return meta('2');
     }
     return 0;
+back:
+    while (n > 0)
+        SLang_ungetkey(b[--n]);
+    return -1;
 }
 
 static int newt_key(void)

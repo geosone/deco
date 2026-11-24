@@ -19,9 +19,11 @@
  */
 
 #include <errno.h>
+#include <poll.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 #include "scr.h"
 
 static struct KeyMap *km;
@@ -118,6 +120,14 @@ int KeyGetChar()
     return (c & 0377);
 }
 
+/* whether a byte of the same key follows (within 50 ms) */
+static int morekeys(void)
+{
+    struct pollfd p = { 0, POLLIN, 0 };
+
+    return poll(&p, 1, 50) > 0;
+}
+
 static void badkey()
 {
     alarm(oldalarm);
@@ -130,8 +140,14 @@ static int nmgetch(struct KeyMap *kp)
     register struct KeyMap *lp;
 
     for (match = 1;; ++match) {
-        if (!kp->str[match])
-            return (kp->val);
+        if (!kp->str[match]) {
+            /* a longer key starting with this one (ESC ESC O P after ESC
+             * ESC): if more comes at once, it is that one */
+            lp = kp + 1;
+            if (!lp->str || strncmp(lp->str, kp->str, match) || !morekeys())
+                return (kp->val);
+            kp = lp;
+        }
         c = KeyGetChar();
         if (kp->str[match] == c)
             continue;

@@ -91,11 +91,26 @@ static struct KeyMap keymap[] = {
     { 0, "\033h", meta('h') },
     { 0, "\033e", meta('e') },
 
-    /* Alt-F1/F2, Shift-F1/F2 as xterm: the drive of a panel */
+    /* Alt-F1/F2, Shift-F1/F2: the drive of a panel; xterm, VTE, Konsole,
+       older xterm, and Alt as an ESC before the key (rxvt, Linux console) */
     { 0, "\033[1;3P", meta('1') },
     { 0, "\033[1;3Q", meta('2') },
     { 0, "\033[1;2P", meta('1') },
     { 0, "\033[1;2Q", meta('2') },
+    { 0, "\033[11;3~", meta('1') },
+    { 0, "\033[12;3~", meta('2') },
+    { 0, "\033[11;2~", meta('1') },
+    { 0, "\033[12;2~", meta('2') },
+    { 0, "\033O3P", meta('1') },
+    { 0, "\033O3Q", meta('2') },
+    { 0, "\033O2P", meta('1') },
+    { 0, "\033O2Q", meta('2') },
+    { 0, "\033\033OP", meta('1') },
+    { 0, "\033\033OQ", meta('2') },
+    { 0, "\033\033[11~", meta('1') },
+    { 0, "\033\033[12~", meta('2') },
+    { 0, "\033\033[[A", meta('1') },
+    { 0, "\033\033[[B", meta('2') },
 
     { 0, "\033\033", cntrl('C') },
     { 0, 0, 0 },
