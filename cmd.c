@@ -154,6 +154,12 @@ void setdwid()
         right.topfile += H;
 }
 
+/* a view that needs the whole width */
+static int wideview(struct dir *d)
+{
+    return d->view == VIEW_FULL || d->view == VIEW_INFO;
+}
+
 void setfull(int k, int sk)
 {
     register struct dir *c = k == 'l' ? &left : &right;
@@ -179,6 +185,10 @@ void setfull(int k, int sk)
             setdwid();
         break;
     }
+    /* Full and Info take the whole width; back from them, the two panels
+     * again (else only ^W brought them back, and the init file kept one) */
+    if (widewin && (sk == 'b' || sk == 'l' || sk == 'w') && !wideview(&left) && !wideview(&right))
+        setdwid();
     while (c->topfile + PAGELEN(c) <= c->curfile)
         c->topfile += H;
 }
