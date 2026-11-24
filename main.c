@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include "deco.h"
 #include "dir.h"
 #include "env.h"
@@ -116,6 +117,7 @@ int main(int argc, char **argv, char **envp)
     VSetPalette(palette.fg, palette.bg, palette.revfg, palette.revbg, palette.boldfg,
                 palette.boldbg, palette.boldrevfg, palette.boldrevbg, palette.dimfg, palette.dimbg,
                 palette.dimrevfg, palette.dimrevbg);
+    initcolors();
     setdir(&left, ".");
     setdir(&right, home);
     chdir(left.cwd);
@@ -425,7 +427,7 @@ static void doscrreg(int c)
         draw();
         return;
     case meta('H'): /* f8 */
-        delete ();
+        delete();
         draw();
         return;
     case cntrl('L'): /* status */
@@ -537,7 +539,7 @@ static void init()
 
     /* H is the number of lines at file window */
 
-    H = LINES / 2 - 1;
+    H = LINES - 7; /* full height panels, like VC; Options/Full screen halves them */
 
     left.basecol  = 0;
     right.basecol = PANELWID;

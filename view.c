@@ -18,10 +18,13 @@ static void viewhead(char *filename, int line, int col);
 
 void viewfile(int d, char *filename)
 {
+    int oldc;
+
     viewfd  = d;
     viewrec = RecOpen(viewfd, 0);
     if (!viewrec)
         return;
+    oldc     = VSetColor(VCOL_VIEW);
     viewseek = 0;
     viewhlen = (viewrec->size + 15) / 16;
     for (;;) {
@@ -36,6 +39,7 @@ void viewfile(int d, char *filename)
             viewhex = 1;
         }
     }
+    VSetColor(oldc);
     VClearBox(1, 0, LINES - 2, COLS);
     RecClose(viewrec);
 }

@@ -25,6 +25,72 @@ static void drawtime(struct file *f);
 static void drawlong(struct file *f);
 static char *filnam(const char *p, int tail, int n);
 
+/*
+ * The colours of each role (scr.h), VC-like: fg and bg of normal,
+ * reverse, bold, bold reverse, dim and dim reverse. VGA colour numbers:
+ * 0 black, 1 blue, 3 cyan, 4 red, 7 light gray, 8 gray, 11 bright cyan,
+ * 14 yellow, 15 white.
+ */
+static const int vccolors[VCOL_NROLES][12] = {
+    [VCOL_PANEL] = {
+        11, 1, /* names */
+        0, 3,  /* cursor */
+        14, 1, /* tagged names */
+        14, 3, /* cursor on a tagged name */
+        3, 1,  /* frames, file types, details */
+        0, 3,  /* the current panel's directory */
+    },
+    [VCOL_KEYS] = {
+        7, 0, 0, 3, 15, 0, 15, 3,
+        15, 0, /* the key numbers */
+        0, 3,  /* the labels */
+    },
+    [VCOL_BAR] = {
+        0, 3, 0, 3,
+        15, 0, /* the chosen menu */
+        15, 0,
+        0, 3, /* the top line, the menu bar */
+        0, 3,
+    },
+    [VCOL_MENU] = {
+        0, 3,  /* items */
+        15, 0, /* the chosen item */
+        15, 3, /* the frame */
+        15, 0,
+        8, 3, /* items not possible now */
+        0, 3, /* pop-up lists */
+    },
+    [VCOL_DIALOG] = {
+        0, 3,  /* the input line */
+        0, 7,
+        0, 7,  /* the chosen button of an error */
+        15, 4, /* errors */
+        0, 3,  /* the chosen button */
+        0, 7,  /* dialogs */
+    },
+    [VCOL_LIST] = {
+        15, 0, /* the chosen line */
+        0, 3, 15, 0, 15, 3, 0, 3,
+        0, 3, /* the list */
+    },
+    [VCOL_VIEW] = {
+        11, 1, /* text */
+        0, 3,  /* found text */
+        15, 1, /* bold */
+        15, 3,
+        3, 1, /* control characters */
+        0, 3, /* the head line */
+    },
+};
+
+void initcolors()
+{
+    int i;
+
+    for (i = VCOL_DEFAULT + 1; i < VCOL_NROLES; ++i)
+        VSetRoleColors(i, vccolors[i]);
+}
+
 void draw()
 {
     if (visualwin) {
@@ -32,7 +98,7 @@ void draw()
         draw1dir(&left);
         draw1dir(&right);
     } else {
-        VClearBox(1, 0, LINES - 2, 80);
+        VClearBox(1, 0, LINES - 2, COLS);
         drawbanners();
     }
 }
@@ -97,18 +163,22 @@ static int namewidth(int view, int w)
 
 void drawdir(struct dir *c, int statusflag) /* redraw window */
 {
+    int oldc = VSetColor(VCOL_PANEL);
+
     draw1dir(c);
     if (statusflag) {
         c = (c == &left ? &right : &left);
         if (c->status)
             draw1dir(c);
     }
+    VSetColor(oldc);
 }
 
 void drawbanners()
 {
     register int i;
     register char *curtime;
+    int oldc = VSetColor(VCOL_PANEL);
 
     if (visualwin) {
         if (widewin) {
@@ -118,6 +188,7 @@ void drawbanners()
             drawframe(right.basecol, right.view, right.status);
         }
     }
+    VSetColor(VCOL_BAR);
     VSetDim();
     VStandOut();
     VMove(0, 0);
@@ -144,6 +215,7 @@ void drawbanners()
     };
 
     drawkeys(keys[cmdreg != 0]);
+    VSetColor(oldc);
     VSetNormal();
 }
 
@@ -152,7 +224,9 @@ void drawbanners()
 void drawkeys(const char *const labels[10])
 {
     char buf[1024], *p = buf;
-    int i, slot        = COLS / 10, w;
+    int i, w;
+    int slot = COLS / 10;
+    int oldc = VSetColor(VCOL_KEYS);
 
     *p++ = '\1';
     for (i = 0; i < 10; ++i) {
@@ -166,6 +240,7 @@ void drawkeys(const char *const labels[10])
     *p++ = '\2';
     *p   = 0;
     VMPutString(LINES - 1, 0, buf);
+    VSetColor(oldc);
 }
 
 static void draw1dir(struct dir *c) /* redraw window */
@@ -177,6 +252,7 @@ static void draw1dir(struct dir *c) /* redraw window */
     if (!visualwin || (widewin && c != cur))
         return;
     cdir = c;
+    VSetColor(VCOL_PANEL);
 
     /* if it is status window - draw status of another one */
     if (c->status) {
@@ -226,12 +302,14 @@ static void draw1dir(struct dir *c) /* redraw window */
 void drawcursor()
 {
     register int col, line, w, k;
+    int oldc = VSetColor(VCOL_PANEL);
 
     cdir = cur;
     if (cur->status) {
         VStandOut();
         drawcwd(cur->basecol, " Status ");
         VStandEnd();
+        VSetColor(oldc);
         return;
     }
     line = cur->curfile - cur->topfile;
@@ -257,10 +335,13 @@ void drawcursor()
     drawcwd(cur->basecol, cur->shortcwd);
     VStandEnd();
     drawstatus(BASECOL(cur), &cur->cat[cur->curfile], cur->view);
+    VSetColor(oldc);
 }
 
 void undrawcursor()
 {
+    int oldc = VSetColor(VCOL_PANEL);
+
     if (cbox) {
         VUngetBox(cbox);
         cbox = 0;
@@ -268,6 +349,7 @@ void undrawcursor()
     VSetDim();
     drawcwd(cur->basecol, cur->status ? " Status " : cur->shortcwd);
     VSetNormal();
+    VSetColor(oldc);
 }
 
 /*
@@ -275,6 +357,8 @@ void undrawcursor()
  */
 static void drawframe(int c, int view, int stawin)
 {
+    /* the whole panel in its colours, then the lines */
+    VClearBox(1, widewin ? 0 : c, H + 4, PAGEWID);
     VSetDim();
     if (stawin) {
         VHorLine(4, c + 1, PAGEWID - 2);
@@ -372,8 +456,9 @@ static void drawsdir(struct dir *c) /* draw status window */
 
 static void drawstatus(int col, struct file *f, int view)
 {
-    int nw = 14 + PAGEWID - (widewin ? 77 : 39);
+    int nw = 14 + PAGEWID - (widewin ? 80 : 40);
 
+    VClearBox(H + 3, col + 1, 1, PAGEWID - 2);
     /* draw current file status box */
     VMove(H + 3, col + 2);
     VSetDim();

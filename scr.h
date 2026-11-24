@@ -49,6 +49,24 @@ void VPutString(char *str);
 void VPrint(char *fmt, ...);
 void VSetPalette(int n, int nb, int nr, int nrb, int b, int bb, int br, int brb, int d, int db,
                  int dr, int drb);
+/*
+ * Colour roles: each part of the screen has its own colours for the six
+ * attributes (normal, bold, dim, each also reversed), like the VC colour
+ * scheme. A cell keeps its role; VClearBox clears in the current role.
+ */
+enum {
+    VCOL_DEFAULT, /* the command line and what is outside of the panels */
+    VCOL_PANEL,   /* panels: names, frames, cursor, tagged files */
+    VCOL_KEYS,    /* the F1...F10 bar */
+    VCOL_BAR,     /* the top line and the menu bar */
+    VCOL_MENU,    /* pull-down menus and pop-up lists */
+    VCOL_DIALOG,  /* dialogs (dim) and errors (bold) */
+    VCOL_VIEW,    /* viewer and editor */
+    VCOL_LIST,    /* pop-up lists: history, jobs, user menu */
+    VCOL_NROLES
+};
+int VSetColor(int role); /* returns the previous role */
+void VSetRoleColors(int role, const int colors[12]);
 int VStandOut(void);
 void VStandEnd(void);
 void VSetNormal(void);

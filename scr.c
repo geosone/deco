@@ -116,25 +116,29 @@
  */
 /* #define DEBUG */
 
+#include "scr.h"
+
+#include <fcntl.h>
 #include <setjmp.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
+
 #include "deco.h"
 #include "env.h"
-#include "scr.h"
 
-#define STANDOUT 0400
-#define BOLD     01000
-#define DIM      02000
-#define GRAPH    04000
-#define NOCHANGE -1
-#define OUTBUFSZ 256
+#define STANDOUT  0400
+#define BOLD      01000
+#define DIM       02000
+#define GRAPH     04000
+#define ROLESHIFT 12
+#define ROLEMASK  070000 /* VCOL_*: 3 bits, the sign bit stays free */
+#define NOCHANGE  -1
+#define OUTBUFSZ  256
 
 #define qputch(c) (outptr >= outbuf + OUTBUFSZ ? VFlush(), *outptr++ = (c) : (*outptr++ = (c)))
 
@@ -832,7 +836,7 @@ static void domvcur(int y, int x)
 
         while (curscr.curx < x) {
             i = curscr.y[curscr.cury][curscr.curx];
-            if ((i & ~0377) == curscr.flgs)
+            if ((i & ~0377 & ~ROLEMASK) == curscr.flgs)
                 putch((int)i);
             else
                 break;
@@ -864,17 +868,19 @@ void VClearLine()
     register short *maxx;
     register int minx;
 
+    short blank = ' ' | (VScreen.flgs & ROLEMASK); /* in the current colours */
+
     y    = VScreen.cury;
     x    = VScreen.curx;
     end  = &VScreen.y[y][COLS];
     minx = NOCHANGE;
     maxx = &VScreen.y[y][x];
     for (sp = maxx; sp < end; sp++)
-        if (*sp != ' ') {
+        if (*sp != blank) {
             maxx = sp;
             if (minx == NOCHANGE)
                 minx = sp - VScreen.y[y];
-            *sp = ' ';
+            *sp = blank;
         }
     if (minx != NOCHANGE) {
         if (VScreen.firstch[y] > minx || VScreen.firstch[y] == NOCHANGE)
@@ -998,6 +1004,15 @@ static void initcolor()
             btab[i] = btab[i + 8];
     }
     VSetPalette(7, 0, 0, 7, 15, 0, 15, 12, 3, 0, 0, 6);
+}
+#endif
+
+#ifndef DECO_NEWT
+/* the terminal backend draws all roles in the six attribute colours */
+void VSetRoleColors(int role, const int colors[12])
+{
+    (void)role;
+    (void)colors;
 }
 #endif
 
@@ -1185,6 +1200,14 @@ static void setattr(int c)
     curscr.flgs = c;
 }
 #endif
+
+int VSetColor(int role)
+{
+    int old = (VScreen.flgs & ROLEMASK) >> ROLESHIFT;
+
+    VScreen.flgs = (VScreen.flgs & ~ROLEMASK) | ((role << ROLESHIFT) & ROLEMASK);
+    return old;
+}
 
 int VStandOut()
 {
@@ -1447,7 +1470,7 @@ void VClearBox(int r, int c, int nr, int nc)
 
     for (; --nr >= 0; ++r)
         for (i = nc; --i >= 0;)
-            pokechr(r, c + i, ' ');
+            pokechr(r, c + i, ' ' | (VScreen.flgs & ROLEMASK));
 }
 
 void VFillBox(int r, int c, int nr, int nc, int sym)
@@ -1674,8 +1697,10 @@ static int _graphsym(int c)
 #include <newt.h>
 #include <slang.h>
 
-/* S-Lang colour objects of the six attributes, past newt's own */
+/* S-Lang colour objects of the six attributes, past newt's own, for each
+ * colour role */
 enum { C_NORMAL = 64, C_REVERSE, C_BOLD, C_BOLDREV, C_DIM, C_DIMREV };
+#define C_ROLE(r) (6 * (r))
 
 static const char *const colornames[16] = {
     "black",     "blue",          "green",  "cyan",       "red",         "magenta",
@@ -1745,26 +1770,37 @@ void VRestore()
     }
 }
 
+/* colors: fg and bg of normal, reverse, bold, bold reverse, dim, dim
+ * reverse */
+void VSetRoleColors(int role, const int colors[12])
+{
+    int i;
+
+    if (role < 0 || role >= VCOL_NROLES)
+        return;
+    for (i = 0; i < 6; ++i)
+        newt_color(C_NORMAL + C_ROLE(role) + i, colors[2 * i], colors[2 * i + 1]);
+}
+
+/* the colours of the default role (the "palette" of the init file) */
 void VSetPalette(int n, int nb, int nr, int nrb, int b, int bb, int br, int brb, int d, int db,
                  int dr, int drb)
 {
-    newt_color(C_NORMAL, n, nb);
-    newt_color(C_REVERSE, nr, nrb);
-    newt_color(C_BOLD, b, bb);
-    newt_color(C_BOLDREV, br, brb);
-    newt_color(C_DIM, d, db);
-    newt_color(C_DIMREV, dr, drb);
+    const int c[12] = { n, nb, nr, nrb, b, bb, br, brb, d, db, dr, drb };
+
+    VSetRoleColors(VCOL_DEFAULT, c);
 }
 
 static int color_of(int c)
 {
-    int rev = (c & STANDOUT) != 0;
+    int rev  = (c & STANDOUT) != 0;
+    int role = C_ROLE((c & ROLEMASK) >> ROLESHIFT);
 
     if (c & BOLD)
-        return (rev ? C_BOLDREV : C_BOLD);
+        return role + (rev ? C_BOLDREV : C_BOLD);
     if (c & DIM)
-        return (rev ? C_DIMREV : C_DIM);
-    return (rev ? C_REVERSE : C_NORMAL);
+        return role + (rev ? C_DIMREV : C_DIM);
+    return role + (rev ? C_REVERSE : C_NORMAL);
 }
 
 static void newt_line(int y)
@@ -1779,8 +1815,8 @@ static void newt_line(int y)
     SLsmg_gotorc(y, x);
     for (; x <= last && x < COLS; ++x) {
         c = VScreen.y[y][x];
-        if ((c & (BOLD | DIM | STANDOUT)) != attr) {
-            attr = c & (BOLD | DIM | STANDOUT);
+        if ((c & (BOLD | DIM | STANDOUT | ROLEMASK)) != attr) {
+            attr = c & (BOLD | DIM | STANDOUT | ROLEMASK);
             SLsmg_set_color(color_of(c));
         }
         if (((c & GRAPH) != 0) != graph) {

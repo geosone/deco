@@ -67,7 +67,18 @@ static int lastpos(int n)
     return (p->len);
 }
 
+static void edit1(int d, char *filename, char *basename);
+
+/* the editor, in its colours */
 void editfile(int d, char *filename, char *basename)
+{
+    int oldc = VSetColor(VCOL_VIEW);
+
+    edit1(d, filename, basename);
+    VSetColor(oldc);
+}
+
+static void edit1(int d, char *filename, char *basename)
 {
     register int baseline, basecol;
     int stepud = LINES - 3; /* step up-down */

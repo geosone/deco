@@ -2,11 +2,12 @@
 #include <time.h>
 /* width of directory window */
 
-/* The panels follow the width of the screen: each is half of it (the
- * classic 40 of 80 columns), or all of it but 3 in the wide window mode. */
+/* The panels follow the width of the screen: each is half of it (40 of
+ * 80 columns, side by side without a gap), or all of it in the wide
+ * window mode. */
 extern int LINES, COLS; /* scr.c */
 #define PANELWID (COLS / 2)
-#define PAGEWID  (widewin ? COLS - 3 : PANELWID - 1)
+#define PAGEWID  (widewin ? COLS : PANELWID)
 
 /* number of displayable files in directory window */
 
@@ -15,6 +16,7 @@ extern int LINES, COLS; /* scr.c */
 #define BASECOL(c) (widewin ? 0 : (c)->basecol)
 
 void drawkeys(const char *const labels[10]); /* F1...F10 bar */
+void initcolors(void);                       /* the VC colour scheme */
 int ncolumns(int view);                      /* columns of names in a panel in this view */
 int colsep(int k, int view); /* column separator k (0 ... ncolumns) from the panel's left frame */
 

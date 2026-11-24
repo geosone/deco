@@ -118,6 +118,7 @@ int getmenu()
 static void drawhead(int nm)
 {
     register int i, reverse;
+    int oldc = VSetColor(VCOL_BAR);
 
     VSetDim();
     reverse = VStandOut();
@@ -142,6 +143,7 @@ static void drawhead(int nm)
     }
     VSetNormal();
     VStandEnd();
+    VSetColor(oldc);
 }
 
 static void clrmenu(struct menu *m)
@@ -152,6 +154,7 @@ static void clrmenu(struct menu *m)
 static void drawmenu(struct menu *m)
 {
     register int i, reverse;
+    int oldc = VSetColor(VCOL_MENU);
 
     VClearBox(1, m->col - 1, m->hgh + 3, m->wid + 4);
     VSetBold();
@@ -178,6 +181,7 @@ static void drawmenu(struct menu *m)
         else if (!m->submenu[i].active)
             VSetNormal();
     }
+    VSetColor(oldc);
 }
 
 static void upmenu(struct menu *m)

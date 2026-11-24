@@ -39,10 +39,11 @@
  *              %%      - symbol '%'
  */
 
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
+
 #include "deco.h"
 #include "dir.h"
 #include "scr.h"
@@ -476,6 +477,7 @@ static char *runudm(char *scale)
     BOX *box, *curbox;
 
     box = VGetBox(menurow - 2, menucol - 4, nm + 4, menuwid + 8);
+    VSetColor(VCOL_LIST);
     VSetDim();
     VStandOut();
     VFillBox(menurow - 2, menucol - 4, nm + 4, menuwid + 8, ' ');
@@ -484,10 +486,13 @@ static char *runudm(char *scale)
     printudm();
     VSetNormal();
     VStandEnd();
+    VSetColor(VCOL_DEFAULT);
     cm = 0;
     for (;;) {
         curbox = VGetBox(menurow + cm, menucol, 1, menuwid);
+        VSetColor(VCOL_LIST);
         VPrintBox(curbox);
+        VSetColor(VCOL_DEFAULT);
         hidecursor();
         VSync();
         key = KeyGet();
@@ -686,8 +691,11 @@ void readinitfile()
         case 'c': /* use cshell */
             usecshell = 1;
             break;
-        case 'f': /* full screen */
+        case 'f': /* full screen (the default) */
             H = LINES - 7;
+            break;
+        case 's': /* small panels, half the height */
+            H = LINES / 2 - 1;
             break;
         case 'w': /* double width */
             widewin = 1;
@@ -915,8 +923,8 @@ void writeinitfile()
     }
     if (usecshell)
         *bufp++ = 'c', *bufp++ = '\n';
-    if (H == LINES - 7)
-        *bufp++ = 'f', *bufp++ = '\n';
+    if (H != LINES - 7)
+        *bufp++ = 's', *bufp++ = '\n';
     if (widewin)
         *bufp++ = 'w', *bufp++ = '\n';
     if (!showhidden)

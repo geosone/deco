@@ -59,7 +59,19 @@ void endmesg()
     mbox = 0;
 }
 
+static int getchoice1(int bold, char *head, char *msg, char *mesg2, char *c1, char *c2, char *c3);
+
+/* in the dialog colours */
 int getchoice(int bold, char *head, char *msg, char *mesg2, char *c1, char *c2, char *c3)
+{
+    int oldc = VSetColor(VCOL_DIALOG);
+    int r    = getchoice1(bold, head, msg, mesg2, c1, c2, c3);
+
+    VSetColor(oldc);
+    return r;
+}
+
+static int getchoice1(int bold, char *head, char *msg, char *mesg2, char *c1, char *c2, char *c3)
 {
     int len, ch;
     int isattr;
@@ -303,7 +315,19 @@ static char *editstring(int r, int c, int w, char *str, int cp)
     }
 }
 
+static char *getstring1(int w, char *str, char *head, char *mesg);
+
+/* in the dialog colours */
 char *getstring(int w, char *str, char *head, char *mesg)
+{
+    int oldc = VSetColor(VCOL_DIALOG);
+    char *r  = getstring1(w, str, head, mesg);
+
+    VSetColor(oldc);
+    return r;
+}
+
+static char *getstring1(int w, char *str, char *head, char *mesg)
 {
     register int r, c, h;
     int len;
@@ -339,7 +363,19 @@ char *getstring(int w, char *str, char *head, char *mesg)
     return (str);
 }
 
+static char *getwstring1(int w, char *str, char *head, char *mesg);
+
+/* in the dialog colours */
 char *getwstring(int w, char *str, char *head, char *mesg)
+{
+    int oldc = VSetColor(VCOL_DIALOG);
+    char *r  = getwstring1(w, str, head, mesg);
+
+    VSetColor(oldc);
+    return r;
+}
+
+static char *getwstring1(int w, char *str, char *head, char *mesg)
 {
     register int r, c, h;
     int len;

@@ -569,6 +569,7 @@ static void jobmenu()
     histcol = (COLS - 1 - histwid) / 2;
 
     box = VGetBox(histrow - 2, histcol - 4, nh + 4, histwid + 8);
+    VSetColor(VCOL_LIST);
     VSetDim();
     VStandOut();
     VFillBox(histrow - 2, histcol - 4, nh + 4, histwid + 8, ' ');
@@ -585,10 +586,13 @@ static void jobmenu()
 
     VSetNormal();
     VStandEnd();
+    VSetColor(VCOL_DEFAULT);
     ch = 0;
     for (;;) {
         curbox = VGetBox(histrow + nh - ch - 1, histcol, 1, histwid);
+        VSetColor(VCOL_LIST);
         VPrintBox(curbox);
+        VSetColor(VCOL_DEFAULT);
         hidecursor();
         VSync();
         n = KeyGet();
@@ -687,6 +691,7 @@ void histmenu()
     histcol = (COLS - 1 - histwid) / 2;
 
     box = VGetBox(histrow - 2, histcol - 4, nh + 4, histwid + 8);
+    VSetColor(VCOL_LIST);
     VSetDim();
     VStandOut();
     VFillBox(histrow - 2, histcol - 4, nh + 4, histwid + 8, ' ');
@@ -702,10 +707,13 @@ void histmenu()
 
     VSetNormal();
     VStandEnd();
+    VSetColor(VCOL_DEFAULT);
     ch = 0;
     for (;;) {
         curbox = VGetBox(histrow + nh - ch - 1, histcol, 1, histwid);
+        VSetColor(VCOL_LIST);
         VPrintBox(curbox);
+        VSetColor(VCOL_DEFAULT);
         hidecursor();
         VSync();
         n = KeyGet();
