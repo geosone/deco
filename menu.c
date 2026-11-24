@@ -117,7 +117,7 @@ static void drawhead(int nm)
     VSetDim();
     reverse = VStandOut();
     VMove(0, 0);
-    for (i = 0; i < 80; ++i)
+    for (i = 0; i < COLS; ++i)
         VPutChar(' ');
     VMove(0, 2);
     for (i = 0; menu[i].name; ++i) {

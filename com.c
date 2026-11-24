@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
+
 #include "deco.h"
 #include "dir.h"
 #include "env.h"
@@ -48,7 +49,7 @@ void drawcmd()
     int c;
     CURSOR cursor;
 
-    if (H == LINES - 7 && strlen(cur->shortcwd) + 3 + esclen(command) > 79) {
+    if (H == LINES - 7 && strlen(cur->shortcwd) + 3 + esclen(command) > COLS - 1) {
         fullscreen(0, 0);
         draw();
     }
@@ -421,7 +422,7 @@ static int inputcmd(int plen)
 
 static void erasecmd(int plen)
 {
-    if (plen + esclen(command) >= 80) {
+    if (plen + esclen(command) >= COLS) {
         write(1, "\r\n", 2);
         write(1, prompt, (unsigned)strlen(prompt));
     } else
@@ -565,14 +566,14 @@ static void jobmenu()
     else if (histwid > 70)
         histwid = 70;
     histrow = (LINES - nh) / 2;
-    histcol = (79 - histwid) / 2;
+    histcol = (COLS - 1 - histwid) / 2;
 
     box = VGetBox(histrow - 2, histcol - 4, nh + 4, histwid + 8);
     VSetDim();
     VStandOut();
     VFillBox(histrow - 2, histcol - 4, nh + 4, histwid + 8, ' ');
     VDrawBox(histrow - 1, histcol - 1, nh + 2, histwid + 2);
-    mvcaddstr(histrow - 1, 40, " Jobs ");
+    mvcaddstr(histrow - 1, COLS / 2, " Jobs ");
 
     for (ch = 0; ch < nh; ++ch) {
         sprintf(buf, "[%d]", job[nh - ch - 1].pid);
@@ -683,16 +684,16 @@ void histmenu()
     else if (histwid > 70)
         histwid = 70;
     histrow = (LINES - nh) / 2;
-    histcol = (79 - histwid) / 2;
+    histcol = (COLS - 1 - histwid) / 2;
 
     box = VGetBox(histrow - 2, histcol - 4, nh + 4, histwid + 8);
     VSetDim();
     VStandOut();
     VFillBox(histrow - 2, histcol - 4, nh + 4, histwid + 8, ' ');
     VDrawBox(histrow - 1, histcol - 1, nh + 2, histwid + 2);
-    mvcaddstr(histrow - 1, 40, " History ");
+    mvcaddstr(histrow - 1, COLS / 2, " History ");
     if (job[0].command)
-        mvcaddstr(histrow + nh + 1, 40, " ^B - Jobs ");
+        mvcaddstr(histrow + nh + 1, COLS / 2, " ^B - Jobs ");
 
     for (ch = 0; ch < nh; ++ch) {
         VMove(histrow + ch, histcol + 1);

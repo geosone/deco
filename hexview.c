@@ -146,7 +146,7 @@ static void viewhhead(char *filename, int line)
     VSetDim();
     VStandOut();
     VMove(0, 0);
-    for (i = 80; --i >= 0; VPutChar(' '))
+    for (i = COLS; --i >= 0; VPutChar(' '))
         ;
     VMPutString(0, 1, "File ");
     VPutString(filename);

@@ -93,7 +93,7 @@ int getchoice(int bold, char *head, char *msg, char *mesg2, char *c1, char *c2, 
         r = LINES / 2;
     else
         r = LINES / 4;
-    c = (80 - w) / 2;
+    c = (COLS - w) / 2;
 
     box    = VGetBox(r - 1, c - 2, h + 2, w + 4); /* save box */
     isattr = VStandOut();
@@ -319,7 +319,7 @@ char *getstring(int w, char *str, char *head, char *mesg)
     h = 4;
     w += 4;
     r = LINES / 4;
-    c = (78 - w) / 2;
+    c = (COLS - 2 - w) / 2;
 
     box = VGetBox(r - 1, c - 2, h + 2, w + 4); /* save box */
     VStandOut();
@@ -358,8 +358,8 @@ char *getwstring(int w, char *str, char *head, char *mesg)
     c = BASECOL(cur) + (PAGEWID - w) / 2;
     if (c < 3)
         c = 3;
-    else if (c > 76 - w)
-        c = 76 - w;
+    else if (c > COLS - 4 - w)
+        c = COLS - 4 - w;
 
     box = VGetBox(r - 1, c - 2, h + 2, w + 4); /* save box */
     VStandOut();

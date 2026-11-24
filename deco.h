@@ -2,13 +2,20 @@
 #include <time.h>
 /* width of directory window */
 
-#define PAGEWID (widewin ? 77 : 39)
+/* The panels follow the width of the screen: each is half of it (the
+ * classic 40 of 80 columns), or all of it but 3 in the wide window mode. */
+extern int LINES, COLS; /* scr.c */
+#define PANELWID (COLS / 2)
+#define PAGEWID  (widewin ? COLS - 3 : PANELWID - 1)
 
 /* number of displayable files in directory window */
 
 #define PAGELEN(c) pagelen((c)->view)
 
 #define BASECOL(c) (widewin ? 0 : (c)->basecol)
+
+int ncolumns(int view);      /* columns of names in a panel in this view */
+int colsep(int k, int view); /* column separator k (0 ... ncolumns) from the panel's left frame */
 
 #define CMDLEN 512 /* length of command string */
 
@@ -118,7 +125,7 @@ int rundone(char *name, char *a0, char *a1, char *a2);
 #define FO_LINK    2
 #define FO_SYMLINK 3
 int fileop(int op, char *from, char *to); /* to: a name or a directory; 0 or -1 */
-int filesdone(int op); /* the files collected with runset()/runarg() */
+int filesdone(int op);                    /* the files collected with runset()/runarg() */
 void runcancel(void);
 int runl(int silent, char *name, ...);
 void findfile(struct dir *d, char *name);
@@ -154,7 +161,7 @@ void swappanels(void);
 void copy(void);
 void renmove(void);
 void makedir(void);
-void delete(void);
+void delete (void);
 void findname(void);
 void tagall(void);
 void untagall(void);

@@ -194,7 +194,7 @@ int main(int argc, char **argv, char **envp)
             continue;
         case cntrl('B'): /* history */
             if (!visualwin)
-                VClearBox(1, 0, LINES - 2, 80);
+                VClearBox(1, 0, LINES - 2, COLS);
             histmenu();
             draw();
             continue;
@@ -540,7 +540,7 @@ static void init()
     H = LINES / 2 - 1;
 
     left.basecol  = 0;
-    right.basecol = 40;
+    right.basecol = PANELWID;
 }
 
 int pagelen(int view)

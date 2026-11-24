@@ -2,6 +2,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+
 #include "deco.h"
 #include "dir.h"
 #include "scr.h"
@@ -17,13 +18,13 @@ static void drawcwd(int col, char *wd);
 static void drawpat(int col, char *pat, int width);
 static void drawsdir(struct dir *c);
 static void drawstatus(int col, struct file *f, int view);
-static void drawpage(int col, struct file *c, int n, struct dir *d);
-static void drawfull(struct file *f, int tail);
+static void drawpage(int col, struct file *c, int n, struct dir *d, int w);
+static void drawfull(struct file *f, int tail, int nw);
+static void drawkeys(void);
 static void drawmode(char *m, int u, int g);
 static void drawtime(struct file *f);
 static void drawlong(struct file *f);
-static char *filnam(const char *p, int tail);
-static char *filnam_wide(const char *p);
+static char *filnam(const char *p, int tail, int n);
 
 void draw()
 {
@@ -35,6 +36,64 @@ void draw()
         VClearBox(1, 0, LINES - 2, 80);
         drawbanners();
     }
+}
+
+/*
+ * Panel geometry. A brief column takes 19 cells (18 and the line), a long
+ * or wide one 38; a panel has as many as fit, so wider screens show more
+ * names. Full and info views have one column (in the wide window; in a
+ * half panel they are drawn as long).
+ */
+static int colwidth(int view)
+{
+    switch (view) {
+    case VIEW_BRIEF:
+        return 19;
+    case VIEW_INFO:
+    case VIEW_FULL:
+        if (widewin)
+            return PAGEWID - 1;
+        /* Fall through... */
+    default:
+        return 38;
+    }
+}
+
+int ncolumns(int view)
+{
+    int n = (PAGEWID - 1) / colwidth(view);
+
+    return n < 1 ? 1 : n;
+}
+
+int colsep(int k, int view)
+{
+    return k * (PAGEWID - 1) / ncolumns(view);
+}
+
+/* the width of a file name in a column w cells wide (14 in the classic
+ * 80-column layout) */
+static int namewidth(int view, int w)
+{
+    int n;
+
+    switch (view) {
+    case VIEW_BRIEF:
+    case VIEW_WIDE:
+        n = w - 4;
+        break;
+    case VIEW_INFO:
+    case VIEW_FULL:
+        if (widewin) {
+            n = 14 + w - 75;
+            break;
+        }
+        /* Fall through... */
+    default:
+        n = w - 23;
+        break;
+    }
+    return n < 8 ? 8 : n > 200 ? 200 : n;
 }
 
 void drawdir(struct dir *c, int statusflag) /* redraw window */
@@ -63,7 +122,7 @@ void drawbanners()
     VSetDim();
     VStandOut();
     VMove(0, 0);
-    for (i = 80; --i >= 0; VPutChar(' '))
+    for (i = COLS; --i >= 0; VPutChar(' '))
         ;
     VMove(0, 1);
     if (machine) {
@@ -73,24 +132,42 @@ void drawbanners()
     if (tty)
         VPutString(tty);
     if (user)
-        VMPutString(0, 39 - strlen(user), user);
+        VMPutString(0, COLS / 2 - 1 - strlen(user), user);
     VPutChar('.');
     if (group)
         VPutString(group);
     if ((curtime = timestr(time(NULL))))
-        VMPutString(0, 79 - strlen(curtime), curtime);
+        VMPutString(0, COLS - 1 - strlen(curtime), curtime);
     VStandEnd();
-    VMPutString(LINES - 1, 0,
-                cmdreg ? "1\16Help  \17 2\16User  \17 3\16      \17 4\16      \17 5\16    \
-  \17 6\16      \17 7\16      \17 8\16      \17 9\16Menu  \017 10\16Quit \17"
-                       : "1\16Help  \17 2\16User  \17 3\16View  \17 4\16Edit  \17 5\16Copy\
-  \17 6\16RenMov\17 7\16Mkdir \17 8\16Delete\17 9\16Menu  \017 10\16Quit \17");
+    drawkeys();
     VSetNormal();
+}
+
+/* the function keys at the bottom, spread over the width of the screen */
+static void drawkeys()
+{
+    static const char *const keys[2][10] = {
+        { "Help", "User", "View", "Edit", "Copy", "RenMov", "Mkdir", "Delete", "Menu", "Quit" },
+        { "Help", "User", "", "", "", "", "", "", "Menu", "Quit" },
+    };
+    char buf[1024], *p = buf;
+    int i, slot        = COLS / 10, w;
+
+    for (i = 0; i < 10; ++i) {
+        /* each takes a tenth: the number, the label, a space before the
+         * next; the last one takes what is left */
+        w = (i == 9 ? COLS - 9 * slot : slot) - (i == 9 ? 2 : 1) - (i ? 1 : 0);
+        if (w < 1)
+            w = 1;
+        p += sprintf(p, "%s%d\16%-*.*s\17", i ? " " : "", i + 1, w, w, keys[cmdreg != 0][i]);
+    }
+    VMPutString(LINES - 1, 0, buf);
 }
 
 static void draw1dir(struct dir *c) /* redraw window */
 {
     register int len = c->num - c->topfile;
+    int k, n, x, w;
 
     /* check visibility in full window mode */
     if (!visualwin || (widewin && c != cur))
@@ -108,20 +185,12 @@ static void draw1dir(struct dir *c) /* redraw window */
     VHorLine(1, BASECOL(c) + 1, PAGEWID - 2);
     VHorLine(H + 2, BASECOL(c) + 1, PAGEWID - 2);
     VHorLine(H + 4, BASECOL(c) + 1, PAGEWID - 2);
-    if (widewin)
-        switch (c->view) {
-        case VIEW_BRIEF:
-            VCorner(1, 19, 2);
-            VCorner(1, 38, 2);
-            VCorner(1, 57, 2);
-            break;
-        case VIEW_LONG:
-        case VIEW_WIDE:
-            VCorner(1, 38, 2);
-            break;
-        }
-    else if (c->view == VIEW_BRIEF)
-        VCorner(H + 2, BASECOL(c) + 19, 8);
+    n = ncolumns(c->view);
+    for (k = 1; k < n; ++k) {
+        if (widewin)
+            VCorner(1, colsep(k, c->view), 2);
+        VCorner(H + 2, BASECOL(c) + colsep(k, c->view), 8);
+    }
     drawcwd(c->basecol, c->shortcwd);
     if (c->pattern[0])
         drawpat(BASECOL(c), c->pattern, PAGEWID);
@@ -140,49 +209,19 @@ static void draw1dir(struct dir *c) /* redraw window */
     }
     VSetNormal();
 
-    switch (c->view) {
-    case VIEW_INFO:
-    case VIEW_FULL:
-        if (widewin) {
-            VClearBox(2, 1, H, 75);
-            drawpage(1, &c->cat[c->topfile], len, c);
-            break;
-        }
-        /* Fall through... */
-    case VIEW_LONG:
-    case VIEW_WIDE:
-        VClearBox(2, BASECOL(c) + 1, H, 37);
-        drawpage(BASECOL(c) + 1, &c->cat[c->topfile], len, c);
-        if (widewin) {
-            VClearBox(2, BASECOL(c) + 39, H, 37);
-            if (len > H)
-                drawpage(BASECOL(c) + 39, &c->cat[c->topfile + H], len - H, c);
-        }
-        break;
-    case VIEW_BRIEF:
-        VClearBox(2, BASECOL(c) + 1, H, 18);
-        drawpage(BASECOL(c) + 1, &c->cat[c->topfile], len, c);
-
-        VClearBox(2, BASECOL(c) + 20, H, 18);
-        if (len > H)
-            drawpage(BASECOL(c) + 20, &c->cat[c->topfile + H], len -= H, c);
-        if (widewin) {
-            VClearBox(2, BASECOL(c) + 39, H, 18);
-            if (len > H)
-                drawpage(BASECOL(c) + 39, &c->cat[c->topfile + H + H], len -= H, c);
-
-            VClearBox(2, BASECOL(c) + 58, H, 18);
-            if (len > H)
-                drawpage(BASECOL(c) + 58, &c->cat[c->topfile + H + H + H], len - H, c);
-        }
-        break;
+    for (k = 0; k < n; ++k, len -= H) {
+        x = BASECOL(c) + colsep(k, c->view) + 1;
+        w = colsep(k + 1, c->view) - colsep(k, c->view) - 1;
+        VClearBox(2, x, H, w);
+        if (len > 0)
+            drawpage(x, &c->cat[c->topfile + k * H], len, c, w);
     }
     drawstatus(BASECOL(c), &c->cat[c->curfile], c->view);
 }
 
 void drawcursor()
 {
-    register int col, line, w;
+    register int col, line, w, k;
 
     cdir = cur;
     if (cur->status) {
@@ -191,26 +230,11 @@ void drawcursor()
         VStandEnd();
         return;
     }
-    switch (cur->view) {
-    case VIEW_INFO:
-    case VIEW_FULL:
-        w = PAGEWID - 2;
-        break;
-    case VIEW_LONG:
-    case VIEW_WIDE:
-        w = 37;
-        break;
-    default:
-        w = 18;
-        break;
-    }
     line = cur->curfile - cur->topfile;
-    if (line < H)
-        col = BASECOL(cur) + 1;
-    else {
-        col = BASECOL(cur) + line / H * (w + 1) + 1;
-        line %= H;
-    }
+    k    = line / H;
+    line %= H;
+    col = BASECOL(cur) + colsep(k, cur->view) + 1;
+    w   = colsep(k + 1, cur->view) - colsep(k, cur->view) - 1;
     line += 2;
     if (cbox)
         VFreeBox(cbox);
@@ -261,80 +285,40 @@ static void drawframe(int c, int view, int stawin)
         VCorner(11, c + PAGEWID - 1, 6);
         VCorner(H + 4, c, 7);
         VCorner(H + 4, c + PAGEWID - 1, 9);
-    } else if (widewin)
-        switch (view) {
-        case VIEW_INFO:
-        case VIEW_FULL:
-            VHorLine(H + 2, 1, PAGEWID - 2);
-            VVertLine(0, 2, H + 2);
-            VVertLine(PAGEWID - 1, 2, H + 2);
-            VCorner(1, 0, 1);
-            VCorner(1, PAGEWID - 1, 3);
-            VCorner(H + 2, 0, 4);
-            VCorner(H + 2, PAGEWID - 1, 6);
-            VCorner(H + 4, 0, 7);
-            VCorner(H + 4, PAGEWID - 1, 9);
-            break;
-        case VIEW_WIDE:
-        case VIEW_LONG:
-            VHorLine(H + 2, 1, PAGEWID - 2);
-            VVertLine(0, 2, H + 2);
-            VVertLine(38, 2, H);
-            VVertLine(PAGEWID - 1, 2, H + 2);
-            VCorner(1, 0, 1);
-            VCorner(1, PAGEWID - 1, 3);
-            VCorner(H + 2, 0, 4);
-            VCorner(H + 2, 38, 8);
-            VCorner(H + 2, PAGEWID - 1, 6);
-            VCorner(H + 4, 0, 7);
-            VCorner(H + 4, PAGEWID - 1, 9);
-            break;
-        case VIEW_BRIEF:
-            VHorLine(H + 2, 1, PAGEWID - 2);
-            VVertLine(0, 2, H + 2);
-            VVertLine(19, 2, H);
-            VVertLine(38, 2, H);
-            VVertLine(57, 2, H);
-            VVertLine(PAGEWID - 1, 2, H + 2);
-            VCorner(1, 0, 1);
-            VCorner(1, PAGEWID - 1, 3);
-            VCorner(H + 2, 0, 4);
-            VCorner(H + 2, 19, 8);
-            VCorner(H + 2, 38, 8);
-            VCorner(H + 2, 57, 8);
-            VCorner(H + 2, PAGEWID - 1, 6);
-            VCorner(H + 4, 0, 7);
-            VCorner(H + 4, PAGEWID - 1, 9);
-            break;
-        }
-    else {
+    } else {
+        int k, n = ncolumns(view);
+
+        if (widewin)
+            c = 0;
         VHorLine(H + 2, c + 1, PAGEWID - 2);
         VVertLine(c, 2, H + 2);
-        if (view == VIEW_BRIEF)
-            VVertLine(c + 19, 2, H);
-        VVertLine(c + 38, 2, H + 2);
+        VVertLine(c + PAGEWID - 1, 2, H + 2);
+        for (k = 1; k < n; ++k) {
+            VVertLine(c + colsep(k, view), 2, H);
+            VCorner(H + 2, c + colsep(k, view), 8);
+        }
         VCorner(1, c, 1);
-        VCorner(1, c + 38, 3);
+        VCorner(1, c + PAGEWID - 1, 3);
         VCorner(H + 2, c, 4);
-        VCorner(H + 2, c + 38, 6);
+        VCorner(H + 2, c + PAGEWID - 1, 6);
         VCorner(H + 4, c, 7);
-        if (view == VIEW_BRIEF)
-            VCorner(H + 2, c + 19, 8);
-        VCorner(H + 4, c + 38, 9);
+        VCorner(H + 4, c + PAGEWID - 1, 9);
     }
     VSetNormal();
 }
 
 static void drawcwd(int col, char *wd)
 {
-    register int len;
+    register int len, tw;
 
     if (!visualwin)
         return;
+    /* over the panel; in the wide window over its half */
+    tw  = widewin ? (PAGEWID + 1) / 2 : PAGEWID;
     len = strlen(wd);
     if (widewin && col)
-        col = 38;
-    VMPutString(1, col + (39 - len) / 2, wd);
+        col = PAGEWID - tw;
+    VMPutString(1, col + (tw - len) / 2, wd);
 }
 
 static void drawpat(int col, char *pat, int width)
@@ -384,6 +368,8 @@ static void drawsdir(struct dir *c) /* draw status window */
 
 static void drawstatus(int col, struct file *f, int view)
 {
+    int nw = 14 + PAGEWID - (widewin ? 77 : 39);
+
     /* draw current file status box */
     VMove(H + 3, col + 2);
     VSetDim();
@@ -393,28 +379,29 @@ static void drawstatus(int col, struct file *f, int view)
     if (widewin)
         switch (view) {
         case VIEW_FULL:
-            VPutString(filnam(f->name, 1));
+            VPutString(filnam(f->name, 1, nw));
             drawtime(f);
             break;
         case VIEW_INFO:
         case VIEW_LONG:
         case VIEW_WIDE:
         case VIEW_BRIEF:
-            drawfull(f, 1);
+            drawfull(f, 1, nw);
             drawlong(f);
             break;
         }
     else
-        drawfull(f, 1);
+        drawfull(f, 1, nw);
 }
 
 /*
  * Redraw file window
  */
-static void drawpage(int col, struct file *c, int n, struct dir *d)
+static void drawpage(int col, struct file *c, int n, struct dir *d, int w)
 {
     register int i;
     char *info;
+    int nw = namewidth(d->view, w);
 
     if (n > H)
         n = H;
@@ -436,9 +423,9 @@ static void drawpage(int col, struct file *c, int n, struct dir *d)
         case VIEW_INFO:
             if (!widewin)
                 goto draw_long;
-            VPutString(filnam(c->name, 0)); /* 14 */
-            VPutChar(' ');                  /* 1 */
-            VPutChar(' ');                  /* 1 */
+            VPutString(filnam(c->name, 0, nw)); /* 14 */
+            VPutChar(' ');                      /* 1 */
+            VPutChar(' ');                      /* 1 */
             if (!c->infoflag)
                 setinfo(c, d);
             if (!c->dateflag)
@@ -457,19 +444,19 @@ static void drawpage(int col, struct file *c, int n, struct dir *d)
             }
             break;
         case VIEW_FULL:
-            drawfull(c, 0);
+            drawfull(c, 0, nw);
             if (widewin)
                 drawlong(c);
             break;
         case VIEW_LONG:
         draw_long:
-            drawfull(c, 0);
+            drawfull(c, 0, nw);
             break;
         case VIEW_WIDE:
-            VPutString(filnam_wide(c->name));
+            VPutString(filnam(c->name, 0, nw));
             break;
         case VIEW_BRIEF:
-            VPutString(filnam(c->name, 0));
+            VPutString(filnam(c->name, 0, nw));
             break;
         }
         if (c->tag)
@@ -477,12 +464,12 @@ static void drawpage(int col, struct file *c, int n, struct dir *d)
     }
 }
 
-static void drawfull(struct file *f, int tail)
+static void drawfull(struct file *f, int tail, int nw)
 {
-    VPutString(filnam(f->name, tail)); /* 14 */
-    VPutString(filesize(f));           /* 8 */
-    VPutChar(' ');                     /* 1 */
-    VPutChar(' ');                     /* 1 */
+    VPutString(filnam(f->name, tail, nw)); /* 14 */
+    VPutString(filesize(f));               /* 8 */
+    VPutChar(' ');                         /* 1 */
+    VPutChar(' ');                         /* 1 */
     drawmode(filemode((int)f->mode), (int)f->uid, (int)f->gid);
 }
 
@@ -537,23 +524,26 @@ static void drawlong(struct file *f)
     VPutString(timestr(f->mtime));
 }
 
-static char *filnam(const char *p, int tail)
+/* p in a field of n cells: cut with '~', the extension aligned to the
+ * end if the panel wants that */
+static char *filnam(const char *p, int tail, int n)
 {
-    static char buf[20];
+    static char buf[256];
     register char *s;
     const char *e, *q;
 
-    if (strlen(p) > 14) {
+    if ((int)strlen(p) > n) {
         if (tail) {
             buf[0] = '~';
-            strcpy(buf + 1, p + strlen(p) - 13);
+            strcpy(buf + 1, p + strlen(p) - (n - 1));
         } else {
-            strncpy(buf, p, 13);
-            buf[13] = '~';
+            strncpy(buf, p, n - 1);
+            buf[n - 1] = '~';
+            buf[n]     = 0;
         }
         return (buf);
     }
-    for (s = buf; s < buf + 14; *s++ = ' ')
+    for (s = buf; s < buf + n; *s++ = ' ')
         ; /* clear buf */
     if (cdir->alignext) {
         e = extension(p); /* make ptr to extension */
@@ -561,44 +551,13 @@ static char *filnam(const char *p, int tail)
             ; /* copy file name */
         for (q = e; *q; ++q)
             ; /* search extension end */
-        for (s = buf + 13, --q; q >= e; *s-- = *q--)
+        for (s = buf + n - 1, --q; q >= e; *s-- = *q--)
             ; /* copy extension */
     } else {
-        e = p + 14; /* make ptr to end */
+        e = p + n; /* make ptr to end */
         for (s = buf; *p && p < e; *s++ = *p++)
             ; /* copy file name */
     }
-    buf[14] = 0;
-    return (buf);
-}
-
-static char *filnam_wide(const char *p)
-{
-    static char buf[40];
-    register char *s;
-    const char *e, *q;
-
-#define N 33
-    if (strlen(p) > N) {
-        strncpy(buf, p, N - 1);
-        buf[N - 1] = '~';
-        return (buf);
-    }
-    for (s = buf; s < buf + N; *s++ = ' ')
-        ; /* clear buf */
-    if (cdir->alignext) {
-        e = extension(p); /* make ptr to extension */
-        for (s = buf; p < e; *s++ = *p++)
-            ; /* copy file name */
-        for (q = e; *q; ++q)
-            ; /* search extension end */
-        for (s = buf + N - 1, --q; q >= e; *s-- = *q--)
-            ; /* copy extension */
-    } else {
-        e = p + N; /* make ptr to end */
-        for (s = buf; *p && p < e; *s++ = *p++)
-            ; /* copy file name */
-    }
-    buf[N] = 0;
+    buf[n] = 0;
     return (buf);
 }

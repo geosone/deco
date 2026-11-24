@@ -465,7 +465,7 @@ static int initudm(char *filename, char *scale)
     if (menuwid > 70)
         menuwid = 70;
     menurow = (LINES - nm) / 2;
-    menucol = (79 - menuwid) / 2;
+    menucol = (COLS - 1 - menuwid) / 2;
     return (1);
 }
 
@@ -480,7 +480,7 @@ static char *runudm(char *scale)
     VStandOut();
     VFillBox(menurow - 2, menucol - 4, nm + 4, menuwid + 8, ' ');
     VDrawBox(menurow - 1, menucol - 1, nm + 2, menuwid + 2);
-    mvcaddstr(menurow - 1, 40, " User Menu ");
+    mvcaddstr(menurow - 1, COLS / 2, " User Menu ");
     printudm();
     VSetNormal();
     VStandEnd();

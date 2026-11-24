@@ -163,7 +163,7 @@ int setdir(struct dir *d, char *dirname)
         }
     }
     chdirup(d->cwd);
-    d->shortcwd = strtail(d->cwd, '/', 35);
+    d->shortcwd = strtail(d->cwd, '/', PANELWID - 5);
     stat(d->cwd, &st);
     d->dev = st.st_dev;
     d->ino = st.st_ino;

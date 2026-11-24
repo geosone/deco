@@ -63,7 +63,7 @@ static int textview(char *filename)
         for (;;) {
             viewhead(filename, baseline, basecol);
             if (sline >= baseline && sline < baseline + LINES - 2 && ccol >= basecol &&
-                ccol < basecol + 80)
+                ccol < basecol + COLS)
                 VMove(sline - baseline + 1, ccol - basecol);
             else {
                 hidecursor();
@@ -198,7 +198,7 @@ static void viewhead(char *filename, int line, int col)
     VSetDim();
     VStandOut();
     VMove(0, 0);
-    for (i = 80; --i >= 0; VPutChar(' '))
+    for (i = COLS; --i >= 0; VPutChar(' '))
         ;
     VMPutString(0, 1, "File ");
     VPutString(filename);

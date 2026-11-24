@@ -110,7 +110,7 @@ void setstatus()
 
 void fullscreen(int k, int sk)
 {
-    VClearBox(1, 0, LINES - 2, 80);
+    VClearBox(1, 0, LINES - 2, COLS);
     if (H == LINES / 2 - 1)
         H = LINES - 7;
     else
@@ -144,7 +144,7 @@ void reread(int k, int sk)
 
 void setdwid()
 {
-    VClearBox(1, 0, LINES - 2, 80);
+    VClearBox(1, 0, LINES - 2, COLS);
     widewin ^= 1;
     while (left.topfile + PAGELEN(&left) <= left.curfile)
         left.topfile += H;
@@ -469,7 +469,7 @@ void swappanels()
     left           = right;
     right          = dir;
     left.basecol   = 0;
-    right.basecol  = 40;
+    right.basecol  = PANELWID;
     right.shortcwd = lo + right.cwd;
     left.shortcwd  = ro + left.cwd;
     cur            = (cur == &left ? &right : &left);

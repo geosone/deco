@@ -40,7 +40,7 @@ static void edithead(char *filename, int line, int col, int off)
     VSetDim();
     VStandOut();
     VMove(0, 0);
-    for (i = 80; --i >= 0; VPutChar(' '))
+    for (i = COLS; --i >= 0; VPutChar(' '))
         ;
     VMPutString(0, 1, "File ");
     VPutString(filename);
@@ -99,7 +99,7 @@ void editfile(int d, char *filename, char *basename)
             if (soff > lastpos(sline))
                 --soff;
             lastccol = column(sline, soff);
-            if (lastccol < basecol || lastccol >= basecol + 80) {
+            if (lastccol < basecol || lastccol >= basecol + COLS) {
                 basecol = lastccol / 40 * 40 - 40;
                 if (basecol < 0)
                     basecol = 0;
@@ -140,7 +140,7 @@ void editfile(int d, char *filename, char *basename)
                 editmodflg = 1;
                 joinlines(viewrec, sline);
                 RecDelLine(viewrec, sline + 1);
-                if (ccol < basecol || ccol >= basecol + 80) {
+                if (ccol < basecol || ccol >= basecol + COLS) {
                     basecol = ccol < 40 ? 0 : ((ccol - 40) / 40 * 40);
                     break;
                 }
@@ -271,7 +271,7 @@ void editfile(int d, char *filename, char *basename)
                     sline = 0;
                 soff = lastpos(sline);
                 ccol = column(sline, soff);
-                if (ccol < basecol || ccol >= basecol + 80)
+                if (ccol < basecol || ccol >= basecol + COLS)
                     basecol = ccol < 40 ? 0 : ((ccol - 40) / 40 * 40);
                 break;
             case cntrl('C'):
@@ -367,7 +367,7 @@ void editfile(int d, char *filename, char *basename)
                     --sline;
                     soff = lastpos(sline);
                     ccol = column(sline, soff);
-                    if (ccol < basecol || ccol >= basecol + 80) {
+                    if (ccol < basecol || ccol >= basecol + COLS) {
                         basecol = ccol < 40 ? 0 : ((ccol - 40) / 40 * 40);
                         if (baseline > sline)
                             baseline = sline;
@@ -416,7 +416,7 @@ void editfile(int d, char *filename, char *basename)
                     continue;
                 soff = c;
                 ccol = column(sline, soff);
-                if (ccol < basecol || ccol >= basecol + 80)
+                if (ccol < basecol || ccol >= basecol + COLS)
                     basecol = ccol < 40 ? 0 : ((ccol - 40) / 40 * 40);
                 break;
             }
