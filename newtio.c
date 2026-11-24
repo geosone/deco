@@ -4,6 +4,7 @@
  * terminal set up and reads the keys; they are mapped here to deco's key
  * codes (main.c's keymap).
  */
+#include <stdlib.h>
 #include <newt.h>
 #include <slang.h>
 
@@ -91,6 +92,9 @@ static int newt_key(void)
         return (cntrl('C'));
     case NEWT_KEY_RESIZE:
         return (cntrl('L'));
+    case NEWT_KEY_ERROR: /* the terminal gone (a hangup): go too */
+        VClose();
+        exit(0);
     default:
         if (k >= NEWT_KEY_F1 && k <= NEWT_KEY_F10)
             return (meta(('A' + (k - (NEWT_KEY_F1)))));

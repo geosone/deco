@@ -18,6 +18,7 @@
  *              Returns char (always >= 0).
  */
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -107,8 +108,12 @@ int KeyGetChar()
 {
     char c;
 
-    while (read(0, &c, 1) != 1)
-        if (!isatty(0))
+    int n;
+
+    /* the terminal gone (end of file, EIO after a hangup): go too,
+     * instead of reading it in a loop */
+    while ((n = read(0, &c, 1)) != 1)
+        if (n == 0 || errno != EINTR || !isatty(0))
             exit(0);
     return (c & 0377);
 }
