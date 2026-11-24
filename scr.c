@@ -149,9 +149,11 @@ static int scrool, rscrool;
 static int beepflag;
 static int prevattr;
 
+#ifndef DECO_NEWT
 static short ctab[16], btab[16];
 static char *colorbuf, *colorp;
 static char outbuf[OUTBUFSZ], *outptr = outbuf;
+#endif
 
 static char *BS, *BR, *DS, *DR, *NS, *NR;
 static char *GS, *GE, *G1, *G2, *GT, *AC, *AS, *AE;
@@ -168,8 +170,10 @@ static char Cy;
 static char *Cs, *Ce, *Ct;
 
 char VCyrInputTable['~' - ' ' + 1];
+#ifndef DECO_NEWT
 static char VCyrOutputTable[64];
 static int cyroutput;
+#endif
 
 int LINES; /* number of lines on screen */
 int COLS;  /* number of columns */
@@ -229,7 +233,7 @@ struct CapTab outtab[] = {
     // clang-format on
 };
 
-static char *skipdelay(char*);
+static char *skipdelay(char *);
 
 static char linedraw[11] = {
     // clang-format off
@@ -247,25 +251,30 @@ static char linedraw[11] = {
     // clang-format on
 };
 
+#ifndef DECO_NEWT
 static void putch(int c);
 static void cyr(int on);
 static void tputs(char *cp);
-static void pokechr(int y, int x, int c);
 static void setattr(int c);
 static void initgraph(void);
 static void resetattr(int c);
 static void initcolor(void);
 static void initbold(void);
+#endif
+static void pokechr(int y, int x, int c);
 static void delwin(WINDOW *win);
 static int newwin(WINDOW *win);
 static int makenew(WINDOW *win);
+#ifndef DECO_NEWT
 static void makech(int y);
 static void makerch(int y);
 static void domvcur(int y, int x);
 static void doscrool(void);
 static void sclln(int y1, int y2, int n);
+#endif
 static void screrase();
 
+#ifndef DECO_NEWT
 int VInit()
 {
     register char *p;
@@ -367,7 +376,9 @@ int VInit()
         cyr(0);
     return (1);
 }
+#endif
 
+#ifndef DECO_NEWT
 void VOpen()
 {
     TtySet();
@@ -382,7 +393,9 @@ void VOpen()
     if (EA)
         tputs(EA);
 }
+#endif
 
+#ifndef DECO_NEWT
 void VReopen()
 {
     TtySet();
@@ -393,7 +406,9 @@ void VReopen()
     if (ME)
         tputs(ME);
 }
+#endif
 
+#ifndef DECO_NEWT
 void VClose()
 {
     if (curscr.y)
@@ -411,7 +426,9 @@ void VClose()
     VFlush();
     TtyReset();
 }
+#endif
 
+#ifndef DECO_NEWT
 void VRestore()
 {
     if (Cy)
@@ -423,6 +440,7 @@ void VRestore()
     VFlush();
     TtyReset();
 }
+#endif
 
 static void delwin(WINDOW *win)
 {
@@ -492,6 +510,7 @@ static int makenew(WINDOW *win)
     return (1);
 }
 
+#ifndef DECO_NEWT
 void VRedraw()
 {
     register short wy;
@@ -508,7 +527,9 @@ void VRedraw()
     setattr(VScreen.flgs);
     VFlush();
 }
+#endif
 
+#ifndef DECO_NEWT
 static void makerch(int y)
 {
     register short *new;
@@ -526,7 +547,9 @@ static void makerch(int y)
         curscr.curx = x + 1;
     }
 }
+#endif
 
+#ifndef DECO_NEWT
 void VSyncLine(int wy)
 {
     if (VScreen.firstch[wy] != NOCHANGE) {
@@ -534,7 +557,9 @@ void VSyncLine(int wy)
         VScreen.firstch[wy] = NOCHANGE;
     }
 }
+#endif
 
+#ifndef DECO_NEWT
 void VSync()
 {
     register short wy;
@@ -574,7 +599,9 @@ void VSync()
     setattr(VScreen.flgs);
     VFlush();
 }
+#endif
 
+#ifndef DECO_NEWT
 static void makech(int y)
 {
     register short *new, *old;
@@ -595,7 +622,9 @@ static void makech(int y)
         curscr.curx = x + 1;
     }
 }
+#endif
 
+#ifndef DECO_NEWT
 static void doscrool()
 {
     register int line, n, topline, botline;
@@ -701,7 +730,9 @@ static void doscrool()
         /* unset scrool region */
         tputs(CapGoto(CS, LINES - 1, 0));
 }
+#endif
 
+#ifndef DECO_NEWT
 static void sclln(int y1, int y2, int n)
 {
     register short *end, *temp;
@@ -733,6 +764,7 @@ static void sclln(int y1, int y2, int n)
         }
     }
 }
+#endif
 
 void VDelLine(int n)
 {
@@ -790,6 +822,7 @@ void VInsLine(int n)
         ;
 }
 
+#ifndef DECO_NEWT
 static void domvcur(int y, int x)
 {
     if (curscr.curx == x && curscr.cury == y)
@@ -814,6 +847,7 @@ static void domvcur(int y, int x)
     curscr.curx = x;
     curscr.cury = y;
 }
+#endif
 
 void VMove(int y, int x)
 {
@@ -890,6 +924,7 @@ void VPutString(char *str)
         VPutChar(*str++);
 }
 
+#ifndef DECO_NEWT
 static char *makecolor(int c, int b)
 {
     register char *p = colorp;
@@ -919,7 +954,9 @@ static char *makecolor(int c, int b)
     }
     return (p);
 }
+#endif
 
+#ifndef DECO_NEWT
 static void initcolor()
 {
     register int i;
@@ -962,7 +999,9 @@ static void initcolor()
     }
     VSetPalette(7, 0, 0, 7, 15, 0, 15, 12, 3, 0, 0, 6);
 }
+#endif
 
+#ifndef DECO_NEWT
 void VSetPalette(int n, int nb, int nr, int nrb, int b, int bb, int br, int brb, int d, int db,
                  int dr, int drb)
 {
@@ -983,7 +1022,9 @@ void VSetPalette(int n, int nb, int nr, int nrb, int b, int bb, int br, int brb,
     DS = makecolor(ctab[d], btab[db]);   /* DIM - white on black */
     DR = makecolor(ctab[dr], btab[drb]); /* REVERSE DIM - bright yellow on brown */
 }
+#endif
 
+#ifndef DECO_NEWT
 static void initbold()
 {
     if (ME)
@@ -997,7 +1038,9 @@ static void initbold()
     else if (MR)
         SO = skipdelay(MR);
 }
+#endif
 
+#ifndef DECO_NEWT
 static void initgraph()
 {
     register int i;
@@ -1055,6 +1098,7 @@ static void initgraph()
             }
     }
 }
+#endif
 
 #define RESETATTR(a, b, c, f) \
     if (a)                    \
@@ -1065,6 +1109,7 @@ static void initgraph()
     }                         \
     break
 
+#ifndef DECO_NEWT
 static void resetattr(int c)
 {
     c &= DIM | BOLD | STANDOUT | GRAPH;
@@ -1084,6 +1129,7 @@ static void resetattr(int c)
     }
     curscr.flgs = c;
 }
+#endif
 
 #define SETATTR(a, b, c)                                \
     if (a)                                              \
@@ -1108,6 +1154,7 @@ static void resetattr(int c)
     }                                            \
     break
 
+#ifndef DECO_NEWT
 static void setattr(int c)
 {
     c &= DIM | BOLD | STANDOUT | GRAPH;
@@ -1137,6 +1184,7 @@ static void setattr(int c)
         }
     curscr.flgs = c;
 }
+#endif
 
 int VStandOut()
 {
@@ -1262,6 +1310,7 @@ static char *skipdelay(char *cp)
     return (cp);
 }
 
+#ifndef DECO_NEWT
 static void tputs(char *cp)
 {
     register int c;
@@ -1272,7 +1321,9 @@ static void tputs(char *cp)
     while ((c = *cp++))
         qputch(c);
 }
+#endif
 
+#ifndef DECO_NEWT
 static void cyr(int on)
 {
     if (on) {
@@ -1287,7 +1338,9 @@ static void cyr(int on)
         }
     }
 }
+#endif
 
+#ifndef DECO_NEWT
 static void putch(int c)
 {
     c &= 0377;
@@ -1308,18 +1361,23 @@ static void putch(int c)
     }
     qputch(c);
 }
+#endif
 
+#ifndef DECO_NEWT
 void VFlush()
 {
     if (outptr > outbuf)
         write(1, outbuf, (unsigned)(outptr - outbuf));
     outptr = outbuf;
 }
+#endif
 
+#ifndef DECO_NEWT
 void VBeep()
 {
     beepflag = 1;
 }
+#endif
 
 CURSOR VGetCursor()
 {
@@ -1603,5 +1661,183 @@ static int _graphsym(int c)
                 return ('0' + i - 1);
             }
     return ('?');
+}
+#endif
+
+#ifdef DECO_NEWT
+/*
+ * The screen on newt (S-Lang's screen management, which newt draws with):
+ * the virtual screen above stays, VSync writes its changed cells with
+ * SLsmg, which sends only what differs; newt's windows (the dialogs of
+ * choice.c) save and restore what they cover.
+ */
+#include <newt.h>
+#include <slang.h>
+
+/* S-Lang colour objects of the six attributes, past newt's own */
+enum { C_NORMAL = 64, C_REVERSE, C_BOLD, C_BOLDREV, C_DIM, C_DIMREV };
+
+static const char *const colornames[16] = {
+    "black",     "blue",          "green",  "cyan",       "red",         "magenta",
+    "brown",     "lightgray",     "gray",   "brightblue", "brightgreen", "brightcyan",
+    "brightred", "brightmagenta", "yellow", "white",
+};
+
+static int newt_on;
+
+static void newt_color(int obj, int fg, int bg)
+{
+    SLtt_set_color(obj, NULL, (char *)colornames[fg & 15], (char *)colornames[bg & 15]);
+}
+
+int VInit()
+{
+    if (!newt_on) {
+        newtInit();
+        newt_on = 1;
+    }
+    newtGetScreenSize(&COLS, &LINES);
+    if (LINES <= 6 || COLS <= 30)
+        return (0);
+    /* the line drawing characters in S-Lang's alternate set */
+    memcpy(linedraw, "qxmvjtnulwk", 11);
+    SO = NR = BS = DS = "";
+    VSetPalette(7, 0, 0, 7, 15, 0, 15, 12, 3, 0, 0, 6);
+    if (curscr.y)
+        delwin(&curscr);
+    if (VScreen.y)
+        delwin(&VScreen);
+    if (!newwin(&curscr) || !newwin(&VScreen)) {
+        VClose();
+        return (0);
+    }
+    VScreen.clear = 1;
+    return (1);
+}
+
+void VOpen()
+{
+}
+
+void VReopen()
+{
+    if (!newt_on) {
+        newtResume();
+        newt_on = 1;
+    }
+    VScreen.clear = 1;
+}
+
+void VClose()
+{
+    if (newt_on) {
+        newtFinished();
+        newt_on = 0;
+    }
+}
+
+/* the terminal for a program run from the commander */
+void VRestore()
+{
+    if (newt_on) {
+        newtSuspend();
+        newt_on = 0;
+    }
+}
+
+void VSetPalette(int n, int nb, int nr, int nrb, int b, int bb, int br, int brb, int d, int db,
+                 int dr, int drb)
+{
+    newt_color(C_NORMAL, n, nb);
+    newt_color(C_REVERSE, nr, nrb);
+    newt_color(C_BOLD, b, bb);
+    newt_color(C_BOLDREV, br, brb);
+    newt_color(C_DIM, d, db);
+    newt_color(C_DIMREV, dr, drb);
+}
+
+static int color_of(int c)
+{
+    int rev = (c & STANDOUT) != 0;
+
+    if (c & BOLD)
+        return (rev ? C_BOLDREV : C_BOLD);
+    if (c & DIM)
+        return (rev ? C_DIMREV : C_DIM);
+    return (rev ? C_REVERSE : C_NORMAL);
+}
+
+static void newt_line(int y)
+{
+    int x, last, attr = -1, graph = 0;
+    short c;
+
+    x    = VScreen.firstch[y];
+    last = VScreen.lastch[y];
+    if (x == NOCHANGE)
+        return;
+    SLsmg_gotorc(y, x);
+    for (; x <= last && x < COLS; ++x) {
+        c = VScreen.y[y][x];
+        if ((c & (BOLD | DIM | STANDOUT)) != attr) {
+            attr = c & (BOLD | DIM | STANDOUT);
+            SLsmg_set_color(color_of(c));
+        }
+        if (((c & GRAPH) != 0) != graph) {
+            graph = (c & GRAPH) != 0;
+            SLsmg_set_char_set(graph);
+        }
+        SLsmg_write_char((unsigned char)(c & 0377));
+    }
+    if (graph)
+        SLsmg_set_char_set(0);
+    VScreen.firstch[y] = NOCHANGE;
+}
+
+void VSyncLine(int wy)
+{
+    newt_line(wy);
+}
+
+void VSync()
+{
+    int y;
+
+    if (VScreen.clear) {
+        SLsmg_set_color(C_NORMAL);
+        SLsmg_cls();
+        VScreen.clear = 0;
+        for (y = 0; y < LINES; y++) {
+            VScreen.firstch[y] = 0;
+            VScreen.lastch[y]  = COLS - 1;
+        }
+    }
+    for (y = 0; y < LINES; y++) {
+        newt_line(y);
+        VScreen.lnum[y] = y;
+    }
+    SLsmg_gotorc(VScreen.cury, VScreen.curx);
+    if (beepflag) {
+        SLtt_beep();
+        beepflag = 0;
+    }
+    SLsmg_refresh();
+}
+
+void VRedraw()
+{
+    SLsmg_touch_lines(0, LINES);
+    VScreen.clear = 1;
+    VSync();
+}
+
+void VFlush()
+{
+    SLsmg_refresh();
+}
+
+void VBeep()
+{
+    beepflag = 1;
 }
 #endif

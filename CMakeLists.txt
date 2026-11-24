@@ -5,8 +5,11 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 add_compile_options(-Wall -Werror -Wshadow)
 
+# DECO_NEWT: the screen and the keys on newt (on S-Lang) instead of
+# termcap, for systems with newt but no terminfo (GonWare's CMDR.EXE)
+option(DECO_NEWT "Screen and keys on newt" OFF)
+
 add_executable(${PROJECT_NAME}
-    cap.c
     choice.c
     cmd.c
     com.c
@@ -17,7 +20,6 @@ add_executable(${PROJECT_NAME}
     ex.c
     help.c
     hexview.c
-    key.c
     main.c
     menu.c
     mh.c
@@ -25,11 +27,20 @@ add_executable(${PROJECT_NAME}
     rec.c
     run.c
     scr.c
-    tty.c
     ut.c
     view.c
 )
-target_link_libraries(${PROJECT_NAME} ncurses)
+if(DECO_NEWT)
+    target_sources(${PROJECT_NAME} PRIVATE newtio.c)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DECO_NEWT)
+    target_link_libraries(${PROJECT_NAME} newt slang)
+else()
+    target_sources(${PROJECT_NAME} PRIVATE cap.c key.c tty.c)
+    # termcap's tgetent: in ncurses, or in a separate tinfo (Gentoo, some
+    # other distributions split it off)
+    find_library(TINFO_LIBRARY tinfo)
+    target_link_libraries(${PROJECT_NAME} ncurses $<$<BOOL:${TINFO_LIBRARY}>:${TINFO_LIBRARY}>)
+endif()
 
 install(TARGETS ${PROJECT_NAME}
     DESTINATION bin
