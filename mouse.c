@@ -13,6 +13,7 @@
  * Copyright (C) 2026 Mario Fetka
  * Under the MIT license, as the rest of the commander.
  */
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -116,4 +117,143 @@ int mousestr(const char *s)
 {
     mstr = s;
     return mouseread(strget);
+}
+
+/*
+ * A key as xterm sends it with its modifiers: ESC [ num ; mod final, or
+ * ESC O mod final (mod - 1: 1 Shift, 2 Alt, 4 Ctrl; 1 for none). The
+ * commander's code for it, 0 for one it has no use for.
+ */
+int xtermkey(int final, int num, int mod)
+{
+    static const signed char fnum[25] = { 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,  1, 2,
+                                          3, 4, 5, 0, 6, 7, 8, 9, 10, 0, 11, 12 };
+    int f = 0, k = 0, m = mod > 1 ? mod - 1 : 0;
+
+    switch (final) {
+    case 'P':
+    case 'Q':
+    case 'R':
+    case 'S':
+        f = final - 'P' + 1;
+        break;
+    case 'A':
+        k = meta('u');
+        break;
+    case 'B':
+        k = meta('d');
+        break;
+    case 'C':
+        k = meta('r');
+        break;
+    case 'D':
+        k = meta('l');
+        break;
+    case 'H':
+        k = meta('h');
+        break;
+    case 'F':
+        k = meta('e');
+        break;
+    case '~':
+        if (num >= 11 && num <= 24)
+            f = fnum[num];
+        else if (num == 5)
+            k = meta('p');
+        else if (num == 6)
+            k = meta('n');
+        else if (num == 1 || num == 7)
+            k = meta('h');
+        else if (num == 4 || num == 8)
+            k = meta('e');
+        else if (num == 2)
+            k = cntrl('T');
+        else if (num == 3)
+            k = cntrl('G');
+        break;
+    }
+    if (f) {
+        if (m & 4)
+            return KEY_CF(f);
+        if (m & 2)
+            return KEY_AF(f);
+        if (m & 1)
+            return KEY_SF(f);
+        return f <= 10 ? meta(('A' + f - 1)) : 0;
+    }
+    if (k && (m & 4)) /* Ctrl and a cursor key */
+        switch (k) {
+        case meta('l'):
+            return KEY_CLEFT;
+        case meta('r'):
+            return KEY_CRIGHT;
+        case meta('h'):
+            return KEY_CHOME;
+        case meta('e'):
+            return KEY_CEND;
+        case meta('p'):
+            return KEY_CPGUP;
+        case meta('n'):
+            return KEY_CPGDN;
+        case meta('u'):
+            return KEY_CUP;
+        case meta('d'):
+            return KEY_CDOWN;
+        }
+    return k; /* with Shift or Alt: the key itself */
+}
+
+/* whether s (n bytes after the ESC) is a whole key sequence yet */
+int xtermdone(const unsigned char *s, int n)
+{
+    int i = n && s[0] == 033; /* Alt as an ESC before the key */
+
+    if (n <= i)
+        return 0;
+    if (s[i] == 'O')
+        return n > i + 1 &&
+               ((s[n - 1] >= 'A' && s[n - 1] <= 'Z') || (s[n - 1] >= 'a' && s[n - 1] <= 'z'));
+    if (s[i] != '[')
+        return 1;                     /* Alt and a key: no sequence */
+    if (n > i + 1 && s[i + 1] == '[') /* ESC [ [ A */
+        return n > i + 2;
+    return n > i + 1 && s[n - 1] >= 0x40 && s[n - 1] <= 0x7e;
+}
+
+/*
+ * A whole sequence after the ESC (n bytes): the key, 0 one of no use, -1
+ * none of the kind (xterm's keys with modifiers, Alt as an ESC before a
+ * key, the Linux console's F1-F5, the mouse).
+ */
+int xtermseq(const unsigned char *s, int n)
+{
+    char buf[40];
+    int alt = 0, num = 0, mod = 1, f, final;
+
+    if (n > 0 && s[0] == 033)
+        alt = 1, ++s, --n;
+    if (n < 2 || n >= (int)sizeof(buf))
+        return -1;
+    memcpy(buf, s, n);
+    buf[n] = 0;
+    final  = (unsigned char)buf[n - 1];
+    if (buf[0] == '[' && buf[1] == '<')
+        return alt ? -1 : mousestr(buf + 2);
+    if (buf[0] == '[' && buf[1] == '[') { /* ESC [ [ A ... E */
+        if (final < 'A' || final > 'E')
+            return 0;
+        f = final - 'A' + 1;
+        return alt ? KEY_AF(f) : meta(('A' + f - 1));
+    }
+    if (buf[0] == 'O')
+        sscanf(buf + 1, "%d", &mod);
+    else if (buf[0] == '[')
+        sscanf(buf + 1, "%d;%d", &num, &mod);
+    else
+        return -1;
+    if (mod < 1)
+        mod = 1;
+    if (alt)
+        mod = ((mod - 1) | 2) + 1;
+    return xtermkey(final, num, mod);
 }

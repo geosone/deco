@@ -56,18 +56,14 @@ void KeyInit(struct KeyMap *map, void (*flushproc)(void))
 }
 
 /*
- * F1/F2 with Alt or Shift, which newt does not know, after the ESC newt
- * gave back:
- *   ESC [ 1 ; m P, ESC [ 1 1 ; m ~   xterm, VTE, Konsole (m - 1: 1 Shift, 2 Alt)
- *   ESC O m P                         older xterm and Konsole
- *   ESC ESC O P, ESC ESC [ 1 1 ~, ESC ESC [ [ A
- *                                     Alt as an ESC before the key (rxvt,
- *                                     "meta sends escape", the Linux console)
- * Alt-F1/Alt-F2, Shift-F1/Shift-F2 choose the drive of the left and right
- * panel (on GonWare Alt-F1... switch the screens). Other keys of this form
- * are dropped; anything else goes back and the ESC stays an ESC.
+ * The keys newt does not know, after the ESC it gave back: those with
+ * Shift, Alt or Ctrl as xterm, VTE and Konsole send them (ESC [ 1 ; m P,
+ * ESC [ 15 ; m ~, ESC [ 1 ; m D, older ESC O m P), Alt as an ESC before
+ * the key (ESC ESC O P, ESC ESC [ 11 ~; rxvt, "meta sends escape", the
+ * Linux console's ESC ESC [ [ A), and the mouse reports ESC [ < b ; x ; y
+ * M (mouse.c). xtermkey() says what they are; one of no use is dropped,
+ * anything else goes back and the ESC stays an ESC.
  */
-/* also: the mouse reports ESC [ < b ; x ; y M (mouse.c) */
 static int modkey(void)
 {
     unsigned char b[32];
@@ -93,31 +89,21 @@ static int modkey(void)
     }
     i = alt + 1; /* the parameters after [ or O */
     if (b[i] == '[' && b[alt] == '[') {
-        if (c >= 'A' && c <= 'E') /* Linux console: ESC [ [ A */
-            f = c - 'A' + 1;
-    } else {
-        if (b[alt] == 'O')
-            sscanf((char *)b + i, "%d", &mod); /* ESC O m P */
-        else
-            sscanf((char *)b + i, "%d;%d", &num, &mod);
-        if (c >= 'P' && c <= 'S')
-            f = c - 'P' + 1;
-        else if (c == '~' && num >= 11 && num <= 15)
-            f = num - 10;
-        else
-            goto back;
+        /* Linux console: ESC [ [ A ... E, F1 ... F5 */
+        if (c < 'A' || c > 'E')
+            return 0;
+        f = c - 'A' + 1;
+        return alt ? KEY_AF(f) : meta(('A' + f - 1));
     }
+    if (b[alt] == 'O')
+        sscanf((char *)b + i, "%d", &mod); /* ESC O m P */
+    else
+        sscanf((char *)b + i, "%d;%d", &num, &mod);
     if (mod < 1)
         mod = 1;
     if (alt)
         mod = ((mod - 1) | 2) + 1; /* with Alt */
-    if ((mod - 1) & 3) {
-        if (f == 1)
-            return meta('1');
-        if (f == 2)
-            return meta('2');
-    }
-    return 0;
+    return xtermkey(c, num, mod);  /* 0: one of no use, dropped */
 back:
     while (n > 0)
         SLang_ungetkey(b[--n]);

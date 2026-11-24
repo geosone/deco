@@ -175,6 +175,7 @@ static char Cy;
 static char *Cs, *Ce, *Ct;
 
 char VCyrInputTable['~' - ' ' + 1];
+int VCyrInput; /* the terminal has the table (Cy, Ct): ^N, ^O switch it */
 #ifndef DECO_NEWT
 static char VCyrOutputTable[64];
 static int cyroutput;
@@ -371,7 +372,7 @@ int VInit()
         int fd = open(Ct, 0);
         if (fd >= 0) {
             read(fd, VCyrOutputTable, sizeof(VCyrOutputTable));
-            read(fd, VCyrInputTable, sizeof(VCyrInputTable));
+            VCyrInput = read(fd, VCyrInputTable, sizeof(VCyrInputTable)) > 0;
             close(fd);
         }
     }

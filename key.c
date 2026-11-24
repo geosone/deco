@@ -40,6 +40,11 @@ static unsigned oldalarm;
 
 static int cyrinput;
 extern char VCyrInputTable[];
+extern int VCyrInput;
+
+/* the bytes of the escape sequence being read, after its ESC */
+static unsigned char seq[32];
+static int seqn;
 
 /*
  *      Compare keys. Used in call to qsort.
@@ -144,11 +149,19 @@ static int nmgetch(struct KeyMap *kp)
             /* a longer key starting with this one (ESC ESC O P after ESC
              * ESC): if more comes at once, it is that one */
             lp = kp + 1;
-            if (!lp->str || strncmp(lp->str, kp->str, match) || !morekeys())
+            if (!lp->str || strncmp(lp->str, kp->str, match)) {
+                /* ESC ESC and more at once: Alt and a key */
+                if (!strcmp(kp->str, "\033\033") && morekeys())
+                    goto unknown;
+                return (kp->val);
+            }
+            if (!morekeys())
                 return (kp->val);
             kp = lp;
         }
         c = KeyGetChar();
+        if (seqn < (int)sizeof(seq))
+            seq[seqn++] = c;
         if (kp->str[match] == c)
             continue;
         lp = kp;
@@ -201,10 +214,10 @@ nextkey:
          * It is specified by Ct termcap descriptor.
          * ^O turns off cyrillic input mode.
          */
-        if (c == cntrl('N')) {
+        if (VCyrInput && c == cntrl('N')) {
             cyrinput = 1;
             goto nextkey;
-        } else if (c == cntrl('O')) {
+        } else if (VCyrInput && c == cntrl('O')) {
             cyrinput = 0;
             goto nextkey;
         } else if (cyrinput && c >= ' ' && c <= '~')
@@ -217,11 +230,24 @@ nextkey:
     /* look for escape sequence */
     if ((j = setjmp(wakeup))) {
         /* time out or unknown escape sequence */
-        TtyFlushInput();
-        if (j < 0)
+        if (j < 0) {
+            TtyFlushInput();
             return (c);
+        }
+        /* one not in the table: a key with Shift, Alt or Ctrl as xterm
+         * sends it, Alt as an ESC before a key (mouse.c) */
+        if (c == 033) {
+            while (seqn < (int)sizeof(seq) && !xtermdone(seq, seqn) && morekeys())
+                seq[seqn++] = KeyGetChar();
+            if ((j = xtermseq(seq, seqn)) > 0)
+                return (j);
+            if (j == 0)
+                goto nextkey;
+        }
+        TtyFlushInput();
         goto nextkey;
     }
+    seqn = 0;
     signal(SIGALRM, badkey);
     oldalarm = alarm(2);
     c        = nmgetch(kp);

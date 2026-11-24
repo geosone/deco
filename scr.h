@@ -2,7 +2,19 @@
 #define cntrl(c) (c & 037)
 #endif
 #ifndef meta
-#define meta(c)     (c | 0400)
+#define meta(c) (c | 0400)
+/* keys with Shift, Alt or Ctrl, past the meta() range */
+#define KEY_SF(n)   (01000 + (n)) /* Shift-F1 ... Shift-F12 */
+#define KEY_AF(n)   (01020 + (n)) /* Alt-F1 ... */
+#define KEY_CF(n)   (01040 + (n)) /* Ctrl-F1 ... */
+#define KEY_CLEFT   01100         /* Ctrl and a cursor key */
+#define KEY_CRIGHT  01101
+#define KEY_CHOME   01102
+#define KEY_CEND    01103
+#define KEY_CPGUP   01104
+#define KEY_CPGDN   01105
+#define KEY_CUP     01106
+#define KEY_CDOWN   01107
 #define MOUSEREPORT meta('@') /* the key table: ESC [ <, a mouse report follows */
 #endif
 
@@ -121,6 +133,9 @@ int KeyGetChar(void);
 void VMouse(int on);
 int mouseread(int (*get)(void));
 int mousestr(const char *s);
+int xtermkey(int final, int num, int mod);
+int xtermdone(const unsigned char *s, int n);
+int xtermseq(const unsigned char *s, int n);
 int KeyGet(void);
 void KeyUnget(int key);
 

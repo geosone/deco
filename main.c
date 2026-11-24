@@ -35,87 +35,38 @@ struct palette dflt_palette = {
 struct palette palette;
 
 static struct KeyMap keymap[] = {
-    { "kl", 0, meta('l') },
-    { "kr", 0, meta('r') },
-    { "ku", 0, meta('u') },
-    { "kd", 0, meta('d') },
-    { "kN", 0, meta('n') },
-    { "kP", 0, meta('p') },
-    { "kh", 0, meta('h') },
-    { "kH", 0, meta('e') },
-    { "@7", 0, meta('e') },
-    { "kI", 0, cntrl('T') },
-    { "k.", 0, cntrl('G') },
-    { "kD", 0, cntrl('G') },
-    { "kE", 0, meta('h') },
-    { "kS", 0, meta('e') },
-    { "k1", 0, meta('A') },
-    { "k2", 0, meta('B') },
-    { "k3", 0, meta('C') },
-    { "k4", 0, meta('D') },
-    { "k5", 0, meta('E') },
-    { "k6", 0, meta('F') },
-    { "k7", 0, meta('G') },
-    { "k8", 0, meta('H') },
-    { "k9", 0, meta('I') },
-    { "k0", 0, meta('J') },
-    { "k;", 0, meta('J') },
-    { "f1", 0, meta('A') },
-    { "f2", 0, meta('B') },
-    { "f3", 0, meta('C') },
-    { "f4", 0, meta('D') },
-    { "f5", 0, meta('E') },
-    { "f6", 0, meta('F') },
-    { "f7", 0, meta('G') },
-    { "f8", 0, meta('H') },
-    { "f9", 0, meta('I') },
-    { "f0", 0, meta('J') },
-    { "kb", "\b", meta('b') },
-    { 0, "\0331", meta('A') },
-    { 0, "\0332", meta('B') },
-    { 0, "\0333", meta('C') },
-    { 0, "\0334", meta('D') },
-    { 0, "\0335", meta('E') },
-    { 0, "\0336", meta('F') },
-    { 0, "\0337", meta('G') },
-    { 0, "\0338", meta('H') },
-    { 0, "\0339", meta('I') },
-    { 0, "\0330", meta('J') },
+    { "kl", 0, meta('l') },        { "kr", 0, meta('r') },
+    { "ku", 0, meta('u') },        { "kd", 0, meta('d') },
+    { "kN", 0, meta('n') },        { "kP", 0, meta('p') },
+    { "kh", 0, meta('h') },        { "kH", 0, meta('e') },
+    { "@7", 0, meta('e') },        { "kI", 0, cntrl('T') },
+    { "k.", 0, cntrl('G') },       { "kD", 0, cntrl('G') },
+    { "kE", 0, meta('h') },        { "kS", 0, meta('e') },
+    { "k1", 0, meta('A') },        { "k2", 0, meta('B') },
+    { "k3", 0, meta('C') },        { "k4", 0, meta('D') },
+    { "k5", 0, meta('E') },        { "k6", 0, meta('F') },
+    { "k7", 0, meta('G') },        { "k8", 0, meta('H') },
+    { "k9", 0, meta('I') },        { "k0", 0, meta('J') },
+    { "k;", 0, meta('J') },        { "f1", 0, meta('A') },
+    { "f2", 0, meta('B') },        { "f3", 0, meta('C') },
+    { "f4", 0, meta('D') },        { "f5", 0, meta('E') },
+    { "f6", 0, meta('F') },        { "f7", 0, meta('G') },
+    { "f8", 0, meta('H') },        { "f9", 0, meta('I') },
+    { "f0", 0, meta('J') },        { "kb", "\b", meta('b') },
+    { 0, "\0331", meta('A') },     { 0, "\0332", meta('B') },
+    { 0, "\0333", meta('C') },     { 0, "\0334", meta('D') },
+    { 0, "\0335", meta('E') },     { 0, "\0336", meta('F') },
+    { 0, "\0337", meta('G') },     { 0, "\0338", meta('H') },
+    { 0, "\0339", meta('I') },     { 0, "\0330", meta('J') },
 
-    { 0, "\033l", meta('l') },
-    { 0, "\033r", meta('r') },
-    { 0, "\033u", meta('u') },
-    { 0, "\033d", meta('d') },
-    { 0, "\033n", meta('n') },
-    { 0, "\033p", meta('p') },
-    { 0, "\033h", meta('h') },
-    { 0, "\033e", meta('e') },
-
-    /* Alt-F1/F2, Shift-F1/F2: the drive of a panel; xterm, VTE, Konsole,
-       older xterm, and Alt as an ESC before the key (rxvt, Linux console) */
-    { 0, "\033[1;3P", meta('1') },
-    { 0, "\033[1;3Q", meta('2') },
-    { 0, "\033[1;2P", meta('1') },
-    { 0, "\033[1;2Q", meta('2') },
-    { 0, "\033[11;3~", meta('1') },
-    { 0, "\033[12;3~", meta('2') },
-    { 0, "\033[11;2~", meta('1') },
-    { 0, "\033[12;2~", meta('2') },
-    { 0, "\033O3P", meta('1') },
-    { 0, "\033O3Q", meta('2') },
-    { 0, "\033O2P", meta('1') },
-    { 0, "\033O2Q", meta('2') },
-    { 0, "\033\033OP", meta('1') },
-    { 0, "\033\033OQ", meta('2') },
-    { 0, "\033\033[11~", meta('1') },
-    { 0, "\033\033[12~", meta('2') },
-    { 0, "\033\033[[A", meta('1') },
-    { 0, "\033\033[[B", meta('2') },
+    { 0, "\033l", meta('l') },     { 0, "\033r", meta('r') },
+    { 0, "\033u", meta('u') },     { 0, "\033d", meta('d') },
+    { 0, "\033n", meta('n') },     { 0, "\033p", meta('p') },
+    { 0, "\033h", meta('h') },     { 0, "\033e", meta('e') },
 
     { 0, "\033[<", MOUSEREPORT }, /* the mouse: the rest in KeyGet */
 
-    { 0, "\033\033", cntrl('C') },
-    { 0, 0, 0 },
+    { 0, "\033\033", cntrl('C') }, { 0, 0, 0 },
 };
 
 static void init(void);
@@ -284,9 +235,11 @@ int main(int argc, char **argv, char **envp)
             if ((c = mouseclick()))
                 KeyUnget(c);
             continue;
-        case meta('1'): /* Alt-F1, Shift-F1: the left panel's drive */
-        case meta('2'): /* Alt-F2, Shift-F2: the right one's */
-            setdrive(c == meta('1') ? 'l' : 'r', 0);
+        case KEY_SF(1): /* Shift-F1, Alt-F1: the left panel's drive */
+        case KEY_AF(1):
+        case KEY_SF(2): /* Shift-F2, Alt-F2: the right one's */
+        case KEY_AF(2):
+            setdrive(c == KEY_SF(1) || c == KEY_AF(1) ? 'l' : 'r', 0);
             draw();
             continue;
         case meta('B'): /* f2 */
