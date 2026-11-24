@@ -325,6 +325,8 @@ static void userloop(void)
             VUserScreen();
         }
     }
+    /* the prompt left there goes, the line is free for what comes */
+    write(1, "\r\33[K", 4);
     cmdreg    = 0;
     visualwin = 1;
 }

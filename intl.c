@@ -89,6 +89,7 @@ int trchosen()
     return chosen[0] != 0;
 }
 
+#ifndef __GONWARE__
 /* "locale" beside the program, where the build puts the catalogues: a
  * commander run from its build directory speaks the language too; NULL
  * if there is none (or no /proc/self/exe) */
@@ -108,6 +109,8 @@ static char *besideme(void)
     return stat(path, &st) == 0 && S_ISDIR(st.st_mode) ? path : 0;
 }
 
+#endif
+
 void trinit()
 {
     char *dir = getenv("TEXTDOMAINDIR"); /* gettext's way to point elsewhere */
@@ -115,8 +118,10 @@ void trinit()
 #ifdef LC_MESSAGES
     setlocale(LC_MESSAGES, "");
 #endif
+#ifndef __GONWARE__ /* there the catalogues are in the program */
     if (!dir || !*dir)
         dir = besideme();
+#endif
 #ifdef CMDR_LOCALEDIR
     if (!dir || !*dir)
         dir = CMDR_LOCALEDIR;
