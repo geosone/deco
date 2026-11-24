@@ -11,7 +11,16 @@
 menufunc setfull, reread, directory, setpattern, makelink, viewinfo, editinfo;
 menufunc setlang, redraw, shell, cmpdir, fullscreen, setshellname, setviewname;
 menufunc seteditname, writeinitfile, switchalign, setsort, setrevsort;
-menufunc settypesort, switchhidden;
+menufunc settypesort, switchhidden, setdrive;
+
+/* the keys of Left/Right Drive: on GonWare Alt-F1... switch the screens */
+#ifdef __GONWARE__
+#define DRIVEKEY_L "S-F1"
+#define DRIVEKEY_R "S-F2"
+#else
+#define DRIVEKEY_L "A-F1"
+#define DRIVEKEY_R "A-F2"
+#endif
 
 #ifdef S_IFLNK
 menufunc makeslink;
@@ -37,6 +46,7 @@ static struct submenu lmenu[] = {
     { "", 0,                      0,    0 },
     { N_("Re-read"), "^R",  'r',  reread },
     { N_("Pattern"), 0,              'p',  setpattern },
+    { N_("Drive..."), DRIVEKEY_L,    'd',  setdrive },
     { 0,                      0,    0 },
     // clang-format on
 };
@@ -61,6 +71,7 @@ static struct submenu rmenu[] = {
     { "", 0,                      0,    0 },
     { N_("Re-read"), "^R",  'r',  reread },
     { N_("Pattern"), 0,              'p',  setpattern },
+    { N_("Drive..."), DRIVEKEY_R,    'd',  setdrive },
     { 0,                      0,    0 },
     // clang-format on
 };

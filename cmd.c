@@ -17,6 +17,8 @@
 #define MAXARGV 400
 
 #ifdef __GONWARE__
+#include <gonware/syscall.h>
+
 /* GDOS: the shell is COMMAND.EXE (COMSPEC); /C runs one command line, no
  * argument is the interactive shell */
 static char shname[]  = "COMMAND";
@@ -1149,4 +1151,113 @@ int doexec(char *str)
     status = runv(0, str, argv);
     free(str);
     return (status);
+}
+
+/*
+ * The drives to choose a panel's directory from: on GDOS the volumes
+ * with a drive letter, on Unix the mounted file systems on a device and
+ * the home directory.
+ */
+#define MAXDRIVES 32
+
+struct drive {
+    char path[256];
+    char text[320];
+};
+
+#ifndef __GONWARE__
+/* a path of /proc/mounts: \040 for a space and so on */
+static void unoctal(char *s)
+{
+    char *d = s;
+
+    for (; *s; ++s)
+        if (s[0] == '\\' && s[1] >= '0' && s[1] <= '3' && s[2] >= '0' && s[3] >= '0') {
+            *d++ = (s[1] - '0') << 6 | (s[2] - '0') << 3 | (s[3] - '0');
+            s += 3;
+        } else
+            *d++ = *s;
+    *d = 0;
+}
+#endif
+
+static int getdrives(struct drive *dv, int max)
+{
+    int n = 0, i;
+#ifdef __GONWARE__
+    struct gdos_volume v;
+    long k;
+    struct drive t;
+
+    for (k = 0; n < max && gdos_call2(GDOS_VOL_LIST, k, &v) > 0; ++k) {
+        if (!v.letter)
+            continue; /* an EFI system partition without a letter */
+        snprintf(dv[n].path, sizeof(dv[n].path), "%c:\\", (int)v.letter);
+        snprintf(dv[n].text, sizeof(dv[n].text), "%c:  %-6.8s %.12s", (int)v.letter, v.type,
+                 v.label);
+        ++n;
+    }
+    for (i = 1; i < n; ++i) /* by letter */
+        for (k = i; k > 0 && dv[k - 1].path[0] > dv[k].path[0]; --k)
+            t = dv[k], dv[k] = dv[k - 1], dv[k - 1] = t;
+#else
+    char dev[256], dir[256], type[64];
+    FILE *f = fopen("/proc/self/mounts", "r");
+
+    if (!f)
+        f = fopen("/etc/mtab", "r");
+    while (f && n < max && fscanf(f, "%255s %255s %63s %*[^\n]", dev, dir, type) == 3) {
+        if (dev[0] != '/' && strcmp(dir, "/"))
+            continue; /* proc, sysfs, tmpfs ...: no device */
+        unoctal(dir);
+        for (i = 0; i < n && strcmp(dv[i].path, dir); ++i)
+            ;
+        if (i < n)
+            continue;
+        snprintf(dv[n].path, sizeof(dv[n].path), "%s", dir);
+        snprintf(dv[n].text, sizeof(dv[n].text), "%-24s %s", dir, type);
+        ++n;
+    }
+    if (f)
+        fclose(f);
+    if (home && n < max) {
+        snprintf(dv[n].path, sizeof(dv[n].path), "%s", home);
+        snprintf(dv[n].text, sizeof(dv[n].text), "%-24s ~", home);
+        ++n;
+    }
+#endif
+    return n;
+}
+
+/* Left/Right Drive (Alt-F1, Alt-F2): the panel to the root of a drive */
+void setdrive(int k, int sk)
+{
+    struct dir *d = k == 'l' ? &left : &right;
+    static struct drive dv[MAXDRIVES];
+    char *items[MAXDRIVES];
+    int n, i, sel = 0, best = -1, l;
+
+    n = getdrives(dv, MAXDRIVES);
+    if (!n)
+        return;
+    for (i = 0; i < n; ++i) {
+        items[i] = dv[i].text;
+        l        = strlen(dv[i].path);
+        /* the drive the panel is on: the longest path its directory starts with */
+#ifdef __GONWARE__
+        if ((d->cwd[0] | 040) == (dv[i].path[0] | 040) && l > best)
+#else
+        if (!strncmp(d->cwd, dv[i].path, l) && (d->cwd[l] == '/' || !d->cwd[l] || l == 1) &&
+            l > best)
+#endif
+            best = l, sel = i;
+    }
+    i = getlistat(_(" Drive "), items, n, sel, widewin ? COLS / 2 : d->basecol + PAGEWID / 2);
+    if (i < 0)
+        return;
+    if (chdir(dv[i].path) < 0)
+        error(_("Cannot chdir to %s"), dv[i].path);
+    else
+        setdir(d, ".");
+    chdir(cur->cwd);
 }

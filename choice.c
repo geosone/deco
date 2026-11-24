@@ -437,6 +437,12 @@ static char *getwstring1(int w, char *str, char *head, char *mesg)
  */
 int getlist(char *head, char **items, int n, int sel)
 {
+    return getlistat(head, items, n, sel, COLS / 2);
+}
+
+/* the list centred on column mid */
+int getlistat(char *head, char **items, int n, int sel, int mid)
+{
     int w = VStrLen(head), r, c, i, key, oldc;
     BOX *box, *curbox;
 
@@ -445,7 +451,11 @@ int getlist(char *head, char **items, int n, int sel)
             w = VStrLen(items[i]);
     w += 4;
     r = (LINES - n) / 2;
-    c = (COLS - w) / 2;
+    c = mid - w / 2;
+    if (c + w + 4 > COLS)
+        c = COLS - w - 4;
+    if (c < 4)
+        c = 4;
     if (sel < 0 || sel >= n)
         sel = 0;
 

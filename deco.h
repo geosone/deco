@@ -43,7 +43,9 @@ int trchosen(void);
 void menuretranslate(void);
 void setlang_help(const char *code);
 void helpreset(void);
+void setdrive(int k, int sk);
 int getlist(char *head, char **items, int n, int sel);
+int getlistat(char *head, char **items, int n, int sel, int mid);
 #define _(s)        tr(s)
 #define P_(s, p, n) ntr(s, p, (unsigned long)(n))
 #define N_(s)       (s)

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: GonWare Commander 4.0\n"
 "Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/deco/"
 "issues\n"
-"POT-Creation-Date: 2026-11-24 21:16+0100\n"
+"POT-Creation-Date: 2026-11-24 21:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,369 +23,373 @@ msgstr ""
 msgid " Error "
 msgstr ""
 
-#: choice.c:43 cmd.c:878
+#: choice.c:43 cmd.c:880
 msgid " Ok "
 msgstr ""
 
-#: cmd.c:134
+#: cmd.c:136
 msgid " Change directory "
 msgstr ""
 
-#: cmd.c:134
+#: cmd.c:136
 msgid "Change directory to"
 msgstr ""
 
-#: cmd.c:139 com.c:464 dir.c:122 dir.c:160
+#: cmd.c:141 cmd.c:1259 com.c:464 dir.c:122 dir.c:160
 #, c-format
 msgid "Cannot chdir to %s"
 msgstr ""
 
-#: cmd.c:231 cmd.c:240
+#: cmd.c:233 cmd.c:242
 msgid " View "
 msgstr ""
 
-#: cmd.c:231
+#: cmd.c:233
 msgid "Select which viewer to use for F3:"
 msgstr ""
 
-#: cmd.c:231 cmd.c:263
+#: cmd.c:233 cmd.c:265
 msgid " Built-in "
 msgstr ""
 
-#: cmd.c:232 cmd.c:264
+#: cmd.c:234 cmd.c:266
 msgid " External "
 msgstr ""
 
-#: cmd.c:240
+#: cmd.c:242
 msgid "Viewer to use"
 msgstr ""
 
-#: cmd.c:248
+#: cmd.c:250
 msgid " Shell "
 msgstr ""
 
-#: cmd.c:248
+#: cmd.c:250
 msgid "Select which shell to use:"
 msgstr ""
 
-#: cmd.c:249
+#: cmd.c:251
 msgid " Cshell "
 msgstr ""
 
-#: cmd.c:263 cmd.c:272 cmd.c:382 edit.c:128 edit.c:335
+#: cmd.c:265 cmd.c:274 cmd.c:384 edit.c:128 edit.c:335
 msgid " Edit "
 msgstr ""
 
-#: cmd.c:263
+#: cmd.c:265
 msgid "Select which editor to use for F4:"
 msgstr ""
 
-#: cmd.c:272
+#: cmd.c:274
 msgid "Editor to use"
 msgstr ""
 
-#: cmd.c:297 cmd.c:324 rec.c:266
+#: cmd.c:299 cmd.c:326 rec.c:266
 #, c-format
 msgid "Cannot open %s"
 msgstr ""
 
-#: cmd.c:340
+#: cmd.c:342
 msgid "Cannot edit special files"
 msgstr ""
 
-#: cmd.c:346 ex.c:834 rec.c:253 rec.c:275
+#: cmd.c:348 ex.c:834 rec.c:253 rec.c:275
 #, c-format
 msgid "Cannot create %s"
 msgstr ""
 
-#: cmd.c:364
+#: cmd.c:366
 #, c-format
 msgid "Cannot open %s for writing"
 msgstr ""
 
-#: cmd.c:382
+#: cmd.c:384
 msgid "Enter name of file to edit"
 msgstr ""
 
-#: cmd.c:404
+#: cmd.c:406
 msgid " Menu Edit "
 msgstr ""
 
-#: cmd.c:404
+#: cmd.c:406
 msgid "Select which menu to edit:"
 msgstr ""
 
-#: cmd.c:404
+#: cmd.c:406
 msgid " Current menu "
 msgstr ""
 
-#: cmd.c:405
+#: cmd.c:407
 msgid " Home menu "
 msgstr ""
 
-#: cmd.c:431
+#: cmd.c:433
 #, c-format
 msgid "Do you want to quit the %s ?"
 msgstr ""
 
-#: cmd.c:433
+#: cmd.c:435
 msgid "Do you want to log out ?"
 msgstr ""
 
-#: cmd.c:434
+#: cmd.c:436
 msgid " Yes "
 msgstr ""
 
-#: cmd.c:434
+#: cmd.c:436
 msgid " No "
 msgstr ""
 
-#: cmd.c:434
+#: cmd.c:436
 msgid " Exec shell "
 msgstr ""
 
-#: cmd.c:514
+#: cmd.c:516
 #, c-format
 msgid "Copy %d file to"
 msgid_plural "Copy %d files to"
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:515 cmd.c:526 cmd.c:552 cmd.c:557 cmd.c:568 cmd.c:574
+#: cmd.c:517 cmd.c:528 cmd.c:554 cmd.c:559 cmd.c:570 cmd.c:576
 msgid " Copy "
 msgstr ""
 
-#: cmd.c:526 cmd.c:574 cmd.c:613 cmd.c:645 cmd.c:685 cmd.c:717 cmd.c:759
-#: cmd.c:796 cmd.c:817
+#: cmd.c:528 cmd.c:576 cmd.c:615 cmd.c:647 cmd.c:687 cmd.c:719 cmd.c:761
+#: cmd.c:798 cmd.c:819
 msgid "File exists"
 msgstr ""
 
-#: cmd.c:527 cmd.c:575 cmd.c:614 cmd.c:646 cmd.c:686 cmd.c:718 cmd.c:760
-#: cmd.c:797 cmd.c:818
+#: cmd.c:529 cmd.c:577 cmd.c:616 cmd.c:648 cmd.c:688 cmd.c:720 cmd.c:762
+#: cmd.c:799 cmd.c:820
 msgid " Overwrite "
 msgstr ""
 
-#: cmd.c:527 cmd.c:760
+#: cmd.c:529 cmd.c:762
 msgid " All "
 msgstr ""
 
-#: cmd.c:527 cmd.c:575 cmd.c:614 cmd.c:646 cmd.c:686 cmd.c:718 cmd.c:760
-#: cmd.c:797 cmd.c:818 cmd.c:872 cmd.c:878 cmd.c:887 cmd.c:897
+#: cmd.c:529 cmd.c:577 cmd.c:616 cmd.c:648 cmd.c:688 cmd.c:720 cmd.c:762
+#: cmd.c:799 cmd.c:820 cmd.c:874 cmd.c:880 cmd.c:889 cmd.c:899
 msgid " Cancel "
 msgstr ""
 
-#: cmd.c:542 cmd.c:578 cmd.c:617 cmd.c:649 cmd.c:689 cmd.c:721 cmd.c:770
-#: cmd.c:821
+#: cmd.c:544 cmd.c:580 cmd.c:619 cmd.c:651 cmd.c:691 cmd.c:723 cmd.c:772
+#: cmd.c:823
 #, c-format
 msgid "%s is a directory"
 msgstr ""
 
-#: cmd.c:552
+#: cmd.c:554
 #, c-format
 msgid "Copying %d file to %s ..."
 msgid_plural "Copying %d files to %s ..."
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:557 cmd.c:628 cmd.c:700 cmd.c:780
+#: cmd.c:559 cmd.c:630 cmd.c:702 cmd.c:782
 msgid "Done"
 msgstr ""
 
-#: cmd.c:559
+#: cmd.c:561
 #, c-format
 msgid "Error while copying %d file to %s"
 msgid_plural "Error while copying %d files to %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:582
+#: cmd.c:584
 #, c-format
 msgid "Cannot copy %s to %s"
 msgstr ""
 
-#: cmd.c:603
+#: cmd.c:605
 #, c-format
 msgid "Link %d file to"
 msgid_plural "Link %d files to"
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:604 cmd.c:613 cmd.c:623 cmd.c:628 cmd.c:639 cmd.c:645
+#: cmd.c:606 cmd.c:615 cmd.c:625 cmd.c:630 cmd.c:641 cmd.c:647
 msgid " Link "
 msgstr ""
 
-#: cmd.c:623 cmd.c:695
+#: cmd.c:625 cmd.c:697
 #, c-format
 msgid "Linking %d file to %s ..."
 msgid_plural "Linking %d files to %s ..."
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:630 cmd.c:702
+#: cmd.c:632 cmd.c:704
 #, c-format
 msgid "Error while linking %d file to %s"
 msgid_plural "Error while linking %d files to %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:653
+#: cmd.c:655
 #, c-format
 msgid "Cannot link %s to %s"
 msgstr ""
 
-#: cmd.c:675
+#: cmd.c:677
 #, c-format
 msgid "Symlink %d file to"
 msgid_plural "Symlink %d files to"
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:676 cmd.c:685 cmd.c:695 cmd.c:700 cmd.c:711 cmd.c:717
+#: cmd.c:678 cmd.c:687 cmd.c:697 cmd.c:702 cmd.c:713 cmd.c:719
 msgid " Symlink "
 msgstr ""
 
-#: cmd.c:725
+#: cmd.c:727
 #, c-format
 msgid "Cannot symlink %s to %s"
 msgstr ""
 
-#: cmd.c:747
+#: cmd.c:749
 #, c-format
 msgid "Rename or move %d file to"
 msgid_plural "Rename or move %d files to"
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:748 cmd.c:759 cmd.c:790 cmd.c:796 cmd.c:811 cmd.c:817
+#: cmd.c:750 cmd.c:761 cmd.c:792 cmd.c:798 cmd.c:813 cmd.c:819
 msgid " Rename "
 msgstr ""
 
-#: cmd.c:775 cmd.c:780
+#: cmd.c:777 cmd.c:782
 msgid " Move "
 msgstr ""
 
-#: cmd.c:775
+#: cmd.c:777
 #, c-format
 msgid "Moving %d file to %s ..."
 msgid_plural "Moving %d files to %s ..."
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:782
+#: cmd.c:784
 #, c-format
 msgid "Error while moving %d file to %s"
 msgid_plural "Error while moving %d files to %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:800
+#: cmd.c:802
 #, c-format
 msgid "Directory %s exists"
 msgstr ""
 
-#: cmd.c:804 cmd.c:825
+#: cmd.c:806 cmd.c:827
 #, c-format
 msgid "Cannot move %s to %s"
 msgstr ""
 
-#: cmd.c:839
+#: cmd.c:841
 msgid " Make directory "
 msgstr ""
 
-#: cmd.c:839
+#: cmd.c:841
 msgid "Create the directory"
 msgstr ""
 
-#: cmd.c:844
+#: cmd.c:846
 #, c-format
 msgid "File %s exists"
 msgstr ""
 
-#: cmd.c:847
+#: cmd.c:849
 #, c-format
 msgid "Directory %s already exists"
 msgstr ""
 
-#: cmd.c:851
+#: cmd.c:853
 #, c-format
 msgid "Cannot create directory %s"
 msgstr ""
 
-#: cmd.c:871
+#: cmd.c:873
 #, c-format
 msgid "You have selected %d file."
 msgid_plural "You have selected %d files."
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:872 cmd.c:878 cmd.c:886 cmd.c:887 cmd.c:896 help.c:54 help.c:129
+#: cmd.c:874 cmd.c:880 cmd.c:888 cmd.c:889 cmd.c:898 help.c:54 help.c:129
 msgid " Delete "
 msgstr ""
 
-#: cmd.c:875
+#: cmd.c:877
 #, c-format
 msgid "You are DELETING %d selected file from"
 msgid_plural "You are DELETING %d selected files from"
 msgstr[0] ""
 msgstr[1] ""
 
-#: cmd.c:882 cmd.c:900
+#: cmd.c:884 cmd.c:902
 #, c-format
 msgid "Cannot delete %s"
 msgstr ""
 
-#: cmd.c:886
+#: cmd.c:888
 msgid "Do you wish to delete directory"
 msgstr ""
 
-#: cmd.c:890
+#: cmd.c:892
 #, c-format
 msgid "Cannot delete directory %s"
 msgstr ""
 
-#: cmd.c:896
+#: cmd.c:898
 msgid "Do you wish to delete"
 msgstr ""
 
-#: cmd.c:914
+#: cmd.c:916
 msgid " Find file "
 msgstr ""
 
-#: cmd.c:914
+#: cmd.c:916
 msgid "Enter file name"
 msgstr ""
 
-#: cmd.c:935
+#: cmd.c:937
 msgid "File not found"
 msgstr ""
 
-#: cmd.c:946
+#: cmd.c:948
 msgid " Select "
 msgstr ""
 
-#: cmd.c:946
+#: cmd.c:948
 msgid "Select the files"
 msgstr ""
 
-#: cmd.c:963
+#: cmd.c:965
 msgid " Unselect "
 msgstr ""
 
-#: cmd.c:963
+#: cmd.c:965
 msgid "Unselect the files"
 msgstr ""
 
-#: cmd.c:977
+#: cmd.c:979
 msgid " Set pattern "
 msgstr ""
 
-#: cmd.c:977
+#: cmd.c:979
 msgid "Set pattern for files"
 msgstr ""
 
-#: cmd.c:1138
+#: cmd.c:1140
 #, c-format
 msgid "%s: Too many arguments"
+msgstr ""
+
+#: cmd.c:1255
+msgid " Drive "
 msgstr ""
 
 #: com.c:569
@@ -650,11 +654,11 @@ msgstr ""
 msgid " Cursor Arrows "
 msgstr ""
 
-#: help.c:39 mh.c:131
+#: help.c:39 mh.c:142
 msgid "Left"
 msgstr ""
 
-#: help.c:40 mh.c:135
+#: help.c:40 mh.c:146
 msgid "Right"
 msgstr ""
 
@@ -682,7 +686,7 @@ msgstr ""
 msgid " Panels "
 msgstr ""
 
-#: help.c:47 mh.c:112
+#: help.c:47 mh.c:123
 msgid "Switch panels"
 msgstr ""
 
@@ -690,7 +694,7 @@ msgstr ""
 msgid "Panels on/off"
 msgstr ""
 
-#: help.c:49 mh.c:113
+#: help.c:49 mh.c:124
 msgid "Swap panels"
 msgstr ""
 
@@ -698,11 +702,11 @@ msgstr ""
 msgid "Toggle status"
 msgstr ""
 
-#: help.c:51 mh.c:114
+#: help.c:51 mh.c:125
 msgid "Full screen"
 msgstr ""
 
-#: help.c:52 mh.c:115
+#: help.c:52 mh.c:126
 msgid "Double width"
 msgstr ""
 
@@ -722,11 +726,11 @@ msgstr ""
 msgid " Other "
 msgstr ""
 
-#: help.c:59 mh.c:98
+#: help.c:59 mh.c:109
 msgid "History"
 msgstr ""
 
-#: help.c:60 mh.c:100
+#: help.c:60 mh.c:111
 msgid "Home directory"
 msgstr ""
 
@@ -822,7 +826,7 @@ msgstr ""
 msgid "To end of line"
 msgstr ""
 
-#: help.c:135 help.c:170 help.c:205 mh.c:102
+#: help.c:135 help.c:170 help.c:205 mh.c:113
 msgid "Redraw screen"
 msgstr ""
 
@@ -905,195 +909,199 @@ msgstr ""
 msgid "String not found"
 msgstr ""
 
-#: main.c:639
+#: main.c:678
 msgid " Language "
 msgstr ""
 
-#: mh.c:22 mh.c:46
+#: mh.c:31 mh.c:56
 msgid "Brief"
 msgstr ""
 
-#: mh.c:23 mh.c:47
+#: mh.c:32 mh.c:57
 msgid "Long"
 msgstr ""
 
-#: mh.c:24 mh.c:48
+#: mh.c:33 mh.c:58
 msgid "Wide"
 msgstr ""
 
-#: mh.c:25 mh.c:49
+#: mh.c:34 mh.c:59
 msgid "Full"
 msgstr ""
 
-#: mh.c:26 mh.c:50
+#: mh.c:35 mh.c:60
 msgid "Info"
 msgstr ""
 
-#: mh.c:27 mh.c:51
+#: mh.c:36 mh.c:61
 msgid "Status"
 msgstr ""
 
-#: mh.c:28 mh.c:52
+#: mh.c:37 mh.c:62
 msgid "Align extensions"
 msgstr ""
 
-#: mh.c:30 mh.c:54
+#: mh.c:39 mh.c:64
 msgid "Sort by name"
 msgstr ""
 
-#: mh.c:31 mh.c:55
+#: mh.c:40 mh.c:65
 msgid "Extension"
 msgstr ""
 
-#: mh.c:32 mh.c:56
+#: mh.c:41 mh.c:66
 msgid "Time"
 msgstr ""
 
-#: mh.c:33 mh.c:57
+#: mh.c:42 mh.c:67
 msgid "Size"
 msgstr ""
 
-#: mh.c:34 mh.c:58
+#: mh.c:43 mh.c:68
 msgid "Unsorted"
 msgstr ""
 
-#: mh.c:35 mh.c:59
+#: mh.c:44 mh.c:69
 msgid "Reverse"
 msgstr ""
 
-#: mh.c:36 mh.c:60
+#: mh.c:45 mh.c:70
 msgid "Sort by type"
 msgstr ""
 
-#: mh.c:38 mh.c:62
+#: mh.c:47 mh.c:72
 msgid "Re-read"
 msgstr ""
 
-#: mh.c:39 mh.c:63
+#: mh.c:48 mh.c:73
 msgid "Pattern"
 msgstr ""
 
-#: mh.c:70
-msgid "Help"
-msgstr ""
-
-#: mh.c:71
-msgid "User menu"
-msgstr ""
-
-#: mh.c:72
-msgid "View"
-msgstr ""
-
-#: mh.c:73
-msgid "View info"
-msgstr ""
-
-#: mh.c:74
-msgid "Edit"
-msgstr ""
-
-#: mh.c:75
-msgid "Edit info"
-msgstr ""
-
-#: mh.c:76
-msgid "Copy"
-msgstr ""
-
-#: mh.c:77
-msgid "Link"
-msgstr ""
-
-#: mh.c:79
-msgid "Symlink"
+#: mh.c:49 mh.c:74
+msgid "Drive..."
 msgstr ""
 
 #: mh.c:81
-msgid "Rename/move"
+msgid "Help"
 msgstr ""
 
 #: mh.c:82
-msgid "Make directory"
+msgid "User menu"
 msgstr ""
 
 #: mh.c:83
-msgid "Delete"
+msgid "View"
+msgstr ""
+
+#: mh.c:84
+msgid "View info"
 msgstr ""
 
 #: mh.c:85
-msgid "Select group"
+msgid "Edit"
 msgstr ""
 
 #: mh.c:86
-msgid "Unselect group"
+msgid "Edit info"
+msgstr ""
+
+#: mh.c:87
+msgid "Copy"
 msgstr ""
 
 #: mh.c:88
-msgid "Quit"
+msgid "Link"
 msgstr ""
 
-#: mh.c:95
-msgid "Run subshell"
+#: mh.c:90
+msgid "Symlink"
+msgstr ""
+
+#: mh.c:92
+msgid "Rename/move"
+msgstr ""
+
+#: mh.c:93
+msgid "Make directory"
+msgstr ""
+
+#: mh.c:94
+msgid "Delete"
 msgstr ""
 
 #: mh.c:96
-msgid "Compare directories"
+msgid "Select group"
 msgstr ""
 
 #: mh.c:97
+msgid "Unselect group"
+msgstr ""
+
+#: mh.c:99
+msgid "Quit"
+msgstr ""
+
+#: mh.c:106
+msgid "Run subshell"
+msgstr ""
+
+#: mh.c:107
+msgid "Compare directories"
+msgstr ""
+
+#: mh.c:108
 msgid "Find file"
 msgstr ""
 
-#: mh.c:101
+#: mh.c:112
 msgid "Root directory"
 msgstr ""
 
-#: mh.c:104
+#: mh.c:115
 msgid "Menu file edit"
 msgstr ""
 
-#: mh.c:105
+#: mh.c:116
 msgid "Extensions file edit"
 msgstr ""
 
-#: mh.c:116
+#: mh.c:127
 msgid "Command line mode"
 msgstr ""
 
-#: mh.c:117
+#: mh.c:128
 msgid "Show hidden files"
 msgstr ""
 
-#: mh.c:119
+#: mh.c:130
 msgid "Language..."
 msgstr ""
 
-#: mh.c:120
+#: mh.c:131
 msgid "Viewer..."
 msgstr ""
 
-#: mh.c:121
+#: mh.c:132
 msgid "Editor..."
 msgstr ""
 
-#: mh.c:122
+#: mh.c:133
 msgid "Shell..."
 msgstr ""
 
-#: mh.c:124
+#: mh.c:135
 msgid "Save setup"
 msgstr ""
 
-#: mh.c:132
+#: mh.c:143
 msgid "Files"
 msgstr ""
 
-#: mh.c:133
+#: mh.c:144
 msgid "Commands"
 msgstr ""
 
-#: mh.c:134
+#: mh.c:145
 msgid "Options"
 msgstr ""
 
