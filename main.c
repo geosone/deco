@@ -126,6 +126,15 @@ static void docmdreg(int c);
 static int mouseclick(void);
 static void doscrreg(int c);
 
+#ifndef __GONWARE__
+static pid_t fgpgrp; /* the terminal's group before us */
+
+static void givetty(void)
+{
+    tcsetpgrp(2, fgpgrp);
+}
+#endif
+
 int main(int argc, char **argv, char **envp)
 {
     register int c;
@@ -153,6 +162,17 @@ int main(int argc, char **argv, char **envp)
     tty      = ttyname(0);
     machine  = getmachine();
     sigign();
+#ifndef __GONWARE__
+    /* the terminal to our own process group: one of its own first (run
+     * without job control, sh -c "deco; ...", it is in the shell's, and
+     * the terminal given to a group we are not in made every read EIO);
+     * at the end back to the one that had it */
+    fgpgrp = tcgetpgrp(2);
+    if (getpgrp() != main_pid)
+        setpgid(0, 0);
+    if (fgpgrp > 0 && fgpgrp != main_pid)
+        atexit(givetty);
+#endif
     tcsetpgrp(2, main_pid);
 
     init();
