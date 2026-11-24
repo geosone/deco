@@ -13,14 +13,10 @@ menufunc setlang, redraw, shell, cmpdir, fullscreen, setshellname, setviewname;
 menufunc seteditname, writeinitfile, switchalign, setsort, setrevsort;
 menufunc settypesort, switchhidden, setdrive;
 
-/* the keys of Left/Right Drive: on GonWare Alt-F1... switch the screens */
-#ifdef __GONWARE__
+/* the keys of Left/Right Drive: Shift, as Alt-F1/Alt-F2 are often taken
+ * (GonWare's screens, KDE's menu and KRunner); Alt-F1/Alt-F2 work too */
 #define DRIVEKEY_L "S-F1"
 #define DRIVEKEY_R "S-F2"
-#else
-#define DRIVEKEY_L "A-F1"
-#define DRIVEKEY_R "A-F2"
-#endif
 
 #ifdef S_IFLNK
 menufunc makeslink;
