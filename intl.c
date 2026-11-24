@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "deco.h"
+#include "env.h"
 
 struct trtext {
     const char *key; /* the text gettext returned */
@@ -94,6 +95,81 @@ char *ntr(const char *msgid, const char *plural, unsigned long n)
     const char *t = ngettext(msgid, plural, n);
 
     return t == msgid || t == plural ? (char *)t : keep(t);
+}
+
+/* the languages to choose from: catalogue code and own name (UTF-8) */
+const struct trlang trlangs[] = {
+    { "en", "English" },
+    { "de", "Deutsch" },
+    { "fr",
+      "Fran\xc3\xa7"
+      "ais" },
+    { "es", "Espa\xc3\xb1ol" },
+    { "it", "Italiano" },
+    { 0, 0 },
+};
+
+static char chosen[16]; /* the language chosen in the menu, "" none */
+
+static void forgetall()
+{
+    struct trtext *e, *n;
+    int i;
+
+    for (i = 0; i < 256; ++i) {
+        for (e = trtab[i]; e; e = n) {
+            n = e->next;
+            if (e->latin1 != e->key)
+                free(e->latin1);
+            free(e);
+        }
+        trtab[i] = 0;
+    }
+}
+
+/* another language now: LANGUAGE for gettext (and the programs started
+ * from here); the texts kept from the last are forgotten, the catalogue
+ * they came from may be gone */
+void trsetlang(const char *code)
+{
+#ifdef LC_MESSAGES
+    const char *l = setlocale(LC_MESSAGES, 0);
+
+    /* glibc ignores LANGUAGE in the "C" locale */
+    if (l && (!strcmp(l, "C") || !strcmp(l, "POSIX")))
+        setlocale(LC_MESSAGES, "C.UTF-8");
+#endif
+    snprintf(chosen, sizeof(chosen), "%s", code);
+    setenv("LANGUAGE", code, 1);
+    EnvPut("LANGUAGE", (char *)code);
+    forgetall();
+    textdomain("cmdr"); /* glibc: drop the cached translations */
+}
+
+/* the language now: the one chosen, else the first of the environment */
+const char *trgetlang()
+{
+    static char now[16];
+    const char *v;
+
+    if (chosen[0])
+        return chosen;
+    if (!((v = getenv("LANGUAGE")) && *v) && !((v = getenv("LC_ALL")) && *v) &&
+        !((v = getenv("LC_MESSAGES")) && *v))
+        v = getenv("LANG");
+    snprintf(now, sizeof(now), "%.2s", v && *v ? v : "en");
+    return now;
+}
+
+/* a text of the program (not of a catalogue) in Latin-1 */
+char *trlatin1(const char *s)
+{
+    return keep(s);
+}
+
+int trchosen()
+{
+    return chosen[0] != 0;
 }
 
 void trinit()

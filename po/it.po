@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: GonWare Commander 4.0\n"
 "Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/deco/"
 "issues\n"
-"POT-Creation-Date: 2026-11-24 20:36+0100\n"
+"POT-Creation-Date: 2026-11-24 20:41+0100\n"
 "PO-Revision-Date: 2026-11-24 21:00+0100\n"
 "Last-Translator: Mario Fetka\n"
 "Language-Team: none\n"
@@ -91,7 +91,7 @@ msgstr "Impossibile aprire %s"
 msgid "Cannot edit special files"
 msgstr "Impossibile modificare i file speciali"
 
-#: cmd.c:348 ex.c:827 rec.c:253 rec.c:275
+#: cmd.c:348 ex.c:834 rec.c:253 rec.c:275
 #, c-format
 msgid "Cannot create %s"
 msgstr "Impossibile creare %s"
@@ -419,12 +419,12 @@ msgstr "Il Commander non funziona su questo sistema -- arrivederci!"
 msgid "Cannot read '.' -- good bye !"
 msgstr "Impossibile leggere '.' -- arrivederci!"
 
-#: draw.c:212 draw.c:214 edit.c:104 hexview.c:38 view.c:63
+#: draw.c:212 draw.c:216 edit.c:104 hexview.c:38 view.c:63
 msgctxt "keybar"
 msgid "Help"
 msgstr "Aiuto"
 
-#: draw.c:212 draw.c:214
+#: draw.c:212 draw.c:216
 msgctxt "keybar"
 msgid "User"
 msgstr "Menu"
@@ -434,88 +434,88 @@ msgctxt "keybar"
 msgid "View"
 msgstr "Vedi"
 
-#: draw.c:212
+#: draw.c:213
 msgctxt "keybar"
 msgid "Edit"
 msgstr "Modif"
 
-#: draw.c:212
+#: draw.c:213
 msgctxt "keybar"
 msgid "Copy"
 msgstr "Copia"
 
-#: draw.c:212
+#: draw.c:213
 msgctxt "keybar"
 msgid "RenMov"
 msgstr "RinSpo"
 
-#: draw.c:212
+#: draw.c:214
 msgctxt "keybar"
 msgid "Mkdir"
 msgstr "MkDir"
 
-#: draw.c:213
+#: draw.c:214
 msgctxt "keybar"
 msgid "Delete"
 msgstr "Elim"
 
-#: draw.c:213 draw.c:214
+#: draw.c:214 draw.c:217
 msgctxt "keybar"
 msgid "Menu"
 msgstr "Barra"
 
-#: draw.c:213 draw.c:214 edit.c:106 hexview.c:40 menu.c:89 view.c:65
+#: draw.c:215 draw.c:217 edit.c:106 hexview.c:40 menu.c:102 view.c:65
 msgctxt "keybar"
 msgid "Quit"
 msgstr "Esci"
 
-#: draw.c:280 draw.c:283
+#: draw.c:283 draw.c:286
 #, c-format
 msgid " %s in %s "
 msgstr " %s in %s "
 
-#: draw.c:422
+#: draw.c:425
 #, c-format
 msgid "%s byte"
 msgid_plural "%s bytes"
 msgstr[0] "%s byte"
 msgstr[1] "%s byte"
 
-#: draw.c:423
+#: draw.c:426
 #, c-format
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d file"
 msgstr[1] "%d file"
 
-#: draw.c:445
+#: draw.c:448
 msgid "after the Demos Commander, S.Vakulenko"
 msgstr "dal Demos Commander, S.Vakulenko"
 
-#: draw.c:446
+#: draw.c:449
 msgid "Directory"
 msgstr "Directory"
 
-#: draw.c:448
+#: draw.c:451
 #, c-format
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d file"
 msgstr[1] "%d file"
 
-#: draw.c:450
+#: draw.c:453
 #, c-format
 msgid "%s byte"
 msgid_plural "%s bytes"
 msgstr[0] "%s byte"
 msgstr[1] "%s byte"
 
-#: draw.c:453
+#: draw.c:456
 #, c-format
 msgid "%s in %s matched"
 msgstr "%s in %s corrispondenti"
 
-#: draw.c:457
+#: draw.c:460
 #, c-format
 msgid "%s in %s selected"
 msgstr "%s in %s selezionati"
@@ -619,27 +619,27 @@ msgstr " Cerca "
 msgid "Search for the string"
 msgstr "Cerca il testo"
 
-#: ex.c:413
+#: ex.c:414
 msgid "Menu not found"
 msgstr "Menu non trovato"
 
-#: ex.c:421
+#: ex.c:422
 msgid "Cannot read menu"
 msgstr "Impossibile leggere il menu"
 
-#: ex.c:462
+#: ex.c:463
 msgid "Menu is empty"
 msgstr "Il menu è vuoto"
 
-#: ex.c:485
+#: ex.c:486
 msgid " User Menu "
 msgstr " Menu utente "
 
-#: ex.c:1076
+#: ex.c:1085
 msgid " Setup "
 msgstr " Impostazioni "
 
-#: ex.c:1076
+#: ex.c:1085
 #, c-format
 msgid "Saving setup in %s ..."
 msgstr "Salvataggio delle impostazioni in %s ..."
@@ -663,17 +663,9 @@ msgstr "Byte %ld"
 msgid "String not found"
 msgstr "Testo non trovato"
 
-#: main.c:637
+#: main.c:638
 msgid " Language "
 msgstr " Lingua "
-
-#: main.c:637
-msgid "Select language to use:"
-msgstr "Lingua dell'aiuto:"
-
-#: main.c:637
-msgid " English "
-msgstr " Inglese "
 
 #: mh.c:22 mh.c:46
 msgid "Brief"

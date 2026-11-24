@@ -8,6 +8,7 @@ struct submenu {
     int active;     /* is it active for now */
     int tag;        /* tag of submenu */
     int row;        /* row of submenu */
+    char *id;       /* its text before translation */
 };
 
 struct menu {
@@ -20,6 +21,7 @@ struct menu {
     int wid;                 /* width of submenu window */
     int nsm;                 /* current submenu */
     BOX *box;                /* box under menu */
+    char *id;                /* its text before translation */
 };
 
 extern struct menu menu[]; /* main menu array */

@@ -23,11 +23,17 @@ static void trmenu(struct menu *m)
     char *s;
     int w = 0, n;
 
-    m->name = _(m->name);
+    if (!m->id)
+        m->id = m->name;
+    m->name = _(m->id);
     for (sm = m->submenu; sm->name; ++sm) {
         if (!sm->name[0])
             continue;
-        sm->name = _(sm->name);
+        if (!sm->id)
+            sm->id = sm->name;
+        else if (sm->key2)
+            free(sm->name); /* the padded one of the last language */
+        sm->name = _(sm->id);
         n        = strlen(sm->name) + (sm->key2 ? 2 + strlen(sm->key2) : 0);
         if (n > w)
             w = n;
@@ -41,6 +47,12 @@ static void trmenu(struct menu *m)
         sprintf(s, "%-*s%s", w - (int)strlen(sm->key2), sm->name, sm->key2);
         sm->name = s;
     }
+}
+
+/* the language changed: translate the menus anew when shown next */
+void menuretranslate()
+{
+    menu[0].len = 0;
 }
 
 static void initmenu()

@@ -40,6 +40,7 @@
  */
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -703,6 +704,12 @@ void readinitfile()
         case 'h': /* show hidden files */
             showhidden ^= 1;
             break;
+        case 'L': /* language */
+            if (line[1]) {
+                trsetlang(line + 1);
+                setlang_help(line + 1);
+            }
+            break;
         case 'v': /* viewer */
             switch (line[1]) {
             case 'b': /* built-in */
@@ -1073,6 +1080,8 @@ void writeinitfile()
         *bufp++ = '\n';
     }
 
+    if (trchosen())
+        bufp += sprintf(bufp, "L%s\n", trgetlang());
     message(_(" Setup "), _("Saving setup in %s ..."), fname);
     write(fd, buf, (unsigned)(bufp - buf));
     close(fd);

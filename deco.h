@@ -33,6 +33,17 @@ int colsep(int k, int view); /* column separator k (0 ... ncolumns) from the pan
 char *tr(const char *msgid);
 char *ntr(const char *msgid, const char *plural, unsigned long n);
 void trinit(void);
+struct trlang {
+    const char *code, *name;
+};
+extern const struct trlang trlangs[];
+void trsetlang(const char *code);
+const char *trgetlang(void);
+char *trlatin1(const char *s);
+int trchosen(void);
+void menuretranslate(void);
+void setlang_help(const char *code);
+int getlist(char *head, char **items, int n, int sel);
 #define _(s)        tr(s)
 #define P_(s, p, n) ntr(s, p, (unsigned long)(n))
 #define N_(s)       (s)

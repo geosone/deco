@@ -414,3 +414,85 @@ static char *getwstring1(int w, char *str, char *head, char *mesg)
     VFreeBox(box);
     return (str);
 }
+
+/*
+ * A list to choose one of: the index, or -1 for Esc. Up, Down, Home,
+ * End, Enter; the first letter of an item jumps to it.
+ */
+int getlist(char *head, char **items, int n, int sel)
+{
+    int w = strlen(head), r, c, i, key, oldc;
+    BOX *box, *curbox;
+
+    for (i = 0; i < n; ++i)
+        if ((int)strlen(items[i]) > w)
+            w = strlen(items[i]);
+    w += 4;
+    r = (LINES - n) / 2;
+    c = (COLS - w) / 2;
+    if (sel < 0 || sel >= n)
+        sel = 0;
+
+    oldc = VSetColor(VCOL_LIST);
+    box  = VGetBox(r - 2, c - 4, n + 4, w + 8);
+    VSetDim();
+    VStandOut();
+    VFillBox(r - 2, c - 4, n + 4, w + 8, ' ');
+    VDrawBox(r - 1, c - 1, n + 2, w + 2);
+    VMPutString(r - 1, c + (w - (int)strlen(head)) / 2, head);
+    for (i = 0; i < n; ++i)
+        VMPutString(r + i, c + 2, items[i]);
+    VSetNormal();
+    VStandEnd();
+    for (;;) {
+        curbox = VGetBox(r + sel, c, 1, w);
+        VPrintBox(curbox);
+        hidecursor();
+        VSync();
+        key = KeyGet();
+        VUngetBox(curbox);
+        VFreeBox(curbox);
+        switch (key) {
+        case cntrl(']'):
+            VRedraw();
+            continue;
+        case cntrl('M'):
+        case cntrl('J'):
+            break;
+        case cntrl('C'):
+        case cntrl('['):
+        case meta('J'): /* F10 */
+            sel = -1;
+            break;
+        case meta('u'):
+            if (--sel < 0)
+                sel = n - 1;
+            continue;
+        case meta('d'):
+            if (++sel >= n)
+                sel = 0;
+            continue;
+        case meta('h'):
+            sel = 0;
+            continue;
+        case meta('e'):
+            sel = n - 1;
+            continue;
+        default:
+            for (i = 1; i <= n; ++i)
+                if (key > ' ' && key < 0177 &&
+                    ((unsigned char)items[(sel + i) % n][0] | 040) == (key | 040)) {
+                    sel = (sel + i) % n;
+                    break;
+                }
+            if (i > n)
+                VBeep();
+            continue;
+        }
+        break;
+    }
+    VUngetBox(box);
+    VFreeBox(box);
+    VSetColor(oldc);
+    return sel;
+}

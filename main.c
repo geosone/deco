@@ -613,49 +613,34 @@ static void initlang()
     }
 }
 
+/* the language of the help files for a catalogue code */
+void setlang_help(const char *code)
+{
+    lang = !strncmp(code, "de", 2)   ? DEU
+           : !strncmp(code, "fr", 2) ? FRA
+           : !strncmp(code, "ru", 2) ? RUS
+           : !strncmp(code, "uk", 2) ? UKR
+                                     : ENG;
+}
+
+/* Options/Language: the language of the commander, at once */
 void setlang()
 {
-    char *s, *altlang;
+    char *items[16];
+    const char *now = trgetlang();
+    int n, sel = 0;
 
-    s = EnvGet("MSG");
-    if (!s)
-        s = "l";
-    switch (*s) {
-    default:
-        altlang = " Russian ";
-        break;
-    case 'u':
-        altlang = " Ukrainian ";
-        break;
-    case 'd':
-        altlang = " Deutch ";
-        break;
-    case 'f':
-        altlang = " Francais ";
-        break;
+    for (n = 0; trlangs[n].code && n < 16; ++n) {
+        items[n] = trlatin1(trlangs[n].name);
+        if (!strncmp(now, trlangs[n].code, 2))
+            sel = n;
     }
-    switch (getchoice(0, _(" Language "), _("Select language to use:"), 0, _(" English "), altlang,
-                      0)) {
-    case 0:
-        lang = ENG;
-        break;
-    case 1:
-        switch (*s) {
-        default:
-            lang = RUS;
-            break;
-        case 'u':
-            lang = UKR;
-            break;
-        case 'd':
-            lang = DEU;
-            break;
-        case 'f':
-            lang = FRA;
-            break;
-        }
-        break;
-    }
+    n = getlist(_(" Language "), items, n, sel);
+    if (n < 0)
+        return;
+    trsetlang(trlangs[n].code);
+    setlang_help(trlangs[n].code);
+    menuretranslate();
 }
 
 void hidecursor()
