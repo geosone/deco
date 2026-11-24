@@ -393,13 +393,33 @@ int VInit()
 #endif
 
 #ifndef DECO_NEWT
+/* in the terminal's screen of the commander (TI), not the programs' one */
+static int inalt;
+
+/* the programs' screen: what they wrote is there (and stays) */
+static void leavealt(void)
+{
+    if (TE && inalt) {
+        /* the terminal's own colours there, not a role's */
+        if (ME)
+            tputs(ME);
+        else
+            tputs("\33[0m");
+        curscr.flgs = -1; /* to be set again */
+        tputs(TE);
+        inalt = 0;
+    }
+}
+
 void VOpen()
 {
     TtySet();
     if (IS)
         tputs(IS);
-    if (TI)
+    if (TI) {
         tputs(TI);
+        inalt = 1;
+    }
     if (VS)
         tputs(VS);
     if (KS)
@@ -415,6 +435,11 @@ void VOpen()
 void VReopen()
 {
     TtySet();
+    if (TI && !inalt) { /* the commander's screen again, all drawn anew */
+        tputs(TI);
+        inalt         = 1;
+        VScreen.clear = 1;
+    }
     if (VS)
         tputs(VS);
     if (KS)
@@ -437,13 +462,25 @@ void VClose()
         tputs(FS);
     if (VE)
         tputs(VE);
-    if (TE)
+    if (TE && inalt)
         tputs(TE);
+    inalt = 0;
     if (KE)
         tputs(KE);
     VFlush();
     VMouse(0);
     TtyReset();
+}
+#endif
+
+#ifndef DECO_NEWT
+/* keys without the commander's screen: the terminal raw, nothing drawn */
+void VUserScreen()
+{
+    leavealt();
+    VFlush();
+    VMouse(0);
+    TtySet();
 }
 #endif
 
@@ -456,6 +493,7 @@ void VRestore()
         tputs(VE);
     if (KE)
         tputs(KE);
+    leavealt();
     VFlush();
     VMouse(0);
     TtyReset();
@@ -1975,8 +2013,34 @@ void VOpen()
 {
 }
 
+/* keys without the commander's screen: the terminal raw, nothing drawn
+ * (the screen of the programs, Ctrl-O) */
+static int user_raw;
+
+void VUserScreen()
+{
+    if (newt_on) {
+        VMouse(0);
+        newtSuspend();
+        newt_on = 0;
+    }
+    if (!user_raw) {
+        SLang_init_tty(0, 0, 0);
+        user_raw = 1;
+    }
+}
+
+static void userend(void)
+{
+    if (user_raw) {
+        SLang_reset_tty();
+        user_raw = 0;
+    }
+}
+
 void VReopen()
 {
+    userend();
     if (!newt_on) {
         newtnomouse(1);
         newtResume();
@@ -1989,6 +2053,7 @@ void VReopen()
 
 void VClose()
 {
+    userend();
     if (newt_on) {
         VMouse(0);
         newtFinished();
@@ -1999,6 +2064,7 @@ void VClose()
 /* the terminal for a program run from the commander */
 void VRestore()
 {
+    userend();
     if (newt_on) {
         VMouse(0);
         newtSuspend();
@@ -2105,7 +2171,8 @@ void VRedraw()
 
 void VFlush()
 {
-    SLsmg_refresh();
+    if (newt_on) /* not on the programs' screen (VUserScreen) */
+        SLsmg_refresh();
 }
 
 void VBeep()

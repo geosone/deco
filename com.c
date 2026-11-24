@@ -43,6 +43,7 @@ static void wresccmd(char *str, int n);
 static void wrescchar(int c);
 static void wrescback(int c);
 static int inputcmd(int plen);
+static void userloop(void);
 
 void drawcmd()
 {
@@ -297,11 +298,52 @@ void outprompt()
     write(1, prompt, (unsigned)strlen(prompt));
 }
 
+/*
+ * The screen of the programs, as VC shows it with Ctrl-O: what they
+ * wrote, the command line under it; a command runs there, Enter on an
+ * empty line, Ctrl-O, Tab or a function key goes back to the panels.
+ */
+static void userloop(void)
+{
+    char pr[MAXPATHLEN + 4];
+
+    /* plain, as the line of a command that ran (execmd) */
+    snprintf(pr, sizeof(pr), "%s > ", cur->shortcwd);
+    prompt = pr;
+    VUserScreen();
+    command[cpos = 0] = 0;
+    for (;;) {
+        if (!inputcmd(VStrLen(cur->shortcwd) + 3) || !command[0])
+            break;
+        histcmd();
+        hpos = -1;
+        if (mycmd(0) || mycmd2(0)) {
+            snprintf(pr, sizeof(pr), "%s > ", cur->shortcwd);
+        } else {
+            VRestore();
+            syscmd(command);
+            VUserScreen();
+        }
+    }
+    cmdreg    = 0;
+    visualwin = 1;
+}
+
+/* Ctrl-O: the panels off, the programs' screen */
+void userscreen(void)
+{
+    VSync();
+    VRestore();
+    userloop();
+    VReopen();
+    command[cpos = 0] = 0;
+    VClear();
+    setdir(cur == &left ? &right : &left, 0);
+    setdir(cur, 0);
+}
+
 void execmd(int hit, int savhist)
 {
-    char pr[256];
-    char buf[256];
-
     /* run command */
     if (savhist)
         histcmd();  /* save it in history */
@@ -310,38 +352,19 @@ void execmd(int hit, int savhist)
         command[cpos = 0] = 0;
         return;
     }
-    VClear();  /* clear screen */
-    endcmd();  /* move cursor to the end of command */
-    drawcmd(); /* draw comand */
     VSync();
-    VRestore();          /* restore terminal */
-    write(1, "\n", 1);   /* new line */
+    VRestore(); /* the programs' screen */
+    /* the command line there, then what it writes */
+    write(1, cur->shortcwd, strlen(cur->shortcwd));
+    write(1, " > ", 3);
+    write(1, command, strlen(command));
+    write(1, "\r\n", 2);
     if (!mycmd2(1))      /* exec built in commands */
         syscmd(command); /* execute command */
-    if (hit) {
-        sprintf(buf, "\7\1%s\3 > \2", cur->shortcwd);
-        VExpandString(buf, pr);
-        prompt = pr;
-        VReopen();
-        command[cpos = 0] = 0;
-        for (;;) {
-            if (!inputcmd(VStrLen(cur->shortcwd) + 3) || !command[0])
-                break;
-            histcmd();
-            hpos = -1;
-            if (mycmd(0) || mycmd2(0)) {
-                sprintf(buf, "\7\1%s\3 > \2", cur->shortcwd);
-                VExpandString(buf, pr);
-            } else {
-                VRestore();
-                syscmd(command);
-                VReopen();
-            }
-        }
-    } else {
-        VReopen();
-        command[cpos = 0] = 0;
-    }
+    if (hit)
+        userloop();
+    VReopen();
+    command[cpos = 0] = 0;
     VClear();
     if (visualwin) {
         setdir(cur == &left ? &right : &left, 0);

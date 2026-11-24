@@ -44,6 +44,7 @@ void menuretranslate(void);
 void setlang_help(const char *code);
 void helpreset(void);
 void setdrive(int k, int sk);
+void userscreen(void);
 
 /* the mouse (mouse.c) */
 #define MOUSEKEY meta('M') /* a press that is not a key: MouseRow, MouseCol ... */

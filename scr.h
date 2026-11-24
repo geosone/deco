@@ -45,6 +45,7 @@ void VOpen(void);
 void VReopen(void);
 void VClose(void);
 void VRestore(void);
+void VUserScreen(void);
 void VRedraw(void);
 void VSyncLine(int wy);
 void VSync(void);

@@ -239,7 +239,10 @@ int main(int argc, char **argv, char **envp)
                 delcmd();
             }
             continue;
-        case cntrl('O'): /* set/unset command mode */
+        case cntrl('O'): /* the panels off: the programs' screen */
+            userscreen();
+            draw();
+            continue;
         case cntrl('P'): /* set/unset command mode */
             switchcmdreg();
             if (!cmdreg)
