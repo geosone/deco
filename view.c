@@ -55,9 +55,12 @@ static int textview(char *filename)
         basecol += 40;
     ccol  = 0;
     sline = soff = -1;
-    VMPutString(LINES - 1, 0,
-                "\0011\16Help  \17 2\16      \17 3\16Raw   \17 4\16Hex   \17 5\16Top   \17 "
-                "6\16Bottom\17 7\16Search\17 8\16      \17 9\16Spaces\01710\16Quit \17\2");
+    {
+        static const char *const keys[10] = { "Help",   "",       "Raw", "Hex",    "Top",
+                                              "Bottom", "Search", "",    "Spaces", "Quit" };
+
+        drawkeys(keys);
+    }
     for (;;) {
         viewpage(baseline, basecol);
         for (;;) {
@@ -203,7 +206,7 @@ static void viewhead(char *filename, int line, int col)
     VMPutString(0, 1, "File ");
     VPutString(filename);
     VPrint("  Lines %-5d Bytes %ld", viewrec->len, viewrec->size);
-    VMove(0, 57);
+    VMove(0, COLS - 23); /* at the right, 57 of 80 */
     VPrint("Line %-5d Col %d", line + 1, col);
     VSetNormal();
     VStandEnd();

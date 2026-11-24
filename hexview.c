@@ -1,5 +1,6 @@
 #include <string.h>
 #include <unistd.h>
+
 #include "deco.h"
 #include "rec.h"
 #include "scr.h"
@@ -33,9 +34,12 @@ int hexview(char *filename) /* hexadecimal viewer */
     baseline  = (viewseek + 15) / 16;
     hexcursor = 0;
     sline = soff = -1;
-    VMPutString(LINES - 1, 0,
-                "\0011\16Help  \17 2\16      \17 3\16Raw   \17 4\16Hex   \17 5\16Top   \17 "
-                "6\16Bottom\17 7\16Search\17 8\16      \17 9\16      \01710\16Quit \17\2");
+    {
+        static const char *const keys[10] = { "Help",   "",       "Raw", "Hex", "Top",
+                                              "Bottom", "Search", "",    "",    "Quit" };
+
+        drawkeys(keys);
+    }
     for (;;) {
         viewhpage(baseline);
         for (;;) {
@@ -152,7 +156,7 @@ static void viewhhead(char *filename, int line)
     VPutString(filename);
     VMove(0, 22);
     VPrint("Lines %-5d Bytes %ld", viewrec->len, viewrec->size);
-    VMove(0, 68);
+    VMove(0, COLS - 12); /* at the right, 68 of 80 */
     VPrint("Byte %ld", line * 16L);
     VSetNormal();
     VStandEnd();

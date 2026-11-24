@@ -20,7 +20,6 @@ static void drawsdir(struct dir *c);
 static void drawstatus(int col, struct file *f, int view);
 static void drawpage(int col, struct file *c, int n, struct dir *d, int w);
 static void drawfull(struct file *f, int tail, int nw);
-static void drawkeys(void);
 static void drawmode(char *m, int u, int g);
 static void drawtime(struct file *f);
 static void drawlong(struct file *f);
@@ -139,28 +138,33 @@ void drawbanners()
     if ((curtime = timestr(time(NULL))))
         VMPutString(0, COLS - 1 - strlen(curtime), curtime);
     VStandEnd();
-    drawkeys();
-    VSetNormal();
-}
-
-/* the function keys at the bottom, spread over the width of the screen */
-static void drawkeys()
-{
     static const char *const keys[2][10] = {
         { "Help", "User", "View", "Edit", "Copy", "RenMov", "Mkdir", "Delete", "Menu", "Quit" },
         { "Help", "User", "", "", "", "", "", "", "Menu", "Quit" },
     };
+
+    drawkeys(keys[cmdreg != 0]);
+    VSetNormal();
+}
+
+/* the function keys F1...F10 at the bottom, spread over the width of
+ * the screen; the panels, the viewer and the editor each have their own */
+void drawkeys(const char *const labels[10])
+{
     char buf[1024], *p = buf;
     int i, slot        = COLS / 10, w;
 
+    *p++ = '\1';
     for (i = 0; i < 10; ++i) {
         /* each takes a tenth: the number, the label, a space before the
          * next; the last one takes what is left */
         w = (i == 9 ? COLS - 9 * slot : slot) - (i == 9 ? 2 : 1) - (i ? 1 : 0);
         if (w < 1)
             w = 1;
-        p += sprintf(p, "%s%d\16%-*.*s\17", i ? " " : "", i + 1, w, w, keys[cmdreg != 0][i]);
+        p += sprintf(p, "%s%d\16%-*.*s\17", i ? " " : "", i + 1, w, w, labels[i]);
     }
+    *p++ = '\2';
+    *p   = 0;
     VMPutString(LINES - 1, 0, buf);
 }
 

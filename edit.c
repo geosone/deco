@@ -45,10 +45,10 @@ static void edithead(char *filename, int line, int col, int off)
     VMPutString(0, 1, "File ");
     VPutString(filename);
     VPrint("  Lines %d", viewrec->len);
-    VMove(0, 50);
+    VMove(0, COLS - 30); /* at the right, 50 of 80 */
     VPrint("Line %-5d Col %d", line + 1, col);
     i = charcode(line, off);
-    VMove(0, 70);
+    VMove(0, COLS - 10); /* 70 of 80 */
     if (i)
         VPrint("Char 0%-3o", i);
     else
@@ -89,9 +89,12 @@ void editfile(int d, char *filename, char *basename)
     baseline = basecol = 0;
     sline = ccol = 0;
     VClearBox(1, 0, LINES - 2, COLS);
-    VMPutString(LINES - 1, 0,
-                "\0011\16Help  \17 2\16Save  \17 3\16Raw   \17 4\16      \17 5\16Top   \17 "
-                "6\16Bottom\17 7\16Search\17 8\16Home  \17 9\16Spaces\01710\16Quit \17\2");
+    {
+        static const char *const keys[10] = { "Help",   "Save",   "Raw",  "",       "Top",
+                                              "Bottom", "Search", "Home", "Spaces", "Quit" };
+
+        drawkeys(keys);
+    }
     for (;;) {
         viewpage(baseline, basecol);
         for (;;) {

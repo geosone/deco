@@ -1,8 +1,11 @@
 #include <string.h>
 
+/* menu.h needs BOX from scr.h */
+/* clang-format off */
 #include "deco.h"
 #include "scr.h"
 #include "menu.h"
+/* clang-format on */
 
 static void drawhead(int nm);
 static void clrmenu(struct menu *m);
@@ -50,9 +53,11 @@ int getmenu()
         initmenu();
 
     getboxes();
-    VMPutString(LINES - 1, 0,
-                "\0011\16      \17 2\16      \17 3\16      \17 4\16      \17 5\16      \17 6\16    "
-                "  \17 7\16      \17 8\16      \17 9\16      \01710\16Quit \17\2");
+    {
+        static const char *const keys[10] = { "", "", "", "", "", "", "", "", "", "Quit" };
+
+        drawkeys(keys);
+    }
     for (;;) {
         drawhead(nmenu);
         for (;;) {

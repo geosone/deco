@@ -14,7 +14,8 @@ extern int LINES, COLS; /* scr.c */
 
 #define BASECOL(c) (widewin ? 0 : (c)->basecol)
 
-int ncolumns(int view);      /* columns of names in a panel in this view */
+void drawkeys(const char *const labels[10]); /* F1...F10 bar */
+int ncolumns(int view);                      /* columns of names in a panel in this view */
 int colsep(int k, int view); /* column separator k (0 ... ncolumns) from the panel's left frame */
 
 #define CMDLEN 512 /* length of command string */
