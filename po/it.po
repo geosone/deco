@@ -1,0 +1,946 @@
+# Italian translation of the GonWare Commander.
+# Copyright (C) 2026 Mario Fetka
+# This file is distributed under the same license as the GonWare Commander (MIT).
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GonWare Commander 4.0\n"
+"Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/deco/"
+"issues\n"
+"POT-Creation-Date: 2026-11-24 20:36+0100\n"
+"PO-Revision-Date: 2026-11-24 21:00+0100\n"
+"Last-Translator: Mario Fetka\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: choice.c:41
+msgid " Error "
+msgstr " Errore "
+
+#: choice.c:41 cmd.c:880
+msgid " Ok "
+msgstr " OK "
+
+#: cmd.c:134
+msgid " Change directory "
+msgstr " Cambia directory "
+
+#: cmd.c:134
+msgid "Change directory to"
+msgstr "Vai a"
+
+#: cmd.c:139 com.c:455 dir.c:122 dir.c:160
+#, c-format
+msgid "Cannot chdir to %s"
+msgstr "Impossibile andare in %s"
+
+#: cmd.c:231 cmd.c:240
+msgid " View "
+msgstr " Visualizza "
+
+#: cmd.c:231
+msgid "Select which viewer to use for F3:"
+msgstr "Visualizzatore da usare con F3:"
+
+#: cmd.c:231 cmd.c:264
+msgid " Built-in "
+msgstr " Interno "
+
+#: cmd.c:232 cmd.c:265
+msgid " External "
+msgstr " Esterno "
+
+#: cmd.c:240
+msgid "Viewer to use"
+msgstr "Visualizzatore"
+
+#: cmd.c:249
+msgid " Shell "
+msgstr " Shell "
+
+#: cmd.c:249
+msgid "Select which shell to use:"
+msgstr "Shell da usare:"
+
+#: cmd.c:250
+msgid " Cshell "
+msgstr " Cshell "
+
+#: cmd.c:264 cmd.c:273 cmd.c:384 edit.c:94 edit.c:296
+msgid " Edit "
+msgstr " Modifica "
+
+#: cmd.c:264
+msgid "Select which editor to use for F4:"
+msgstr "Editor da usare con F4:"
+
+#: cmd.c:273
+msgid "Editor to use"
+msgstr "Editor"
+
+#: cmd.c:299 cmd.c:326 rec.c:266
+#, c-format
+msgid "Cannot open %s"
+msgstr "Impossibile aprire %s"
+
+#: cmd.c:342
+msgid "Cannot edit special files"
+msgstr "Impossibile modificare i file speciali"
+
+#: cmd.c:348 ex.c:827 rec.c:253 rec.c:275
+#, c-format
+msgid "Cannot create %s"
+msgstr "Impossibile creare %s"
+
+#: cmd.c:366
+#, c-format
+msgid "Cannot open %s for writing"
+msgstr "Impossibile aprire %s in scrittura"
+
+#: cmd.c:384
+msgid "Enter name of file to edit"
+msgstr "Nome del file da modificare"
+
+#: cmd.c:406
+msgid " Menu Edit "
+msgstr " Modifica menu "
+
+#: cmd.c:406
+msgid "Select which menu to edit:"
+msgstr "Menu da modificare:"
+
+#: cmd.c:406
+msgid " Current menu "
+msgstr " Menu corrente "
+
+#: cmd.c:407
+msgid " Home menu "
+msgstr " Menu personale "
+
+#: cmd.c:433
+#, c-format
+msgid "Do you want to quit the %s ?"
+msgstr "Vuoi uscire dal %s?"
+
+#: cmd.c:435
+msgid "Do you want to log out ?"
+msgstr "Vuoi uscire dalla sessione?"
+
+#: cmd.c:436
+msgid " Yes "
+msgstr " Sì "
+
+#: cmd.c:436
+msgid " No "
+msgstr " No "
+
+#: cmd.c:436
+msgid " Exec shell "
+msgstr " Avvia shell "
+
+#: cmd.c:516
+#, c-format
+msgid "Copy %d file to"
+msgid_plural "Copy %d files to"
+msgstr[0] "Copia %d file in"
+msgstr[1] "Copia %d file in"
+
+#: cmd.c:517 cmd.c:528 cmd.c:554 cmd.c:559 cmd.c:570 cmd.c:576
+msgid " Copy "
+msgstr " Copia "
+
+#: cmd.c:528 cmd.c:576 cmd.c:615 cmd.c:647 cmd.c:687 cmd.c:719 cmd.c:761
+#: cmd.c:798 cmd.c:819
+msgid "File exists"
+msgstr "Il file esiste"
+
+#: cmd.c:529 cmd.c:577 cmd.c:616 cmd.c:648 cmd.c:688 cmd.c:720 cmd.c:762
+#: cmd.c:799 cmd.c:820
+msgid " Overwrite "
+msgstr " Sovrascrivi "
+
+#: cmd.c:529 cmd.c:762
+msgid " All "
+msgstr " Tutti "
+
+#: cmd.c:529 cmd.c:577 cmd.c:616 cmd.c:648 cmd.c:688 cmd.c:720 cmd.c:762
+#: cmd.c:799 cmd.c:820 cmd.c:874 cmd.c:880 cmd.c:889 cmd.c:899
+msgid " Cancel "
+msgstr " Annulla "
+
+#: cmd.c:544 cmd.c:580 cmd.c:619 cmd.c:651 cmd.c:691 cmd.c:723 cmd.c:772
+#: cmd.c:823
+#, c-format
+msgid "%s is a directory"
+msgstr "%s è una directory"
+
+#: cmd.c:554
+#, c-format
+msgid "Copying %d file to %s ..."
+msgid_plural "Copying %d files to %s ..."
+msgstr[0] "Copia di %d file in %s ..."
+msgstr[1] "Copia di %d file in %s ..."
+
+#: cmd.c:559 cmd.c:630 cmd.c:702 cmd.c:782
+msgid "Done"
+msgstr "Fatto"
+
+#: cmd.c:561
+#, c-format
+msgid "Error while copying %d file to %s"
+msgid_plural "Error while copying %d files to %s"
+msgstr[0] "Errore copiando %d file in %s"
+msgstr[1] "Errore copiando %d file in %s"
+
+#: cmd.c:584
+#, c-format
+msgid "Cannot copy %s to %s"
+msgstr "Impossibile copiare %s in %s"
+
+#: cmd.c:605
+#, c-format
+msgid "Link %d file to"
+msgid_plural "Link %d files to"
+msgstr[0] "Collega %d file in"
+msgstr[1] "Collega %d file in"
+
+#: cmd.c:606 cmd.c:615 cmd.c:625 cmd.c:630 cmd.c:641 cmd.c:647
+msgid " Link "
+msgstr " Collegamento "
+
+#: cmd.c:625 cmd.c:697
+#, c-format
+msgid "Linking %d file to %s ..."
+msgid_plural "Linking %d files to %s ..."
+msgstr[0] "Collegamento di %d file in %s ..."
+msgstr[1] "Collegamento di %d file in %s ..."
+
+#: cmd.c:632 cmd.c:704
+#, c-format
+msgid "Error while linking %d file to %s"
+msgid_plural "Error while linking %d files to %s"
+msgstr[0] "Errore collegando %d file in %s"
+msgstr[1] "Errore collegando %d file in %s"
+
+#: cmd.c:655
+#, c-format
+msgid "Cannot link %s to %s"
+msgstr "Impossibile collegare %s in %s"
+
+#: cmd.c:677
+#, c-format
+msgid "Symlink %d file to"
+msgid_plural "Symlink %d files to"
+msgstr[0] "Link simbolico di %d file in"
+msgstr[1] "Link simbolici di %d file in"
+
+#: cmd.c:678 cmd.c:687 cmd.c:697 cmd.c:702 cmd.c:713 cmd.c:719
+msgid " Symlink "
+msgstr " Link simbolico "
+
+#: cmd.c:727
+#, c-format
+msgid "Cannot symlink %s to %s"
+msgstr "Impossibile creare un link simbolico da %s a %s"
+
+#: cmd.c:749
+#, c-format
+msgid "Rename or move %d file to"
+msgid_plural "Rename or move %d files to"
+msgstr[0] "Rinomina o sposta %d file in"
+msgstr[1] "Rinomina o sposta %d file in"
+
+#: cmd.c:750 cmd.c:761 cmd.c:792 cmd.c:798 cmd.c:813 cmd.c:819
+msgid " Rename "
+msgstr " Rinomina "
+
+#: cmd.c:777 cmd.c:782
+msgid " Move "
+msgstr " Sposta "
+
+#: cmd.c:777
+#, c-format
+msgid "Moving %d file to %s ..."
+msgid_plural "Moving %d files to %s ..."
+msgstr[0] "Spostamento di %d file in %s ..."
+msgstr[1] "Spostamento di %d file in %s ..."
+
+#: cmd.c:784
+#, c-format
+msgid "Error while moving %d file to %s"
+msgid_plural "Error while moving %d files to %s"
+msgstr[0] "Errore spostando %d file in %s"
+msgstr[1] "Errore spostando %d file in %s"
+
+#: cmd.c:802
+#, c-format
+msgid "Directory %s exists"
+msgstr "La directory %s esiste"
+
+#: cmd.c:806 cmd.c:827
+#, c-format
+msgid "Cannot move %s to %s"
+msgstr "Impossibile spostare %s in %s"
+
+#: cmd.c:841
+msgid " Make directory "
+msgstr " Crea directory "
+
+#: cmd.c:841
+msgid "Create the directory"
+msgstr "Crea la directory"
+
+#: cmd.c:846
+#, c-format
+msgid "File %s exists"
+msgstr "Il file %s esiste"
+
+#: cmd.c:849
+#, c-format
+msgid "Directory %s already exists"
+msgstr "La directory %s esiste già"
+
+#: cmd.c:853
+#, c-format
+msgid "Cannot create directory %s"
+msgstr "Impossibile creare la directory %s"
+
+#: cmd.c:873
+#, c-format
+msgid "You have selected %d file."
+msgid_plural "You have selected %d files."
+msgstr[0] "Hai selezionato %d file."
+msgstr[1] "Hai selezionato %d file."
+
+#: cmd.c:874 cmd.c:880 cmd.c:888 cmd.c:889 cmd.c:898
+msgid " Delete "
+msgstr " Elimina "
+
+#: cmd.c:877
+#, c-format
+msgid "You are DELETING %d selected file from"
+msgid_plural "You are DELETING %d selected files from"
+msgstr[0] "Stai ELIMINANDO %d file selezionato da"
+msgstr[1] "Stai ELIMINANDO %d file selezionati da"
+
+#: cmd.c:884 cmd.c:902
+#, c-format
+msgid "Cannot delete %s"
+msgstr "Impossibile eliminare %s"
+
+#: cmd.c:888
+msgid "Do you wish to delete directory"
+msgstr "Vuoi eliminare la directory"
+
+#: cmd.c:892
+#, c-format
+msgid "Cannot delete directory %s"
+msgstr "Impossibile eliminare la directory %s"
+
+#: cmd.c:898
+msgid "Do you wish to delete"
+msgstr "Vuoi eliminare"
+
+#: cmd.c:916
+msgid " Find file "
+msgstr " Cerca file "
+
+#: cmd.c:916
+msgid "Enter file name"
+msgstr "Nome del file"
+
+#: cmd.c:937
+msgid "File not found"
+msgstr "File non trovato"
+
+#: cmd.c:948
+msgid " Select "
+msgstr " Seleziona "
+
+#: cmd.c:948
+msgid "Select the files"
+msgstr "Seleziona i file"
+
+#: cmd.c:966
+msgid " Unselect "
+msgstr " Deseleziona "
+
+#: cmd.c:966
+msgid "Unselect the files"
+msgstr "Deseleziona i file"
+
+#: cmd.c:981
+msgid " Set pattern "
+msgstr " Imposta filtro "
+
+#: cmd.c:981
+msgid "Set pattern for files"
+msgstr "Filtro dei file"
+
+#: cmd.c:1143
+#, c-format
+msgid "%s: Too many arguments"
+msgstr "%s: troppi argomenti"
+
+#: com.c:560
+msgid "No background jobs"
+msgstr "Nessun processo in background"
+
+#: com.c:577
+msgid " Jobs "
+msgstr " Processi "
+
+#: com.c:682
+msgid "History is empty"
+msgstr "La cronologia è vuota"
+
+#: com.c:699
+msgid " History "
+msgstr " Cronologia "
+
+#: com.c:701
+msgid " ^B - Jobs "
+msgstr " ^B - Processi "
+
+#: dir.c:124
+#, c-format
+msgid "Cannot read %s"
+msgstr "Impossibile leggere %s"
+
+#: dir.c:128
+msgid "DECO cannot work on this system -- goodbye!"
+msgstr "Il Commander non funziona su questo sistema -- arrivederci!"
+
+#: dir.c:173
+msgid "Cannot read '.' -- good bye !"
+msgstr "Impossibile leggere '.' -- arrivederci!"
+
+#: draw.c:212 draw.c:214 edit.c:104 hexview.c:38 view.c:63
+msgctxt "keybar"
+msgid "Help"
+msgstr "Aiuto"
+
+#: draw.c:212 draw.c:214
+msgctxt "keybar"
+msgid "User"
+msgstr "Menu"
+
+#: draw.c:212
+msgctxt "keybar"
+msgid "View"
+msgstr "Vedi"
+
+#: draw.c:212
+msgctxt "keybar"
+msgid "Edit"
+msgstr "Modif"
+
+#: draw.c:212
+msgctxt "keybar"
+msgid "Copy"
+msgstr "Copia"
+
+#: draw.c:212
+msgctxt "keybar"
+msgid "RenMov"
+msgstr "RinSpo"
+
+#: draw.c:212
+msgctxt "keybar"
+msgid "Mkdir"
+msgstr "MkDir"
+
+#: draw.c:213
+msgctxt "keybar"
+msgid "Delete"
+msgstr "Elim"
+
+#: draw.c:213 draw.c:214
+msgctxt "keybar"
+msgid "Menu"
+msgstr "Barra"
+
+#: draw.c:213 draw.c:214 edit.c:106 hexview.c:40 menu.c:89 view.c:65
+msgctxt "keybar"
+msgid "Quit"
+msgstr "Esci"
+
+#: draw.c:280 draw.c:283
+#, c-format
+msgid " %s in %s "
+msgstr " %s in %s "
+
+#: draw.c:422
+#, c-format
+msgid "%s byte"
+msgid_plural "%s bytes"
+msgstr[0] "%s byte"
+msgstr[1] "%s byte"
+
+#: draw.c:423
+#, c-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d file"
+msgstr[1] "%d file"
+
+#: draw.c:445
+msgid "after the Demos Commander, S.Vakulenko"
+msgstr "dal Demos Commander, S.Vakulenko"
+
+#: draw.c:446
+msgid "Directory"
+msgstr "Directory"
+
+#: draw.c:448
+#, c-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d file"
+msgstr[1] "%d file"
+
+#: draw.c:450
+#, c-format
+msgid "%s byte"
+msgid_plural "%s bytes"
+msgstr[0] "%s byte"
+msgstr[1] "%s byte"
+
+#: draw.c:453
+#, c-format
+msgid "%s in %s matched"
+msgstr "%s in %s corrispondenti"
+
+#: draw.c:457
+#, c-format
+msgid "%s in %s selected"
+msgstr "%s in %s selezionati"
+
+#: edit.c:45 hexview.c:157 view.c:212
+msgid "File "
+msgstr "File "
+
+#: edit.c:47
+#, c-format
+msgid "  Lines %d"
+msgstr "  Righe %d"
+
+#: edit.c:49 view.c:216
+#, c-format
+msgid "Line %-5d Col %d"
+msgstr "Riga %-5d Col %d"
+
+#: edit.c:53
+#, c-format
+msgid "Char 0%-3o"
+msgstr "Car 0%-3o"
+
+#: edit.c:55
+msgid "Char 0"
+msgstr "Car 0"
+
+#: edit.c:94
+msgid "File contains too long lines."
+msgstr "Il file contiene righe troppo lunghe."
+
+#: edit.c:95
+msgid " Break lines "
+msgstr " Spezza le righe "
+
+#: edit.c:95
+msgid " Cancel editing "
+msgstr " Annulla la modifica "
+
+#: edit.c:104
+msgctxt "keybar"
+msgid "Save"
+msgstr "Salva"
+
+#: edit.c:104 hexview.c:38 view.c:63
+msgctxt "keybar"
+msgid "Raw"
+msgstr "Grezzo"
+
+#: edit.c:105 hexview.c:39 view.c:64
+msgctxt "keybar"
+msgid "Top"
+msgstr "Inizio"
+
+#: edit.c:105 hexview.c:39 view.c:64
+msgctxt "keybar"
+msgid "Bottom"
+msgstr "Fine"
+
+#: edit.c:105 hexview.c:39 view.c:64
+msgctxt "keybar"
+msgid "Search"
+msgstr "Cerca"
+
+#: edit.c:105
+msgctxt "keybar"
+msgid "Home"
+msgstr "Inizio"
+
+#: edit.c:106 view.c:65
+msgctxt "keybar"
+msgid "Spaces"
+msgstr "Spazi"
+
+#: edit.c:255 edit.c:297
+msgid " Save "
+msgstr " Salva "
+
+#: edit.c:255
+#, c-format
+msgid "Saving file '%s'..."
+msgstr "Salvataggio del file '%s'..."
+
+#: edit.c:296
+msgid "You've made changes since the last save."
+msgstr "Hai fatto modifiche dall'ultimo salvataggio."
+
+#: edit.c:297
+msgid " Don't save "
+msgstr " Non salvare "
+
+#: edit.c:297
+msgid " Continue editing "
+msgstr " Continua a modificare "
+
+#: edit.c:312 hexview.c:122 view.c:107
+msgid " Search "
+msgstr " Cerca "
+
+#: edit.c:313 hexview.c:123 view.c:108
+msgid "Search for the string"
+msgstr "Cerca il testo"
+
+#: ex.c:413
+msgid "Menu not found"
+msgstr "Menu non trovato"
+
+#: ex.c:421
+msgid "Cannot read menu"
+msgstr "Impossibile leggere il menu"
+
+#: ex.c:462
+msgid "Menu is empty"
+msgstr "Il menu è vuoto"
+
+#: ex.c:485
+msgid " User Menu "
+msgstr " Menu utente "
+
+#: ex.c:1076
+msgid " Setup "
+msgstr " Impostazioni "
+
+#: ex.c:1076
+#, c-format
+msgid "Saving setup in %s ..."
+msgstr "Salvataggio delle impostazioni in %s ..."
+
+#: hexview.c:38 view.c:63
+msgctxt "keybar"
+msgid "Hex"
+msgstr "Hex"
+
+#: hexview.c:160
+#, c-format
+msgid "Lines %-5d Bytes %ld"
+msgstr "Righe %-5d Byte %ld"
+
+#: hexview.c:162
+#, c-format
+msgid "Byte %ld"
+msgstr "Byte %ld"
+
+#: hexview.c:246 view.c:352
+msgid "String not found"
+msgstr "Testo non trovato"
+
+#: main.c:637
+msgid " Language "
+msgstr " Lingua "
+
+#: main.c:637
+msgid "Select language to use:"
+msgstr "Lingua dell'aiuto:"
+
+#: main.c:637
+msgid " English "
+msgstr " Inglese "
+
+#: mh.c:22 mh.c:46
+msgid "Brief"
+msgstr "Breve"
+
+#: mh.c:23 mh.c:47
+msgid "Long"
+msgstr "Lungo"
+
+#: mh.c:24 mh.c:48
+msgid "Wide"
+msgstr "Largo"
+
+#: mh.c:25 mh.c:49
+msgid "Full"
+msgstr "Completo"
+
+#: mh.c:26 mh.c:50
+msgid "Info"
+msgstr "Info"
+
+#: mh.c:27 mh.c:51
+msgid "Status"
+msgstr "Stato"
+
+#: mh.c:28 mh.c:52
+msgid "Align extensions"
+msgstr "Allinea estensioni"
+
+#: mh.c:30 mh.c:54
+msgid "Sort by name"
+msgstr "Per nome"
+
+#: mh.c:31 mh.c:55
+msgid "Extension"
+msgstr "Per estensione"
+
+#: mh.c:32 mh.c:56
+msgid "Time"
+msgstr "Per data"
+
+#: mh.c:33 mh.c:57
+msgid "Size"
+msgstr "Per dimensione"
+
+#: mh.c:34 mh.c:58
+msgid "Unsorted"
+msgstr "Non ordinato"
+
+#: mh.c:35 mh.c:59
+msgid "Reverse"
+msgstr "Inverso"
+
+#: mh.c:36 mh.c:60
+msgid "Sort by type"
+msgstr "Per tipo"
+
+#: mh.c:38 mh.c:62
+msgid "Re-read"
+msgstr "Rileggi"
+
+#: mh.c:39 mh.c:63
+msgid "Pattern"
+msgstr "Filtro"
+
+#: mh.c:70
+msgid "Help"
+msgstr "Aiuto"
+
+#: mh.c:71
+msgid "User menu"
+msgstr "Menu utente"
+
+#: mh.c:72
+msgid "View"
+msgstr "Visualizza"
+
+#: mh.c:73
+msgid "View info"
+msgstr "Vedi info"
+
+#: mh.c:74
+msgid "Edit"
+msgstr "Modifica"
+
+#: mh.c:75
+msgid "Edit info"
+msgstr "Modifica info"
+
+#: mh.c:76
+msgid "Copy"
+msgstr "Copia"
+
+#: mh.c:77
+msgid "Link"
+msgstr "Collegamento"
+
+#: mh.c:79
+msgid "Symlink"
+msgstr "Link simbolico"
+
+#: mh.c:81
+msgid "Rename/move"
+msgstr "Rinomina/sposta"
+
+#: mh.c:82
+msgid "Make directory"
+msgstr "Crea directory"
+
+#: mh.c:83
+msgid "Delete"
+msgstr "Elimina"
+
+#: mh.c:85
+msgid "Select group"
+msgstr "Seleziona gruppo"
+
+#: mh.c:86
+msgid "Unselect group"
+msgstr "Deseleziona gruppo"
+
+#: mh.c:88
+msgid "Quit"
+msgstr "Esci"
+
+#: mh.c:95
+msgid "Run subshell"
+msgstr "Avvia una shell"
+
+#: mh.c:96
+msgid "Compare directories"
+msgstr "Confronta directory"
+
+#: mh.c:97
+msgid "Find file"
+msgstr "Cerca file"
+
+#: mh.c:98
+msgid "History"
+msgstr "Cronologia"
+
+#: mh.c:100
+msgid "Home directory"
+msgstr "Directory personale"
+
+#: mh.c:101
+msgid "Root directory"
+msgstr "Directory radice"
+
+#: mh.c:102
+msgid "Redraw screen"
+msgstr "Ridisegna lo schermo"
+
+#: mh.c:104
+msgid "Menu file edit"
+msgstr "Modifica il file del menu"
+
+#: mh.c:105
+msgid "Extensions file edit"
+msgstr "Modifica il file delle estensioni"
+
+#: mh.c:112
+msgid "Switch panels"
+msgstr "Cambia pannello"
+
+#: mh.c:113
+msgid "Swap panels"
+msgstr "Scambia pannelli"
+
+#: mh.c:114
+msgid "Full screen"
+msgstr "Schermo intero"
+
+#: mh.c:115
+msgid "Double width"
+msgstr "Doppia larghezza"
+
+#: mh.c:116
+msgid "Command line mode"
+msgstr "Modalità riga di comando"
+
+#: mh.c:117
+msgid "Show hidden files"
+msgstr "Mostra file nascosti"
+
+#: mh.c:119
+msgid "Language..."
+msgstr "Lingua..."
+
+#: mh.c:120
+msgid "Viewer..."
+msgstr "Visualizzatore..."
+
+#: mh.c:121
+msgid "Editor..."
+msgstr "Editor..."
+
+#: mh.c:122
+msgid "Shell..."
+msgstr "Shell..."
+
+#: mh.c:124
+msgid "Save setup"
+msgstr "Salva impostazioni"
+
+#: mh.c:131
+msgid "Left"
+msgstr "Sinistra"
+
+#: mh.c:132
+msgid "Files"
+msgstr "File"
+
+#: mh.c:133
+msgid "Commands"
+msgstr "Comandi"
+
+#: mh.c:134
+msgid "Options"
+msgstr "Opzioni"
+
+#: mh.c:135
+msgid "Right"
+msgstr "Destra"
+
+#: rec.c:72
+msgid "Cannot read file"
+msgstr "Impossibile leggere il file"
+
+#: rec.c:81
+msgid "Cannot write file"
+msgstr "Impossibile scrivere il file"
+
+#: rec.c:114
+msgid "No temp space"
+msgstr "Nessuno spazio temporaneo"
+
+#: rec.c:130
+msgid "Cannot lseek on writing temp file"
+msgstr "lseek fallito scrivendo il file temporaneo"
+
+#: rec.c:132
+msgid "Cannot write temporary file"
+msgstr "Impossibile scrivere il file temporaneo"
+
+#: rec.c:171
+msgid "Cannot open temporary file"
+msgstr "Impossibile aprire il file temporaneo"
+
+#: rec.c:177
+msgid "Cannot reopen temporary file"
+msgstr "Impossibile riaprire il file temporaneo"
+
+#: rec.c:216
+msgid "file too long"
+msgstr "file troppo lungo"
+
+#: rec.c:312
+#, c-format
+msgid "Cannot lseek on reading fd=%d, seek=%ld"
+msgstr "lseek fallito in lettura, fd=%d, seek=%ld"
+
+#: rec.c:316
+msgid "Cannot read line"
+msgstr "Impossibile leggere la riga"
+
+#: view.c:214
+#, c-format
+msgid "  Lines %-5d Bytes %ld"
+msgstr "  Righe %-5d Byte %ld"

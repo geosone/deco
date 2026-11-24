@@ -410,7 +410,7 @@ static int initudm(char *filename, char *scale)
 
     fd = openmenu(filename);
     if (fd < 0) {
-        error("Menu not found");
+        error(_("Menu not found"));
         return (0);
     }
     nm   = 0;
@@ -418,7 +418,7 @@ static int initudm(char *filename, char *scale)
     n    = read(fd, buf, sizeof(buf) - 1);
     close(fd);
     if (n <= 0) {
-        error("Cannot read menu");
+        error(_("Cannot read menu"));
         return (0);
     }
     buf[n] = 0;
@@ -459,7 +459,7 @@ static int initudm(char *filename, char *scale)
         }
     }
     if (!nm) {
-        error("Menu is empty");
+        error(_("Menu is empty"));
         return (0);
     }
     menuwid += 6;
@@ -482,7 +482,7 @@ static char *runudm(char *scale)
     VStandOut();
     VFillBox(menurow - 2, menucol - 4, nm + 4, menuwid + 8, ' ');
     VDrawBox(menurow - 1, menucol - 1, nm + 2, menuwid + 2);
-    mvcaddstr(menurow - 1, COLS / 2, " User Menu ");
+    mvcaddstr(menurow - 1, COLS / 2, _(" User Menu "));
     printudm();
     VSetNormal();
     VStandEnd();
@@ -824,7 +824,7 @@ void writeinitfile()
     strcat(fname, INITFILE);
     fd = creat(fname, 0600);
     if (fd < 0) {
-        error("Cannot create %s", fname);
+        error(_("Cannot create %s"), fname);
         return;
     }
     bufp = buf;
@@ -1073,7 +1073,7 @@ void writeinitfile()
         *bufp++ = '\n';
     }
 
-    message(" Setup ", "Saving setup in %s ...", fname);
+    message(_(" Setup "), _("Saving setup in %s ..."), fname);
     write(fd, buf, (unsigned)(bufp - buf));
     close(fd);
     endmesg();

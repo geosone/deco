@@ -60,8 +60,9 @@ static int textview(char *filename)
     ccol  = 0;
     sline = soff = -1;
     {
-        static const char *const keys[10] = { "Help",   "",       "Raw", "Hex",    "Top",
-                                              "Bottom", "Search", "",    "Spaces", "Quit" };
+        static const char *const keys[10] = { NC_("keybar", "Help"),   "",           NC_("keybar", "Raw"),    NC_("keybar", "Hex"),
+                                              NC_("keybar", "Top"),    NC_("keybar", "Bottom"), NC_("keybar", "Search"), "",
+                                              NC_("keybar", "Spaces"), NC_("keybar", "Quit") };
 
         drawkeys(keys);
     }
@@ -103,7 +104,8 @@ static int textview(char *filename)
             case meta('G'): { /* f7 - search */
                 register char *p;
 
-                if (!(p = getstring(SEARCHSZ - 1, viewsrch, " Search ", "Search for the string")))
+                if (!(p = getstring(SEARCHSZ - 1, viewsrch, _(" Search "),
+                                    _("Search for the string"))))
                     continue;
                 strcpy(viewsrch, p);
                 if (sline < 0) {
@@ -207,11 +209,11 @@ static void viewhead(char *filename, int line, int col)
     VMove(0, 0);
     for (i = COLS; --i >= 0; VPutChar(' '))
         ;
-    VMPutString(0, 1, "File ");
+    VMPutString(0, 1, _("File "));
     VPutString(filename);
-    VPrint("  Lines %-5d Bytes %ld", viewrec->len, viewrec->size);
+    VPrint(_("  Lines %-5d Bytes %ld"), viewrec->len, viewrec->size);
     VMove(0, COLS - 23); /* at the right, 57 of 80 */
-    VPrint("Line %-5d Col %d", line + 1, col);
+    VPrint(_("Line %-5d Col %d"), line + 1, col);
     VSetNormal();
     VStandEnd();
 }
@@ -347,7 +349,7 @@ int search(char *str, int l, int c, int *pline, int *pcol)
                 return (1);
             }
     }
-    error("String not found");
+    error(_("String not found"));
     return (0);
 }
 

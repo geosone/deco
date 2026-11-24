@@ -38,7 +38,7 @@ void error(char *s, ...)
     va_start(ap, s);
     vsnprintf(buf, sizeof(buf), s, ap);
     va_end(ap);
-    getchoice(1, " Error ", buf, 0, " Ok ", 0, 0);
+    getchoice(1, _(" Error "), buf, 0, _(" Ok "), 0, 0);
 }
 
 void message(char *name, char *s, ...)

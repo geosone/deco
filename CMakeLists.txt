@@ -29,7 +29,27 @@ add_executable(${PROJECT_NAME}
     scr.c
     ut.c
     view.c
+    intl.c
 )
+# the message catalogues (po/*.po, text domain cmdr) and where they go
+include(GNUInstallDirs)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    CMDR_LOCALEDIR="${CMAKE_INSTALL_FULL_LOCALEDIR}")
+find_program(MSGFMT msgfmt)
+if(MSGFMT)
+    file(GLOB _po "${CMAKE_CURRENT_SOURCE_DIR}/po/*.po")
+    foreach(_f ${_po})
+        get_filename_component(_lang ${_f} NAME_WE)
+        set(_mo "${CMAKE_CURRENT_BINARY_DIR}/locale/${_lang}/LC_MESSAGES/cmdr.mo")
+        add_custom_command(OUTPUT ${_mo}
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/locale/${_lang}/LC_MESSAGES"
+            COMMAND ${MSGFMT} -o ${_mo} ${_f}
+            DEPENDS ${_f})
+        list(APPEND _mos ${_mo})
+        install(FILES ${_mo} DESTINATION ${CMAKE_INSTALL_LOCALEDIR}/${_lang}/LC_MESSAGES)
+    endforeach()
+    add_custom_target(cmdr-mo ALL DEPENDS ${_mos})
+endif()
 if(DECO_NEWT)
     target_sources(${PROJECT_NAME} PRIVATE newtio.c)
     target_compile_definitions(${PROJECT_NAME} PRIVATE DECO_NEWT)

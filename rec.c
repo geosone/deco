@@ -69,7 +69,7 @@ static int ffcopy(int from, int to)
     for (;;) {
         n = read(from, buf, sizeof(buf));
         if (n < 0) {
-            error("Cannot read file");
+            error(_("Cannot read file"));
             return (-1);
         }
         if (n == 0)
@@ -78,7 +78,7 @@ static int ffcopy(int from, int to)
         while (n > 0) {
             k = write(to, p, (unsigned)n);
             if (k <= 0) {
-                error("Cannot write file");
+                error(_("Cannot write file"));
                 return (-1);
             }
             n -= k;
@@ -111,7 +111,7 @@ static long tempbusy(REC *r, int len) /* search & mark temp space busy */
             break;
     }
     if (seek >= MAXTEMP) {
-        error("No temp space");
+        error(_("No temp space"));
         return (0);
     }
     for (n = seek, i = 0; i < len; ++i, ++n)
@@ -127,9 +127,9 @@ static long tempsave(REC *r, char *str, int len) /* save string in temp file, re
         return (0);
     seek = tempbusy(r, len);
     if (lseek(r->tfd, seek, 0) < 0)
-        error("Cannot lseek on writing temp file");
+        error(_("Cannot lseek on writing temp file"));
     if (write(r->tfd, str, (unsigned)len) != len)
-        error("Cannot write temporary file");
+        error(_("Cannot write temporary file"));
     return (seek);
 }
 
@@ -168,13 +168,13 @@ REC *RecOpen(int fd, int wmode)
             tfilename = tfilepattern;
         r->tfd = creat(tfilename, 0600);
         if (r->tfd < 0) {
-            error("Cannot open temporary file");
+            error(_("Cannot open temporary file"));
             return (0);
         }
         close(r->tfd);
         r->tfd = open(tfilename, 2);
         if (r->tfd < 0) {
-            error("Cannot reopen temporary file");
+            error(_("Cannot reopen temporary file"));
             return (0);
         }
         unlink(tfilename);
@@ -213,7 +213,7 @@ REC *RecOpen(int fd, int wmode)
             ++r->broken;
         }
         if (++r->len >= MAXLEN) {
-            error("file too long");
+            error(_("file too long"));
             return (0);
         }
     }
@@ -250,7 +250,7 @@ int RecSave(REC *r, char *filename)
         strcat(bak, BAKSUFFIX);
         r->bakfd = creat(bak, 0600);
         if (r->bakfd < 0) {
-            error("Cannot create %s", bak);
+            error(_("Cannot create %s"), bak);
             return (-1);
         }
         lseek(r->fd, 0L, 0);
@@ -263,7 +263,7 @@ int RecSave(REC *r, char *filename)
         close(r->bakfd);
         r->bakfd = open(bak, 0);
         if (r->bakfd < 0) {
-            error("Cannot open %s", bak);
+            error(_("Cannot open %s"), bak);
             unlink(bak);
             return (-1);
         }
@@ -272,7 +272,7 @@ int RecSave(REC *r, char *filename)
     }
     fd = creat(filename, 0664);
     if (fd < 0) {
-        error("Cannot create %s", filename);
+        error(_("Cannot create %s"), filename);
         unlink(bak);
         return (-1);
     }
@@ -309,11 +309,11 @@ static void readline(int fd, long seek, int len, LINE *rez)
     }
     rez->ptr = malloc(rez->len);
     if (lseek(fd, seek, 0) < 0)
-        error("Cannot lseek on reading fd=%d, seek=%ld", fd, seek);
+        error(_("Cannot lseek on reading fd=%d, seek=%ld"), fd, seek);
     for (l = rez->len, s = rez->ptr; l > 0; l -= n, s += n) {
         n = read(fd, s, (unsigned)l);
         if (n <= 0) {
-            error("Cannot read line");
+            error(_("Cannot read line"));
             if (rez->len)
                 free(rez->ptr);
             rez->len = 0;

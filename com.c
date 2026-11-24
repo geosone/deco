@@ -452,7 +452,7 @@ static int mycmd(int scr)
             setdir(cur, 0);
         else if (chdir(dir) < 0)
             if (scr)
-                error("Cannot chdir to %s", dir);
+                error(_("Cannot chdir to %s"), dir);
             else
                 outerr("Cannot chdir to %s\n", dir);
         else
@@ -557,7 +557,7 @@ static void jobmenu()
         if ((n = esclen(job[nh].command)) > histwid)
             histwid = n;
     if (!nh) {
-        error("No background jobs");
+        error(_("No background jobs"));
         return;
     }
     histwid += 2 + 7;
@@ -574,7 +574,7 @@ static void jobmenu()
     VStandOut();
     VFillBox(histrow - 2, histcol - 4, nh + 4, histwid + 8, ' ');
     VDrawBox(histrow - 1, histcol - 1, nh + 2, histwid + 2);
-    mvcaddstr(histrow - 1, COLS / 2, " Jobs ");
+    mvcaddstr(histrow - 1, COLS / 2, _(" Jobs "));
 
     for (ch = 0; ch < nh; ++ch) {
         sprintf(buf, "[%d]", job[nh - ch - 1].pid);
@@ -679,7 +679,7 @@ void histmenu()
         if ((n = esclen(history[nh])) > histwid)
             histwid = n;
     if (!nh) {
-        error("History is empty");
+        error(_("History is empty"));
         return;
     }
     histwid += 2;
@@ -696,9 +696,9 @@ void histmenu()
     VStandOut();
     VFillBox(histrow - 2, histcol - 4, nh + 4, histwid + 8, ' ');
     VDrawBox(histrow - 1, histcol - 1, nh + 2, histwid + 2);
-    mvcaddstr(histrow - 1, COLS / 2, " History ");
+    mvcaddstr(histrow - 1, COLS / 2, _(" History "));
     if (job[0].command)
-        mvcaddstr(histrow + nh + 1, COLS / 2, " ^B - Jobs ");
+        mvcaddstr(histrow + nh + 1, COLS / 2, _(" ^B - Jobs "));
 
     for (ch = 0; ch < nh; ++ch) {
         VMove(histrow + ch, histcol + 1);

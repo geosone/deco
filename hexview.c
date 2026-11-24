@@ -35,8 +35,9 @@ int hexview(char *filename) /* hexadecimal viewer */
     hexcursor = 0;
     sline = soff = -1;
     {
-        static const char *const keys[10] = { "Help",   "",       "Raw", "Hex", "Top",
-                                              "Bottom", "Search", "",    "",    "Quit" };
+        static const char *const keys[10] = { NC_("keybar", "Help"), "",           NC_("keybar", "Raw"),    NC_("keybar", "Hex"),
+                                              NC_("keybar", "Top"),  NC_("keybar", "Bottom"), NC_("keybar", "Search"), "",
+                                              "",         NC_("keybar", "Quit") };
 
         drawkeys(keys);
     }
@@ -118,7 +119,8 @@ int hexview(char *filename) /* hexadecimal viewer */
                 baseline = viewhlen - (LINES - 2);
                 break;
             case meta('G'): /* f7 - search */
-                if (!(p = getstring(SEARCHSZ - 1, viewsrch, " Search ", "Search for the string")))
+                if (!(p = getstring(SEARCHSZ - 1, viewsrch, _(" Search "),
+                                    _("Search for the string"))))
                     continue;
                 strcpy(viewsrch, p);
                 viewsbsz = cvtsrch(viewsrch, viewsbuf);
@@ -152,12 +154,12 @@ static void viewhhead(char *filename, int line)
     VMove(0, 0);
     for (i = COLS; --i >= 0; VPutChar(' '))
         ;
-    VMPutString(0, 1, "File ");
+    VMPutString(0, 1, _("File "));
     VPutString(filename);
     VMove(0, 22);
-    VPrint("Lines %-5d Bytes %ld", viewrec->len, viewrec->size);
+    VPrint(_("Lines %-5d Bytes %ld"), viewrec->len, viewrec->size);
     VMove(0, COLS - 12); /* at the right, 68 of 80 */
-    VPrint("Byte %ld", line * 16L);
+    VPrint(_("Byte %ld"), line * 16L);
     VSetNormal();
     VStandEnd();
 }
@@ -241,7 +243,7 @@ static int hsearch(int l, int c, int *pline, int *pcol)
         l += SEARCHSZ / 16;
         c = 0;
     }
-    error("String not found");
+    error(_("String not found"));
     return (0);
 }
 

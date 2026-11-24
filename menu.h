@@ -2,6 +2,7 @@ typedef void(menufunc)(int k, int sk);
 
 struct submenu {
     char *name;     /* name of submenu */
+    char *key2;     /* the key shown at the right, "^L", "F3" */
     int key;        /* return key */
     menufunc *exec; /* function to execute */
     int active;     /* is it active for now */

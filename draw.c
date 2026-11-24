@@ -22,6 +22,7 @@ static void drawmode(char *m, int u, int g);
 static void drawtime(struct file *f);
 static void drawlong(struct file *f);
 static char *filnam(const char *p, int tail, int n);
+static void bytesinfiles(char *buf, size_t size, const char *fmt, long bytes, int files);
 
 /*
  * The colours of each role (scr.h), VC-like: fg and bg of normal,
@@ -51,10 +52,10 @@ static const int vccolors[VCOL_NROLES][12] = {
         0, 3,
     },
     [VCOL_MENU] = {
-        0, 3,  /* items */
+        0, 3,  /* items, the frame */
         15, 0, /* the chosen item */
-        15, 3, /* the frame */
-        15, 0,
+        14, 3, /* hot keys */
+        14, 0, /* the hot key of the chosen item */
         8, 3, /* items not possible now */
         0, 3, /* pop-up lists */
     },
@@ -208,8 +209,12 @@ void drawbanners()
         VMPutString(0, COLS - 1 - strlen(curtime), curtime);
     VStandEnd();
     static const char *const keys[2][10] = {
-        { "Help", "User", "View", "Edit", "Copy", "RenMov", "Mkdir", "Delete", "Menu", "Quit" },
-        { "Help", "User", "", "", "", "", "", "", "Menu", "Quit" },
+        { NC_("keybar", "Help"), NC_("keybar", "User"), NC_("keybar", "View"),
+          NC_("keybar", "Edit"), NC_("keybar", "Copy"), NC_("keybar", "RenMov"),
+          NC_("keybar", "Mkdir"), NC_("keybar", "Delete"), NC_("keybar", "Menu"),
+          NC_("keybar", "Quit") },
+        { NC_("keybar", "Help"), NC_("keybar", "User"), "", "", "", "", "", "",
+          NC_("keybar", "Menu"), NC_("keybar", "Quit") },
     };
 
     drawkeys(keys[cmdreg != 0]);
@@ -233,7 +238,7 @@ void drawkeys(const char *const labels[10])
         w = (i == 9 ? COLS - 9 * slot : slot) - (i == 9 ? 2 : 1) - (i ? 1 : 0);
         if (w < 1)
             w = 1;
-        p += sprintf(p, "%s%d\16%-*.*s\17", i ? " " : "", i + 1, w, w, labels[i]);
+        p += sprintf(p, "%s%d\16%-*.*s\17", i ? " " : "", i + 1, w, w, trc("keybar", labels[i]));
     }
     *p++ = '\2';
     *p   = 0;
@@ -273,14 +278,12 @@ static void draw1dir(struct dir *c) /* redraw window */
     if (c->pattern[0])
         drawpat(BASECOL(c), c->pattern, PAGEWID);
     else {
-        char buf[80];
+        char buf[160];
 
-        sprintf(buf, " %s byte%s in %d file%s ", ltoac(c->nbytes), c->nbytes == 1 ? "" : "s",
-                c->nfiles, c->nfiles == 1 ? "" : "s");
+        bytesinfiles(buf, sizeof(buf), _(" %s in %s "), c->nbytes, c->nfiles);
         mvcaddstr(H + 4, BASECOL(c) + PAGEWID / 2 + 1, buf);
         if (c->tfiles) {
-            sprintf(buf, " %s byte%s in %d file%s ", ltoac(c->tbytes), c->tbytes == 1 ? "" : "s",
-                    c->tfiles, c->tfiles == 1 ? "" : "s");
+            bytesinfiles(buf, sizeof(buf), _(" %s in %s "), c->tbytes, c->tfiles);
             VSetBold();
             mvcaddstr(H + 2, BASECOL(c) + PAGEWID / 2 + 1, buf);
         }
@@ -414,10 +417,23 @@ static void drawpat(int col, char *pat, int width)
     VPutString(pat);
 }
 
+/* "<n bytes> in <n files>" with fmt (" %s in %s "), plurals translated */
+static void bytesinfiles(char *buf, size_t size, const char *fmt, long bytes, int files)
+{
+    char b[64], f[64];
+
+    snprintf(b, sizeof(b), P_("%s byte", "%s bytes", bytes), ltoac(bytes));
+    snprintf(f, sizeof(f), P_("%d file", "%d files", files), files);
+    snprintf(buf, size, fmt, b, f);
+    /* on the frame of a panel: no longer than it */
+    if ((int)strlen(buf) > PAGEWID - 2 && PAGEWID > 2 && (size_t)(PAGEWID - 2) < size)
+        buf[PAGEWID - 2] = 0;
+}
+
 static void drawsdir(struct dir *c) /* draw status window */
 {
     struct dir *d = c == &left ? &right : &left;
-    char buf[80];
+    char buf[160];
 
     /* print window name " Status " */
     VSetDim();
@@ -428,22 +444,20 @@ static void drawsdir(struct dir *c) /* draw status window */
     VClearBox(2, BASECOL(c) + 1, 2, PAGEWID - 2);
     VClearBox(5, BASECOL(c) + 1, 6, PAGEWID - 2);
     VClearBox(12, BASECOL(c) + 1, H - 8, PAGEWID - 2);
-    mvcaddstr(2, BASECOL(c) + PAGEWID / 2 + 1, "The " CMDR_NAME " " CMDR_VERSION);
-    mvcaddstr(3, BASECOL(c) + PAGEWID / 2 + 1, "after the Demos Commander, S.Vakulenko");
-    mvcaddstr(5, BASECOL(c) + PAGEWID / 2 + 1, "Directory");
+    mvcaddstr(2, BASECOL(c) + PAGEWID / 2 + 1, CMDR_NAME " " CMDR_VERSION);
+    mvcaddstr(3, BASECOL(c) + PAGEWID / 2 + 1, _("after the Demos Commander, S.Vakulenko"));
+    mvcaddstr(5, BASECOL(c) + PAGEWID / 2 + 1, _("Directory"));
     mvcaddstr(6, BASECOL(c) + PAGEWID / 2 + 1, d->shortcwd);
-    sprintf(buf, "\3%d\2 file%s", d->nfiles, d->nfiles == 1 ? "" : "s");
+    snprintf(buf, sizeof(buf), P_("\3%d\2 file", "\3%d\2 files", d->nfiles), d->nfiles);
     mvcaddstr(7, BASECOL(c) + PAGEWID / 2 + 2, buf);
-    sprintf(buf, "\3%s\2 byte%s", ltoac(d->nbytes), d->nbytes == 1 ? "" : "s");
+    snprintf(buf, sizeof(buf), P_("\3%s\2 byte", "\3%s\2 bytes", d->nbytes), ltoac(d->nbytes));
     mvcaddstr(8, BASECOL(c) + PAGEWID / 2 + 2, buf);
     if (d->pattern[0]) {
-        sprintf(buf, "\3%s\2 byte%s in \3%d\2 matched file%s", ltoac(d->mbytes),
-                d->mbytes == 1 ? "" : "s", d->mfiles, d->mfiles == 1 ? "" : "s");
+        bytesinfiles(buf, sizeof(buf), _("%s in %s matched"), d->mbytes, d->mfiles);
         mvcaddstr(9, BASECOL(c) + PAGEWID / 2 + 3, buf);
     }
     if (d->tfiles) {
-        sprintf(buf, "\3%s\2 byte%s in \3%d\2 selected file%s", ltoac(d->tbytes),
-                d->tbytes == 1 ? "" : "s", d->tfiles, d->tfiles == 1 ? "" : "s");
+        bytesinfiles(buf, sizeof(buf), _("%s in %s selected"), d->tbytes, d->tfiles);
         mvcaddstr(10, BASECOL(c) + PAGEWID / 2 + 3, buf);
     }
 #ifdef notyet

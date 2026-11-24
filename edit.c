@@ -42,17 +42,17 @@ static void edithead(char *filename, int line, int col, int off)
     VMove(0, 0);
     for (i = COLS; --i >= 0; VPutChar(' '))
         ;
-    VMPutString(0, 1, "File ");
+    VMPutString(0, 1, _("File "));
     VPutString(filename);
-    VPrint("  Lines %d", viewrec->len);
+    VPrint(_("  Lines %d"), viewrec->len);
     VMove(0, COLS - 30); /* at the right, 50 of 80 */
-    VPrint("Line %-5d Col %d", line + 1, col);
+    VPrint(_("Line %-5d Col %d"), line + 1, col);
     i = charcode(line, off);
     VMove(0, COLS - 10); /* 70 of 80 */
     if (i)
-        VPrint("Char 0%-3o", i);
+        VPrint(_("Char 0%-3o"), i);
     else
-        VPrint("Char 0");
+        VPrint(_("Char 0"));
     VSetNormal();
     VStandEnd();
 }
@@ -91,8 +91,8 @@ static void edit1(int d, char *filename, char *basename)
         return;
     editmodflg = 0;
     if (viewrec->broken) {
-        if (0 != getchoice(1, " Edit ", "File contains too long lines.", 0, " Break lines ",
-                           " Cancel editing ", 0))
+        if (0 != getchoice(1, _(" Edit "), _("File contains too long lines."), 0,
+                           _(" Break lines "), _(" Cancel editing "), 0))
             return;
         RecBreak(viewrec);
         editmodflg = 1;
@@ -101,8 +101,9 @@ static void edit1(int d, char *filename, char *basename)
     sline = ccol = 0;
     VClearBox(1, 0, LINES - 2, COLS);
     {
-        static const char *const keys[10] = { "Help",   "Save",   "Raw",  "",       "Top",
-                                              "Bottom", "Search", "Home", "Spaces", "Quit" };
+        static const char *const keys[10] = { NC_("keybar", "Help"),   NC_("keybar", "Save"),   NC_("keybar", "Raw"),    "",
+                                              NC_("keybar", "Top"),    NC_("keybar", "Bottom"), NC_("keybar", "Search"), NC_("keybar", "Home"),
+                                              NC_("keybar", "Spaces"), NC_("keybar", "Quit") };
 
         drawkeys(keys);
     }
@@ -251,7 +252,7 @@ static void edit1(int d, char *filename, char *basename)
                 ccol = column(sline, soff + 1);
                 continue;
             case meta('B'): /* f2 - save */
-                message(" Save ", "Saving file '%s'...", basename);
+                message(_(" Save "), _("Saving file '%s'..."), basename);
                 RecSave(viewrec, filename);
                 editmodflg = 0;
                 endmesg();
@@ -292,8 +293,8 @@ static void edit1(int d, char *filename, char *basename)
             case cntrl('['):
             case meta('J'): /* f0 - quit */
                 if (editmodflg)
-                    switch (getchoice(1, " Edit ", "You've made changes since the last save.", 0,
-                                      " Save ", " Don't save ", " Continue editing ")) {
+                    switch (getchoice(1, _(" Edit "), _("You've made changes since the last save."),
+                                      0, _(" Save "), _(" Don't save "), _(" Continue editing "))) {
                     case 0:
                         if (RecSave(viewrec, filename) < 0)
                             continue;
@@ -308,7 +309,8 @@ static void edit1(int d, char *filename, char *basename)
             case meta('G'): { /* f7 - search */
                 register char *p;
 
-                if (!(p = getstring(SEARCHSZ - 1, viewsrch, " Search ", "Search for the string")))
+                if (!(p = getstring(SEARCHSZ - 1, viewsrch, _(" Search "),
+                                    _("Search for the string"))))
                     continue;
                 strcpy(viewsrch, p);
                 if (!search(p, sline, soff + 1, &sline, &soff))

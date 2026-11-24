@@ -1,7 +1,10 @@
+/* menu.h needs BOX from scr.h */
+/* clang-format off */
 #include "deco.h"
 #include "dir.h"
 #include "scr.h"
 #include "menu.h"
+/* clang-format on */
 
 /* menu handler */
 
@@ -16,120 +19,120 @@ menufunc makeslink;
 
 static struct submenu lmenu[] = {
     // clang-format off
-    { "Brief",                'b',  setfull },
-    { "Long",                 'l',  setfull },
-    { "Wide",                 'w',  setfull },
-    { "Full",                 'f',  setfull },
-    { "Info",                 'i',  setfull },
-    { "Status           ^L",  's',  (menufunc*)setstatus },
-    { "Align extensions",     'a',  switchalign },
-    { "",                     0,    0 },
-    { "sort by Name",         'n',  setsort },
-    { "eXtension",            'x',  setsort },
-    { "Time",                 't',  setsort },
-    { "siZe",                 'z',  setsort },
-    { "Unsorted",             'u',  setsort },
-    { "Reverse",              'r',  setrevsort },
-    { "sort by tYpe",         'y',  settypesort },
-    { "",                     0,    0 },
-    { "Re-read          ^R",  'r',  reread },
-    { "Pattern",              'p',  setpattern },
+    { N_("Brief"), 0,                'b',  setfull },
+    { N_("Long"), 0,                 'l',  setfull },
+    { N_("Wide"), 0,                 'w',  setfull },
+    { N_("Full"), 0,                 'f',  setfull },
+    { N_("Info"), 0,                 'i',  setfull },
+    { N_("Status"), "^L",  's',  (menufunc*)setstatus },
+    { N_("Align extensions"), 0,     'a',  switchalign },
+    { "", 0,                      0,    0 },
+    { N_("Sort by name"), 0,         'n',  setsort },
+    { N_("Extension"), 0,            'x',  setsort },
+    { N_("Time"), 0,                 't',  setsort },
+    { N_("Size"), 0,                 'z',  setsort },
+    { N_("Unsorted"), 0,             'u',  setsort },
+    { N_("Reverse"), 0,              'r',  setrevsort },
+    { N_("Sort by type"), 0,         'y',  settypesort },
+    { "", 0,                      0,    0 },
+    { N_("Re-read"), "^R",  'r',  reread },
+    { N_("Pattern"), 0,              'p',  setpattern },
     { 0,                      0,    0 },
     // clang-format on
 };
 
 static struct submenu rmenu[] = {
     // clang-format off
-    { "Brief",                'b',  setfull },
-    { "Long",                 'l',  setfull },
-    { "Wide",                 'w',  setfull },
-    { "Full",                 'f',  setfull },
-    { "Info",                 'i',  setfull },
-    { "Status           ^L",  's',  (menufunc*)setstatus },
-    { "Align extensions",     'a',  switchalign },
-    { "",                     0,    0 },
-    { "sort by Name",         'n',  setsort },
-    { "eXtension",            'x',  setsort },
-    { "Time",                 't',  setsort },
-    { "siZe",                 'z',  setsort },
-    { "Unsorted",             'u',  setsort },
-    { "Reverse",              'r',  setrevsort },
-    { "sort by tYpe",         'y',  settypesort },
-    { "",                     0,    0 },
-    { "Re-read          ^R",  'r',  reread },
-    { "Pattern",              'p',  setpattern },
+    { N_("Brief"), 0,                'b',  setfull },
+    { N_("Long"), 0,                 'l',  setfull },
+    { N_("Wide"), 0,                 'w',  setfull },
+    { N_("Full"), 0,                 'f',  setfull },
+    { N_("Info"), 0,                 'i',  setfull },
+    { N_("Status"), "^L",  's',  (menufunc*)setstatus },
+    { N_("Align extensions"), 0,     'a',  switchalign },
+    { "", 0,                      0,    0 },
+    { N_("Sort by name"), 0,         'n',  setsort },
+    { N_("Extension"), 0,            'x',  setsort },
+    { N_("Time"), 0,                 't',  setsort },
+    { N_("Size"), 0,                 'z',  setsort },
+    { N_("Unsorted"), 0,             'u',  setsort },
+    { N_("Reverse"), 0,              'r',  setrevsort },
+    { N_("Sort by type"), 0,         'y',  settypesort },
+    { "", 0,                      0,    0 },
+    { N_("Re-read"), "^R",  'r',  reread },
+    { N_("Pattern"), 0,              'p',  setpattern },
     { 0,                      0,    0 },
     // clang-format on
 };
 
 static struct submenu fmenu[] = {
     // clang-format off
-    { "Help             F1",  'h',  (menufunc*)genhelp },
-    { "User menu        F2",  'u',  (menufunc*)usermenu },
-    { "View             F3",  'v',  (menufunc*)view },
-    { "View Info",            'i',  viewinfo },
-    { "Edit             F4",  'e',  (menufunc*)edit },
-    { "Edit Info",            'n',  editinfo },
-    { "Copy             F5",  'c',  (menufunc*)copy },
-    { "Link",                 'l',  makelink },
+    { N_("Help"), "F1",  'h',  (menufunc*)genhelp },
+    { N_("User menu"), "F2",  'u',  (menufunc*)usermenu },
+    { N_("View"), "F3",  'v',  (menufunc*)view },
+    { N_("View info"), 0,            'i',  viewinfo },
+    { N_("Edit"), "F4",  'e',  (menufunc*)edit },
+    { N_("Edit info"), 0,            'n',  editinfo },
+    { N_("Copy"), "F5",  'c',  (menufunc*)copy },
+    { N_("Link"), 0,                 'l',  makelink },
 #ifdef S_IFLNK
-    { "Symlink",              's',  makeslink },
+    { N_("Symlink"), 0,              's',  makeslink },
 #endif
-    { "Rename/move      F6",  'r',  (menufunc*)renmove },
-    { "Make directory   F7",  'm',  (menufunc*)makedir },
-    { "Delete           F8",  'd',  (menufunc*)delete },
-    { "",                     0,    0 },
-    { "select Group     +",   'g',  (menufunc*)tagall },
-    { "Unselect group   -",   'u',  (menufunc*)untagall },
-    { "",                     0,    0 },
-    { "Quit             F10", 'q',  (menufunc*)quit },
+    { N_("Rename/move"), "F6",  'r',  (menufunc*)renmove },
+    { N_("Make directory"), "F7",  'm',  (menufunc*)makedir },
+    { N_("Delete"), "F8",  'd',  (menufunc*)delete },
+    { "", 0,                      0,    0 },
+    { N_("Select group"), "+",   'g',  (menufunc*)tagall },
+    { N_("Unselect group"), "-",   'u',  (menufunc*)untagall },
+    { "", 0,                      0,    0 },
+    { N_("Quit"), "F10", 'q',  (menufunc*)quit },
     { 0,                      0,    0 },
     // clang-format on
 };
 
 static struct submenu cmenu[] = {
     // clang-format off
-    { "run subShell",             's',  shell },
-    { "Compare directories",      'c',  cmpdir },
-    { "Find file            ^K",  'f',  (menufunc*)findname },
-    { "hIstory              ^B",  'i',  (menufunc*)histmenu },
-    { "",                         0,    0 },
-    { "hOme directory       ^\\", 'o',  directory },
-    { "Root directory       ^^",  'r',  directory },
-    { "reDraw screen        ^]",  'd',  redraw },
-    { "",                         0,    0 },
-    { "Menu file edit",           'm',  (menufunc*)menuedit },
-    { "eXtensions file edit",     'x',  (menufunc*)extedit },
+    { N_("Run subshell"), 0,             's',  shell },
+    { N_("Compare directories"), 0,      'c',  cmpdir },
+    { N_("Find file"), "^K",  'f',  (menufunc*)findname },
+    { N_("History"), "^B",  'i',  (menufunc*)histmenu },
+    { "", 0,                          0,    0 },
+    { N_("Home directory"), "^\\", 'o',  directory },
+    { N_("Root directory"), "^^",  'r',  directory },
+    { N_("Redraw screen"), "^]",  'd',  redraw },
+    { "", 0,                          0,    0 },
+    { N_("Menu file edit"), 0,           'm',  (menufunc*)menuedit },
+    { N_("Extensions file edit"), 0,     'x',  (menufunc*)extedit },
     { 0,                          0,    0 },
     // clang-format on
 };
 
 static struct submenu omenu[] = {
     // clang-format off
-    { "sWitch panels      ^I",  'w',  (menufunc*)switchpanels },
-    { "Swap panels        ^U",  's',  (menufunc*)swappanels },
-    { "Full screen        ^F",  'f',  fullscreen },
-    { "Double width       ^W",  'd',  (menufunc*)setdwid },
-    { "Command line mode  ^P",  'c',  (menufunc*)switchcmdreg },
-    { "show hiddeN files",      'n',  switchhidden },
-    { "",                       0,    0 },
-    { "Language...",            'l',  setlang },
-    { "Viewer...",              'v',  setviewname },
-    { "Editor...",              'e',  seteditname },
-    { "sHell...",               'h',  setshellname },
-    { "",                       0,    0 },
-    { "sAve setup",             'a',  writeinitfile },
+    { N_("Switch panels"), "^I",  'w',  (menufunc*)switchpanels },
+    { N_("Swap panels"), "^U",  's',  (menufunc*)swappanels },
+    { N_("Full screen"), "^F",  'f',  fullscreen },
+    { N_("Double width"), "^W",  'd',  (menufunc*)setdwid },
+    { N_("Command line mode"), "^P",  'c',  (menufunc*)switchcmdreg },
+    { N_("Show hidden files"), 0,      'n',  switchhidden },
+    { "", 0,                        0,    0 },
+    { N_("Language..."), 0,            'l',  setlang },
+    { N_("Viewer..."), 0,              'v',  setviewname },
+    { N_("Editor..."), 0,              'e',  seteditname },
+    { N_("Shell..."), 0,               'h',  setshellname },
+    { "", 0,                        0,    0 },
+    { N_("Save setup"), 0,             'a',  writeinitfile },
     { 0,                        0,    0 },
     // clang-format on
 };
 
 struct menu menu[] = {
     // clang-format off
-    { "Left",         'l',  lmenu },
-    { "Files",        'f',  fmenu },
-    { "Commands",     'c',  cmenu },
-    { "Options",      'o',  omenu },
-    { "Right",        'r',  rmenu },
+    { N_("Left"),         'l',  lmenu },
+    { N_("Files"),        'f',  fmenu },
+    { N_("Commands"),     'c',  cmenu },
+    { N_("Options"),      'o',  omenu },
+    { N_("Right"),        'r',  rmenu },
     { 0,              0,    0 },
     // clang-format on
 };

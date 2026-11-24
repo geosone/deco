@@ -119,13 +119,13 @@ static void chdirup(char *name)
 
     for (;;) {
         if (chdir(name) < 0)
-            error("Cannot chdir to %s", name);
+            error(_("Cannot chdir to %s"), name);
         else if (access(".", 4) < 0)
-            error("Cannot read %s", name);
+            error(_("Cannot read %s"), name);
         else
             break;
         if (name[0] == '/' && name[1] == 0) { /* root directory */
-            error("DECO cannot work on this system -- goodbye!");
+            error(_("DECO cannot work on this system -- goodbye!"));
             quitdeco();
         }
         /* cut last directory name */
@@ -157,7 +157,7 @@ int setdir(struct dir *d, char *dirname)
     /* change directory */
     if (dirname) {
         if (chdir(dirname) < 0) {
-            error("Cannot chdir to %s", dirname);
+            error(_("Cannot chdir to %s"), dirname);
         } else {
             getcwd(d->cwd, sizeof(d->cwd));
         }
@@ -170,7 +170,7 @@ int setdir(struct dir *d, char *dirname)
 
     f = opendir(".");
     if (!f) {
-        error("Cannot read '.' -- good bye !");
+        error(_("Cannot read '.' -- good bye !"));
         quitdeco();
     }
 

@@ -90,6 +90,7 @@ int main(int argc, char **argv, char **envp)
     if (argc > 1)
         chdir(argv[1]);
     EnvInit(envp);
+    trinit();
     initlang();
     uid      = getuid();
     gidnum   = getgroups(sizeof(gidlist) / sizeof(gidlist[0]), gidlist);
@@ -574,6 +575,23 @@ static void initlang()
 {
     register char *s = EnvGet("MSG");
 
+    /* without MSG the help follows the language of the messages:
+     * LANGUAGE, LC_ALL, LC_MESSAGES, LANG ("de_AT.UTF-8") */
+    if (!s && !((s = EnvGet("LANGUAGE")) && *s) && !((s = EnvGet("LC_ALL")) && *s) &&
+        !((s = EnvGet("LC_MESSAGES")) && *s))
+        s = EnvGet("LANG");
+    if (s && s == EnvGet("MSG"))
+        ;
+    else if (s && !strncmp(s, "de", 2))
+        s = "d";
+    else if (s && !strncmp(s, "fr", 2))
+        s = "f";
+    else if (s && !strncmp(s, "ru", 2))
+        s = "r";
+    else if (s && !strncmp(s, "uk", 2))
+        s = "u";
+    else
+        s = 0;
     if (!s)
         s = "e";
     switch (*s) {
@@ -616,7 +634,8 @@ void setlang()
         altlang = " Francais ";
         break;
     }
-    switch (getchoice(0, " Language ", "Select language to use:", 0, " English ", altlang, 0)) {
+    switch (getchoice(0, _(" Language "), _("Select language to use:"), 0, _(" English "), altlang,
+                      0)) {
     case 0:
         lang = ENG;
         break;

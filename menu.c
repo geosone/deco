@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* menu.h needs BOX from scr.h */
@@ -13,12 +15,42 @@ static void drawmenu(struct menu *m);
 static void upmenu(struct menu *m);
 static int hotkey(int c, struct menu *m);
 
+/* the label of an item translated, its key (after a gap of spaces) kept
+ * and aligned to the right of the widest label of the menu */
+static void trmenu(struct menu *m)
+{
+    struct submenu *sm;
+    char *s;
+    int w = 0, n;
+
+    m->name = _(m->name);
+    for (sm = m->submenu; sm->name; ++sm) {
+        if (!sm->name[0])
+            continue;
+        sm->name = _(sm->name);
+        n        = strlen(sm->name) + (sm->key2 ? 2 + strlen(sm->key2) : 0);
+        if (n > w)
+            w = n;
+    }
+    for (sm = m->submenu; sm->name; ++sm) {
+        if (!sm->name[0] || !sm->key2)
+            continue;
+        s = malloc(w + 1);
+        if (!s)
+            continue;
+        sprintf(s, "%-*s%s", w - (int)strlen(sm->key2), sm->name, sm->key2);
+        sm->name = s;
+    }
+}
+
 static void initmenu()
 {
     register struct menu *m;
     register struct submenu *sm;
     int col, w;
 
+    for (m = menu; m->name; ++m)
+        trmenu(m);
     col = 3;
     for (m = menu; m->name; ++m) {
         m->len = 4 + strlen(m->name);
@@ -54,7 +86,8 @@ int getmenu()
 
     getboxes();
     {
-        static const char *const keys[10] = { "", "", "", "", "", "", "", "", "", "Quit" };
+        static const char *const keys[10] = { "", "", "", "", "",
+                                              "", "", "", "", NC_("keybar", "Quit") };
 
         drawkeys(keys);
     }
@@ -151,13 +184,32 @@ static void clrmenu(struct menu *m)
     VUngetBox(m->box);
 }
 
+/* s in w cells, its first letter that is the hot key (in either case)
+ * highlighted */
+static void puthot(const char *s, int w, int key, int active, const char *key2)
+{
+    int hot  = active && key > ' ' && key < 0177;
+    int text = strlen(s) - (key2 ? strlen(key2) : 0); /* not in "^F" */
+    unsigned char c;
+
+    for (; w > 0; --w, --text, s += *s != 0) {
+        c = *s ? (unsigned char)*s : ' ';
+        if (hot && *s && text > 0 && (c | 040) == (key | 040)) {
+            VSetBold();
+            VPutChar(c);
+            VSetNormal();
+            hot = 0;
+        } else
+            VPutChar(c);
+    }
+}
+
 static void drawmenu(struct menu *m)
 {
     register int i, reverse;
     int oldc = VSetColor(VCOL_MENU);
 
     VClearBox(1, m->col - 1, m->hgh + 3, m->wid + 4);
-    VSetBold();
     VDrawBox(1, m->col, m->hgh + 2, m->wid + 2);
     VSetDim();
     for (i = 0; m->submenu[i].name; ++i)
@@ -174,7 +226,9 @@ static void drawmenu(struct menu *m)
             VSetDim();
         VMove(2 + i, m->col + 1);
         VPutChar(i == m->nsm && !reverse ? '[' : ' ');
-        VPrint("%c %-*s", m->submenu[i].tag ? '*' : ' ', m->wid - 4, m->submenu[i].name);
+        VPrint("%c ", m->submenu[i].tag ? '*' : ' ');
+        puthot(m->submenu[i].name, m->wid - 4, m->submenu[i].key, m->submenu[i].active,
+               m->submenu[i].key2);
         VPutChar(i == m->nsm && !reverse ? ']' : ' ');
         if (i == m->nsm)
             VStandEnd();

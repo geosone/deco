@@ -28,6 +28,19 @@ int colsep(int k, int view); /* column separator k (0 ... ncolumns) from the pan
 #define DECO_ORIGIN    "based on the Demos Commander, Copyright (C) 1989-2000 Serge Vakulenko"
 #define CMDR_SHORTCOPY "(C) 2026 M.Fetka, 1989-2000 S.Vakulenko" /* where room is short */
 
+/* translations (intl.c): _() for a text, P_() for one with a count, N_()
+ * marks a text translated where it is used */
+char *tr(const char *msgid);
+char *ntr(const char *msgid, const char *plural, unsigned long n);
+void trinit(void);
+#define _(s)        tr(s)
+#define P_(s, p, n) ntr(s, p, (unsigned long)(n))
+#define N_(s)       (s)
+/* a text in a context, where the same English needs another translation
+ * (the short labels of the F-key bar) */
+char *trc(const char *ctx, const char *msgid);
+#define NC_(c, s) (s)
+
 #define CMDLEN 512 /* length of command string */
 
 struct dir;

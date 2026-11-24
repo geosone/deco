@@ -3,6 +3,12 @@ from the Demos Commander (deco) by Serge Vakulenko: panels that follow
 the screen size, a VC-like colour scheme, a newt/S-Lang screen backend
 and GDOS support. It still builds for Unix systems as `deco`.
 
+It speaks the language of the messages (LANGUAGE, LC_ALL, LC_MESSAGES,
+LANG) through gettext, text domain `cmdr`: German, French, Spanish and
+Italian so far (po/*.po; `po/update.sh` extracts new texts and merges
+them). The screen cells hold Latin-1 for now, so languages beyond it
+(Polish, Czech, Russian ...) come with Unicode cells.
+
 Demos Commander (deco) is an text-mode file manager for Unix systems.
 
 The main interface consists of two panels, which display the file system.

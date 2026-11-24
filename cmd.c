@@ -131,12 +131,12 @@ void reread(int k, int sk)
     struct dir *d = k == 'l' ? &left : &right;
     register char *p;
 
-    if (!(p = getwstring(50, d->cwd, " Change directory ", "Change directory to")))
+    if (!(p = getwstring(50, d->cwd, _(" Change directory "), _("Change directory to"))))
         return;
     if (!strcmp(p, d->cwd))
         setdir(d, 0);
     else if (chdir(p) < 0)
-        error("Cannot chdir to %s", p);
+        error(_("Cannot chdir to %s"), p);
     else
         setdir(d, ".");
     chdir(cur->cwd);
@@ -228,8 +228,8 @@ void setviewname()
 {
     register char *p;
 
-    switch (getchoice(0, " View ", "Select which viewer to use for F3:", 0, " Built-in ",
-                      " External ", 0)) {
+    switch (getchoice(0, _(" View "), _("Select which viewer to use for F3:"), 0, _(" Built-in "),
+                      _(" External "), 0)) {
     case 0:
         userview = 0;
     default:
@@ -237,7 +237,7 @@ void setviewname()
     case 1:
         break;
     }
-    if (!(p = getstring(40, viewname, " View ", "Viewer to use")))
+    if (!(p = getstring(40, viewname, _(" View "), _("Viewer to use"))))
         return;
     strncpy(viewname, p, 40);
     viewname[39] = 0;
@@ -246,7 +246,8 @@ void setviewname()
 
 void setshellname()
 {
-    switch (getchoice(0, " Shell ", "Select which shell to use:", 0, " Shell ", " Cshell ", 0)) {
+    switch (getchoice(0, _(" Shell "), _("Select which shell to use:"), 0, _(" Shell "),
+                      _(" Cshell "), 0)) {
     case 0:
         usecshell = 0;
         break;
@@ -260,8 +261,8 @@ void seteditname()
 {
     register char *p;
 
-    switch (getchoice(0, " Edit ", "Select which editor to use for F4:", 0, " Built-in ",
-                      " External ", 0)) {
+    switch (getchoice(0, _(" Edit "), _("Select which editor to use for F4:"), 0, _(" Built-in "),
+                      _(" External "), 0)) {
     case 0:
         useredit = 0;
     default:
@@ -269,7 +270,7 @@ void seteditname()
     case 1:
         break;
     }
-    if (!(p = getstring(40, editname, " Edit ", "Editor to use")))
+    if (!(p = getstring(40, editname, _(" Edit "), _("Editor to use"))))
         return;
     strncpy(editname, p, 40);
     editname[39] = 0;
@@ -295,7 +296,7 @@ void view()
         return;
     }
     if ((d = open(name, 0)) < 0) {
-        error("Cannot open %s", name);
+        error(_("Cannot open %s"), name);
         return;
     }
     viewfile(d, name);
@@ -322,7 +323,7 @@ void viewinfo()
         return;
     }
     if ((d = open(name, 0)) < 0) {
-        error("Cannot open %s", name);
+        error(_("Cannot open %s"), name);
         return;
     }
     viewfile(d, name);
@@ -338,13 +339,13 @@ static void editfnam(char *name)
 
     if (stat(name, &st) >= 0) {
         if ((st.st_mode & S_IFMT) != S_IFREG) {
-            error("Cannot edit special files");
+            error(_("Cannot edit special files"));
             return;
         }
     } else {
         d = creat(name, 0644);
         if (d < 0) {
-            error("Cannot create %s", name);
+            error(_("Cannot create %s"), name);
             return;
         }
         close(d);
@@ -362,7 +363,7 @@ static void editfnam(char *name)
         return;
     }
     if ((d = open(name, 2)) < 0) {
-        error("Cannot open %s for writing", name);
+        error(_("Cannot open %s for writing"), name);
         return;
     }
     /* skip directory name */
@@ -380,7 +381,7 @@ void edit()
     char namebuf[50];
 
     if (strcmp(name, ".") == 0) {
-        name = getstring(40, 0, " Edit ", "Enter name of file to edit");
+        name = getstring(40, 0, _(" Edit "), _("Enter name of file to edit"));
         if (!name)
             return;
         strcpy(namebuf, name);
@@ -402,8 +403,8 @@ void menuedit()
 {
     char buf[80];
 
-    switch (getchoice(0, " Menu Edit ", "Select which menu to edit:", 0, " Current menu ",
-                      " Home menu ", 0)) {
+    switch (getchoice(0, _(" Menu Edit "), _("Select which menu to edit:"), 0, _(" Current menu "),
+                      _(" Home menu "), 0)) {
     case 0:
         editfnam(".menu");
         break;
@@ -427,11 +428,12 @@ void extedit()
 void quit()
 {
     int choice;
+    char quitmsg[100];
 
-    choice = getchoice(
-        ppid == 1, " " CMDR_NAME " ",
-        ppid == 1 ? "Do you want to log out ?" : "Do you want to quit the " CMDR_NAME " ?", 0,
-        " Yes ", " No ", " Exec shell ");
+    snprintf(quitmsg, sizeof(quitmsg), _("Do you want to quit the %s ?"), CMDR_NAME);
+    choice =
+        getchoice(ppid == 1, " " CMDR_NAME " ", ppid == 1 ? _("Do you want to log out ?") : quitmsg,
+                  0, _(" Yes "), _(" No "), _(" Exec shell "));
     if (choice == 0)
         quitdeco();
     if (choice == 2) {
@@ -511,8 +513,8 @@ void copy()
     if (c) {
         /* copy group of files */
 
-        sprintf(buf, "Copy %d file%s to", c, c > 1 ? "s" : "");
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Copy ", buf)))
+        sprintf(buf, P_("Copy %d file to", "Copy %d files to", c), c);
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Copy "), buf)))
             return;
         runset(name);
         exd = exist(name);
@@ -523,8 +525,8 @@ void copy()
                 exf = exd == 'd' ? exist(buf) : 0;
                 if (exd == 'f' || exf == 'f') {
                     if (!all) {
-                        ch = getchoice(1, " Copy ", "File exists", exf == 'f' ? buf : name,
-                                       " Overwrite ", " All ", " Cancel ");
+                        ch = getchoice(1, _(" Copy "), _("File exists"), exf == 'f' ? buf : name,
+                                       _(" Overwrite "), _(" All "), _(" Cancel "));
                         switch (ch) {
                         case 2: /* cancel */
                             --c;
@@ -539,7 +541,7 @@ void copy()
                         }
                     }
                 } else if (exf == 'd') {
-                    error("%s is a directory", buf);
+                    error(_("%s is a directory"), buf);
                     continue;
                 }
                 runarg(p->name);
@@ -549,13 +551,15 @@ void copy()
             runcancel();
             return;
         }
-        message(" Copy ", "Copying %d file%s to %s ...", c, c > 1 ? "s" : "", name);
+        message(_(" Copy "), P_("Copying %d file to %s ...", "Copying %d files to %s ...", c), c,
+                name);
         done = filesdone(FO_COPY);
         if (done) {
             endmesg();
-            message(" Copy ", "Done");
+            message(_(" Copy "), _("Done"));
         } else
-            error("Error while copying %d file%s to %s", c, c > 1 ? "s" : "", name);
+            error(P_("Error while copying %d file to %s", "Error while copying %d files to %s", c),
+                  c, name);
         endmesg();
     } else if ((c = (p = &cur->cat[cur->curfile])->mode & S_IFMT) == S_IFDIR) {
         /* copying directory */
@@ -563,21 +567,21 @@ void copy()
         /* copy regular file */
 
         sprintf(buf, "Copy \"%s\" to", p->name);
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Copy ", buf)))
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Copy "), buf)))
             return;
         exd = exist(name);
         sprintf(buf, "%s/%s", name, p->name);
         exf = exd == 'd' ? exist(buf) : 0;
         if (exd == 'f' || exf == 'f') {
-            if (getchoice(1, " Copy ", "File exists", exf == 'f' ? buf : name, " Overwrite ",
-                          " Cancel ", 0))
+            if (getchoice(1, _(" Copy "), _("File exists"), exf == 'f' ? buf : name,
+                          _(" Overwrite "), _(" Cancel "), 0))
                 return;
         } else if (exf == 'd') {
-            error("%s is a directory", buf);
+            error(_("%s is a directory"), buf);
             return;
         }
         if (fileop(FO_COPY, p->name, name)) {
-            error("Cannot copy %s to %s", p->name, name);
+            error(_("Cannot copy %s to %s"), p->name, name);
             return;
         }
     }
@@ -598,8 +602,8 @@ void makelink()
     if (c) {
         /* link group of files */
 
-        sprintf(buf, "Link %d file%s to", c, c > 1 ? "s" : "");
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Link ", buf)))
+        sprintf(buf, P_("Link %d file to", "Link %d files to", c), c);
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Link "), buf)))
             return;
         runset(name);
         exd = exist(name);
@@ -608,23 +612,25 @@ void makelink()
                 sprintf(buf, "%s/%s", name, p->name);
                 exf = exd == 'd' ? exist(buf) : 0;
                 if (exd == 'f' || exf == 'f') {
-                    if (getchoice(1, " Link ", "File exists", exf == 'f' ? buf : name,
-                                  " Overwrite ", " Cancel ", 0))
+                    if (getchoice(1, _(" Link "), _("File exists"), exf == 'f' ? buf : name,
+                                  _(" Overwrite "), _(" Cancel "), 0))
                         continue;
                 } else if (exf == 'd') {
-                    error("%s is a directory", buf);
+                    error(_("%s is a directory"), buf);
                     continue;
                 }
                 runarg(p->name);
                 p->tag = 0;
             }
-        message(" Link ", "Linking %d file%s to %s ...", c, c > 1 ? "s" : "", name);
+        message(_(" Link "), P_("Linking %d file to %s ...", "Linking %d files to %s ...", c), c,
+                name);
         done = filesdone(FO_LINK);
         if (done) {
             endmesg();
-            message(" Link ", "Done");
+            message(_(" Link "), _("Done"));
         } else
-            error("Error while linking %d file%s to %s", c, c > 1 ? "s" : "", name);
+            error(P_("Error while linking %d file to %s", "Error while linking %d files to %s", c),
+                  c, name);
         endmesg();
     } else if ((c = (p = &cur->cat[cur->curfile])->mode & S_IFMT) == S_IFDIR) {
         /* linking directory */
@@ -632,21 +638,21 @@ void makelink()
         /* link regular file */
 
         sprintf(buf, "Link \"%s\" to", p->name);
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Link ", buf)))
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Link "), buf)))
             return;
         exd = exist(name);
         sprintf(buf, "%s/%s", name, p->name);
         exf = exd == 'd' ? exist(buf) : 0;
         if (exd == 'f' || exf == 'f') {
-            if (getchoice(1, " Link ", "File exists", exf == 'f' ? buf : name, " Overwrite ",
-                          " Cancel ", 0))
+            if (getchoice(1, _(" Link "), _("File exists"), exf == 'f' ? buf : name,
+                          _(" Overwrite "), _(" Cancel "), 0))
                 return;
         } else if (exf == 'd') {
-            error("%s is a directory", buf);
+            error(_("%s is a directory"), buf);
             return;
         }
         if (fileop(FO_LINK, p->name, name)) {
-            error("Cannot link %s to %s", p->name, name);
+            error(_("Cannot link %s to %s"), p->name, name);
             return;
         }
     }
@@ -668,8 +674,8 @@ void makeslink()
     if (c) {
         /* symlink group of files */
 
-        sprintf(buf, "Symlink %d file%s to", c, c > 1 ? "s" : "");
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Symlink ", buf)))
+        sprintf(buf, P_("Symlink %d file to", "Symlink %d files to", c), c);
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Symlink "), buf)))
             return;
         runset(name);
         exd = exist(name);
@@ -678,23 +684,25 @@ void makeslink()
                 sprintf(buf, "%s/%s", name, p->name);
                 exf = exd == 'd' ? exist(buf) : 0;
                 if (exd == 'f' || exf == 'f') {
-                    if (getchoice(1, " Symlink ", "File exists", exf == 'f' ? buf : name,
-                                  " Overwrite ", " Cancel ", 0))
+                    if (getchoice(1, _(" Symlink "), _("File exists"), exf == 'f' ? buf : name,
+                                  _(" Overwrite "), _(" Cancel "), 0))
                         continue;
                 } else if (exf == 'd') {
-                    error("%s is a directory", buf);
+                    error(_("%s is a directory"), buf);
                     continue;
                 }
                 runarg(p->name);
                 p->tag = 0;
             }
-        message(" Symlink ", "Linking %d file%s to %s ...", c, c > 1 ? "s" : "", name);
+        message(_(" Symlink "), P_("Linking %d file to %s ...", "Linking %d files to %s ...", c), c,
+                name);
         done = filesdone(FO_SYMLINK);
         if (done) {
             endmesg();
-            message(" Symlink ", "Done");
+            message(_(" Symlink "), _("Done"));
         } else
-            error("Error while linking %d file%s to %s", c, c > 1 ? "s" : "", name);
+            error(P_("Error while linking %d file to %s", "Error while linking %d files to %s", c),
+                  c, name);
         endmesg();
     } else if ((c = (p = &cur->cat[cur->curfile])->mode & S_IFMT) == S_IFDIR) {
         /* symlinking directory */
@@ -702,21 +710,21 @@ void makeslink()
         /* symlink regular file */
 
         sprintf(buf, "Symlink \"%s\" to", p->name);
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Symlink ", buf)))
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Symlink "), buf)))
             return;
         exd = exist(name);
         sprintf(buf, "%s/%s", name, p->name);
         exf = exd == 'd' ? exist(buf) : 0;
         if (exd == 'f' || exf == 'f') {
-            if (getchoice(1, " Symlink ", "File exists", exf == 'f' ? buf : name, " Overwrite ",
-                          " Cancel ", 0))
+            if (getchoice(1, _(" Symlink "), _("File exists"), exf == 'f' ? buf : name,
+                          _(" Overwrite "), _(" Cancel "), 0))
                 return;
         } else if (exf == 'd') {
-            error("%s is a directory", buf);
+            error(_("%s is a directory"), buf);
             return;
         }
         if (fileop(FO_SYMLINK, p->name, name)) {
-            error("Cannot symlink %s to %s", p->name, name);
+            error(_("Cannot symlink %s to %s"), p->name, name);
             return;
         }
     }
@@ -738,8 +746,8 @@ void renmove()
     if (c) {
         /* move group of files */
 
-        sprintf(buf, "Rename or move %d file%s to", c, c > 1 ? "s" : "");
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Rename ", buf)))
+        sprintf(buf, P_("Rename or move %d file to", "Rename or move %d files to", c), c);
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Rename "), buf)))
             return;
         runset(name);
         exd = exist(name);
@@ -750,8 +758,8 @@ void renmove()
                 exf = exd == 'd' ? exist(buf) : 0;
                 if (exd == 'f' || exf == 'f') {
                     if (!all) {
-                        ch = getchoice(1, " Rename ", "File exists", exf == 'f' ? buf : name,
-                                       " Overwrite ", " All ", " Cancel ");
+                        ch = getchoice(1, _(" Rename "), _("File exists"), exf == 'f' ? buf : name,
+                                       _(" Overwrite "), _(" All "), _(" Cancel "));
                         switch (ch) {
                         default:
                         case 2: /* cancel */
@@ -761,60 +769,62 @@ void renmove()
                         }
                     }
                 } else if (exf == 'd') {
-                    error("%s is a directory", buf);
+                    error(_("%s is a directory"), buf);
                     continue;
                 }
                 runarg(p->name);
             }
-        message(" Move ", "Moving %d file%s to %s ...", c, c > 1 ? "s" : "", name);
+        message(_(" Move "), P_("Moving %d file to %s ...", "Moving %d files to %s ...", c), c,
+                name);
         done = filesdone(FO_MOVE);
         if (done) {
             endmesg();
-            message(" Move ", "Done");
+            message(_(" Move "), _("Done"));
         } else
-            error("Error while moving %d file%s to %s", c, c > 1 ? "s" : "", name);
+            error(P_("Error while moving %d file to %s", "Error while moving %d files to %s", c), c,
+                  name);
         endmesg();
         name = 0;
     } else if ((c = (p = &cur->cat[cur->curfile])->mode & S_IFMT) == S_IFDIR) {
         /* rename directory */
 
         sprintf(buf, "Rename \"%s\" to", strtail(p->name, '/', 60));
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Rename ", buf)))
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Rename "), buf)))
             return;
         exd = exist(name);
         sprintf(buf, "%s/%s", name, p->name);
         exf = exd == 'd' ? exist(buf) : 0;
         if (exd == 'f' || exf == 'f') {
-            if (getchoice(1, " Rename ", "File exists", exf == 'f' ? buf : name, " Overwrite ",
-                          " Cancel ", 0))
+            if (getchoice(1, _(" Rename "), _("File exists"), exf == 'f' ? buf : name,
+                          _(" Overwrite "), _(" Cancel "), 0))
                 return;
         } else if (exf == 'd') {
-            error("Directory %s exists", buf);
+            error(_("Directory %s exists"), buf);
             return;
         }
         if (fileop(FO_MOVE, p->name, name)) {
-            error("Cannot move %s to %s", p->name, name);
+            error(_("Cannot move %s to %s"), p->name, name);
             return;
         }
     } else if (c == S_IFREG) {
         /* move regular file */
 
         sprintf(buf, "Rename or move \"%s\" to", p->name);
-        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, " Rename ", buf)))
+        if (!(name = getstring(60, (cur == &left ? &right : &left)->cwd, _(" Rename "), buf)))
             return;
         exd = exist(name);
         sprintf(buf, "%s/%s", name, p->name);
         exf = exd == 'd' ? exist(buf) : 0;
         if (exd == 'f' || exf == 'f') {
-            if (getchoice(1, " Rename ", "File exists", exf == 'f' ? buf : name, " Overwrite ",
-                          " Cancel ", 0))
+            if (getchoice(1, _(" Rename "), _("File exists"), exf == 'f' ? buf : name,
+                          _(" Overwrite "), _(" Cancel "), 0))
                 return;
         } else if (exf == 'd') {
-            error("%s is a directory", buf);
+            error(_("%s is a directory"), buf);
             return;
         }
         if (fileop(FO_MOVE, p->name, name)) {
-            error("Cannot move %s to %s", p->name, name);
+            error(_("Cannot move %s to %s"), p->name, name);
             return;
         }
     }
@@ -828,19 +838,19 @@ void makedir()
 {
     register char *p;
 
-    if (!(p = getstring(60, 0, " Make directory ", "Create the directory")))
+    if (!(p = getstring(60, 0, _(" Make directory "), _("Create the directory"))))
         return;
     switch (exist(p)) {
     default:
     case 'f':
-        error("File %s exists", p);
+        error(_("File %s exists"), p);
         break;
     case 'd':
-        error("Directory %s already exists", p);
+        error(_("Directory %s already exists"), p);
         break;
     case 0:
         if (mkdir(p, 0777) < 0) {
-            error("Cannot create directory %s", p);
+            error(_("Cannot create directory %s"), p);
             break;
         }
         setdir(cur == &left ? &right : &left, 0);
@@ -860,32 +870,36 @@ void delete()
     if (c) {
         /* delete group of files */
 
-        sprintf(buf, "You have selected %d file%s.", c, c > 1 ? "s" : "");
-        if (getchoice(0, " Delete ", buf, 0, " Delete ", " Cancel ", 0))
+        sprintf(buf, P_("You have selected %d file.", "You have selected %d files.", c), c);
+        if (getchoice(0, _(" Delete "), buf, 0, _(" Delete "), _(" Cancel "), 0))
             return;
-        sprintf(buf, "You are DELETING %d selected file%s from", c, c > 1 ? "s" : "");
-        if (getchoice(1, " Delete ", buf, cur->cwd, " Ok ", " Cancel ", 0))
+        sprintf(buf,
+                P_("You are DELETING %d selected file from",
+                   "You are DELETING %d selected files from", c),
+                c);
+        if (getchoice(1, _(" Delete "), buf, cur->cwd, _(" Ok "), _(" Cancel "), 0))
             return;
         for (p = cur->cat; p < cur->cat + cur->num; ++p)
             if (p->tag && unlink(p->name) < 0)
-                error("Cannot delete %s", p->name);
+                error(_("Cannot delete %s"), p->name);
     } else if ((c = (p = &cur->cat[cur->curfile])->mode & S_IFMT) == S_IFDIR) {
         /* delete directory */
 
-        if (getchoice(0, " Delete ", "Do you wish to delete directory", p->name, " Delete ",
-                      " Cancel ", 0))
+        if (getchoice(0, _(" Delete "), _("Do you wish to delete directory"), p->name,
+                      _(" Delete "), _(" Cancel "), 0))
             return;
         if (rmdir(p->name) < 0) {
-            error("Cannot delete directory %s", p->name);
+            error(_("Cannot delete directory %s"), p->name);
             return;
         }
     } else if (c == S_IFREG) {
         /* delete regular file */
 
-        if (getchoice(0, " Delete ", "Do you wish to delete", p->name, " Delete ", " Cancel ", 0))
+        if (getchoice(0, _(" Delete "), _("Do you wish to delete"), p->name, _(" Delete "),
+                      _(" Cancel "), 0))
             return;
         if (unlink(p->name) < 0) {
-            error("Cannot delete %s", p->name);
+            error(_("Cannot delete %s"), p->name);
             return;
         }
     }
@@ -899,7 +913,7 @@ void findname()
     register char *p;
     register struct file *f;
 
-    if (!(p = getwstring(20, "", " Find file ", "Enter file name")) || !*p)
+    if (!(p = getwstring(20, "", _(" Find file "), _("Enter file name"))) || !*p)
         return;
     for (f = cur->cat; f < cur->cat + cur->num; ++f) {
         s = p;
@@ -920,7 +934,7 @@ void findname()
             ++q;
         }
     }
-    error("File not found");
+    error(_("File not found"));
 }
 
 void tagall()
@@ -931,7 +945,7 @@ void tagall()
 
     if (!pat[0])
         strcpy(pat, "*");
-    if (!(p = getwstring(20, pat, " Select ", "Select the files")))
+    if (!(p = getwstring(20, pat, _(" Select "), _("Select the files"))))
         return;
     strncpy(pat, p, 20);
     pat[19] = 0;
@@ -949,7 +963,7 @@ void untagall()
 
     if (!pat[0])
         strcpy(pat, "*");
-    if (!(p = getwstring(20, pat, " Unselect ", "Unselect the files")))
+    if (!(p = getwstring(20, pat, _(" Unselect "), _("Unselect the files"))))
         return;
     strncpy(pat, p, 20);
     pat[19] = 0;
@@ -964,7 +978,7 @@ void setpattern(int k)
     struct dir *d = k == 'l' ? &left : &right;
     register char *p;
 
-    if (!(p = getwstring(20, d->pattern, " Set pattern ", "Set pattern for files")))
+    if (!(p = getwstring(20, d->pattern, _(" Set pattern "), _("Set pattern for files"))))
         return;
     strncpy(d->pattern, p, PATSZ);
     d->pattern[PATSZ - 1] = 0;
@@ -1126,7 +1140,7 @@ int doexec(char *str)
     p   = argv;
     for (t = str; *t;) {
         if (p >= argv + MAXARGV) {
-            error("%s: Too many arguments", str);
+            error(_("%s: Too many arguments"), str);
             break;
         }
         *p++ = t;
