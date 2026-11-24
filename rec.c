@@ -38,14 +38,15 @@
 #include "rec.h"
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "deco.h"
 
-#define BUFSIZ   512
-#define TEMPCELL 16 /* minimal size of temp space */
+#define SCANSZ   512 /* a read of the scan */
+#define TEMPCELL 16  /* minimal size of temp space */
 #define QUANT    512
 #define MAXLINE  1024 /* maximum length of unbroken line */
 #define NOINDEX  (POOLSZ + 2)
@@ -55,11 +56,9 @@
 static char mask[8] = {
     1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80,
 };
-static char tfilepattern[] = "/tmp/recXXXXXX";
 
 static int lenbuf;
 static char *scanbuf, *pbuf;
-static char *tfilename;
 static int eoln;
 static int MAXLEN = ((unsigned int)(int)-1 >> 1) / sizeof(struct index);
 
@@ -143,7 +142,7 @@ static int scanline(int fd)
     eoln = 0;
     for (;;) {
         if (pbuf >= &scanbuf[lenbuf]) {
-            lenbuf = read(fd, pbuf = scanbuf, (unsigned)BUFSIZ);
+            lenbuf = read(fd, pbuf = scanbuf, (unsigned)SCANSZ);
             if (lenbuf <= 0)
                 return (len ? len : -1);
         }
@@ -154,6 +153,33 @@ static int scanline(int fd)
         if (++len >= MAXLINE)
             return (len);
     }
+}
+
+/*
+ * The temporary file for the changed lines, unlinked at once: in $TMPDIR,
+ * $TEMP or $TMP, else /tmp, else the current directory (GonWare has no
+ * /tmp). A name of its own each time: two editors do not share it.
+ */
+static int tempfile(void)
+{
+    static const char *const env[] = { "TMPDIR", "TEMP", "TMP", 0 };
+    const char *dirs[5], *d;
+    char name[1024];
+    int n = 0, i, fd;
+
+    for (i = 0; env[i]; ++i)
+        if ((d = getenv(env[i])) && *d)
+            dirs[n++] = d;
+    dirs[n++] = "/tmp";
+    dirs[n++] = ".";
+    for (i = 0; i < n; ++i) {
+        snprintf(name, sizeof(name), "%s/recXXXXXX", dirs[i]);
+        if ((fd = mkstemp(name)) >= 0) {
+            unlink(name);
+            return fd;
+        }
+    }
+    return -1;
 }
 
 REC *RecOpen(int fd, int wmode)
@@ -167,20 +193,12 @@ REC *RecOpen(int fd, int wmode)
     r->bakfd = -1;
     r->nobak = 0;
     if (wmode) {
-        if (!tfilename)
-            tfilename = tfilepattern;
-        r->tfd = creat(tfilename, 0600);
+        r->tfd = tempfile();
         if (r->tfd < 0) {
             error(_("Cannot open temporary file"));
+            free(r);
             return (0);
         }
-        close(r->tfd);
-        r->tfd = open(tfilename, 2);
-        if (r->tfd < 0) {
-            error(_("Cannot reopen temporary file"));
-            return (0);
-        }
-        unlink(tfilename);
     } else
         r->tfd = -1;
 
@@ -196,7 +214,7 @@ REC *RecOpen(int fd, int wmode)
     r->lindex = 0;
     r->nindex = 0;
     r->size   = 0;
-    scanbuf   = malloc(BUFSIZ);
+    scanbuf   = malloc(SCANSZ);
     pbuf      = scanbuf;
     lenbuf    = 0;
     for (;;) {
