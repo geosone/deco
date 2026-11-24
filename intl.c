@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "deco.h"
 #include "env.h"
@@ -87,6 +89,25 @@ int trchosen()
     return chosen[0] != 0;
 }
 
+/* "locale" beside the program, where the build puts the catalogues: a
+ * commander run from its build directory speaks the language too; NULL
+ * if there is none (or no /proc/self/exe) */
+static char *besideme(void)
+{
+    static char path[1024];
+    struct stat st;
+    char *p;
+    ssize_t n = readlink("/proc/self/exe", path, sizeof(path) - 8);
+
+    if (n <= 0)
+        return 0;
+    path[n] = 0;
+    if (!(p = strrchr(path, '/')))
+        return 0;
+    strcpy(p + 1, "locale");
+    return stat(path, &st) == 0 && S_ISDIR(st.st_mode) ? path : 0;
+}
+
 void trinit()
 {
     char *dir = getenv("TEXTDOMAINDIR"); /* gettext's way to point elsewhere */
@@ -94,6 +115,8 @@ void trinit()
 #ifdef LC_MESSAGES
     setlocale(LC_MESSAGES, "");
 #endif
+    if (!dir || !*dir)
+        dir = besideme();
 #ifdef CMDR_LOCALEDIR
     if (!dir || !*dir)
         dir = CMDR_LOCALEDIR;
