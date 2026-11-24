@@ -261,6 +261,9 @@ static void putch(int c);
 static void cyr(int on);
 static void tputs(char *cp);
 static void setattr(int c);
+#ifndef DECO_NEWT
+static char *rolecolor(int c);
+#endif
 static void initgraph(void);
 static void resetattr(int c);
 static void initcolor(void);
@@ -849,7 +852,8 @@ static void domvcur(int y, int x)
 
         while (curscr.curx < x) {
             i = curscr.y[curscr.cury][curscr.curx];
-            if ((i & ~CHARMASK & ~ROLEMASK) == curscr.flgs)
+            if ((i & ~CHARMASK) == curscr.flgs ||
+                (!rolecolor(i) && (i & ~CHARMASK & ~ROLEMASK) == curscr.flgs))
                 putch((int)i);
             else
                 break;
@@ -983,7 +987,7 @@ static char *makecolor(int c, int b)
             ;
     } else {
 #if 1
-        if (c > 8) {
+        if (c >= 8) { /* the bright ones (dark grey too) */
             strcpy(colorp, "\33[1m");
             while (*colorp++)
                 ;
@@ -1050,11 +1054,38 @@ static void initcolor()
 #endif
 
 #ifndef DECO_NEWT
-/* the terminal backend draws all roles in the six attribute colours */
+/* the colours of each role (VSetColor) as six terminal strings, as
+ * VSetPalette makes NS, NR, BS, BR, DS, DR: normal, reverse, bold, bold
+ * reverse, dim, dim reverse */
+static char rolebuf[VCOL_NROLES][384];
+static char *rolestr[VCOL_NROLES][6];
+
 void VSetRoleColors(int role, const int colors[12])
 {
-    (void)role;
-    (void)colors;
+    char *save;
+    int i;
+
+    if (role < 0 || role >= VCOL_NROLES || !NF || !CF)
+        return;
+    for (i = 0; i < 12; ++i)
+        if (colors[i] < 0 || colors[i] > 15 || (i & 1 ? btab[colors[i]] : ctab[colors[i]]) < 0)
+            return;
+    save   = colorp; /* VSetPalette's buffer */
+    colorp = rolebuf[role];
+    for (i = 0; i < 6; ++i)
+        rolestr[role][i] = makecolor(ctab[colors[2 * i]], btab[colors[2 * i + 1]]);
+    colorp = save;
+}
+
+/* the string of the role and the attributes of cell c, 0 if the role has
+ * no colours */
+static char *rolecolor(int c)
+{
+    static const int idx[8] = { 0, 1, 2, 3, 4, 5, 2, 3 }; /* by DIM BOLD STANDOUT */
+    int role                = (c & ROLEMASK) >> ROLESHIFT;
+    int a                   = (c & STANDOUT ? 1 : 0) | (c & BOLD ? 2 : 0) | (c & DIM ? 4 : 0);
+
+    return rolestr[role][0] ? rolestr[role][idx[a]] : 0;
 }
 #endif
 
@@ -1169,6 +1200,13 @@ static void initgraph()
 #ifndef DECO_NEWT
 static void resetattr(int c)
 {
+    char *rc = rolecolor(c);
+
+    if (rc) {
+        tputs(rc);
+        curscr.flgs = c & (DIM | BOLD | STANDOUT | GRAPH | ROLEMASK);
+        return;
+    }
     c &= DIM | BOLD | STANDOUT | GRAPH;
     switch (c & (DIM | BOLD | STANDOUT)) {
     case 0:
@@ -1214,6 +1252,18 @@ static void resetattr(int c)
 #ifndef DECO_NEWT
 static void setattr(int c)
 {
+    char *rc = rolecolor(c);
+
+    if (rc) {
+        /* the colours of a role: one string sets both and the attribute */
+        c &= DIM | BOLD | STANDOUT | GRAPH | ROLEMASK;
+        if ((c & GRAPH) != (curscr.flgs & GRAPH))
+            tputs(c & GRAPH ? GS : GE);
+        if ((c & ~GRAPH) != (curscr.flgs & ~GRAPH))
+            tputs(rc);
+        curscr.flgs = c;
+        return;
+    }
     c &= DIM | BOLD | STANDOUT | GRAPH;
     if ((c & GRAPH) != (curscr.flgs & GRAPH)) {
         if (c & GRAPH) {
