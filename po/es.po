@@ -489,9 +489,8 @@ msgstr[0] "%d archivo"
 msgstr[1] "%d archivos"
 
 #: draw.c:432
-#, fuzzy
 msgid " Status "
-msgstr "Estado"
+msgstr " Estado "
 
 #: draw.c:439
 msgid "after the Demos Commander, S.Vakulenko"
