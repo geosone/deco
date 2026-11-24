@@ -174,7 +174,7 @@ static void initchoice(int row, int col, char *c1, char *c2, char *c3)
 
 static int menuchoice()
 {
-    int ch = 0;
+    int ch = 0, i;
 
     for (;;) {
         drawchoice(ch);
@@ -183,6 +183,12 @@ static int menuchoice()
         switch (KeyGet()) {
         default:
             VBeep();
+            continue;
+        case MOUSEKEY: /* a click on a button chooses it */
+            for (i = 0; i < cnum; ++i)
+                if (MouseRow == tab[i].r && MouseCol >= tab[i].c &&
+                    MouseCol < tab[i].c + tab[i].namlen)
+                    return (i);
             continue;
         case cntrl(']'): /* redraw screen */
             VRedraw();
@@ -490,6 +496,18 @@ int getlistat(char *head, char **items, int n, int sel, int mid)
         case meta('J'): /* F10 */
             sel = -1;
             break;
+        case MOUSEKEY:
+            /* an item chosen; outside the box: none */
+            if (MouseRow >= r && MouseRow < r + n && MouseCol >= c - 1 && MouseCol <= c + w) {
+                sel = MouseRow - r;
+                break;
+            }
+            if (MouseRow < r - 2 || MouseRow >= r + n + 2 || MouseCol < c - 4 ||
+                MouseCol >= c + w + 4) {
+                sel = -1;
+                break;
+            }
+            continue;
         case meta('u'):
             if (--sel < 0)
                 sel = n - 1;
