@@ -5,11 +5,18 @@
 #define meta(c) (c | 0400)
 #endif
 
+/*
+ * A screen cell: the character as a Unicode code point (bits 0-20) and
+ * its attributes and colour role above it (scr.c)
+ */
+typedef int CELL;
+#define CHARMASK 0x1fffff
+
 typedef struct {
     short cury, curx;
-    short flgs;
+    int flgs;
     char clear;
-    short **y;
+    CELL **y;
     short *firstch;
     short *lastch;
     short *lnum;
@@ -18,7 +25,7 @@ typedef struct {
 typedef struct {
     short y, x;
     short ny, nx;
-    short *mem;
+    CELL *mem;
 } BOX;
 
 typedef long CURSOR;
@@ -30,7 +37,7 @@ extern int TtyUpperCase;
 
 #define VMPutChar(y, x, ch)    (VMove(y, x), VPutChar(ch))
 #define VMPutString(y, x, str) (VMove(y, x), VPutString(str))
-#define VMGetChar(yy, x)       (VMove(yy, x), (VScreen.y[VScreen.cury][VScreen.curx] & 0377))
+#define VMGetChar(yy, x)       (VMove(yy, x), (VScreen.y[VScreen.cury][VScreen.curx] & CHARMASK))
 
 int VInit(void);
 void VOpen(void);
@@ -46,6 +53,9 @@ void VMove(int y, int x);
 void VClearLine(void);
 void VClear(void);
 void VPutString(char *str);
+int VStrLen(const char *s);             /* in cells: the code points */
+char *VStrSkip(const char *s, int n);   /* past n cells */
+void VPutStringN(const char *s, int n); /* at most n cells */
 void VPrint(char *fmt, ...);
 void VSetPalette(int n, int nb, int nr, int nrb, int b, int bb, int br, int brb, int d, int db,
                  int dr, int drb);

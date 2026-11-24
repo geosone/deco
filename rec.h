@@ -1,4 +1,4 @@
-#define SEARCHSZ 41                  /* max size of search string */
+#define SEARCHSZ 161                 /* search string: 40 cells of UTF-8 */
 #define MAXTEMP  2048                /* max of temp file size (in cells) */
 #define TEMPSZ   ((MAXTEMP + 7) / 8) /* temp table size (in bytes) */
 #define POOLSZ   50                  /* number of lines in cache */

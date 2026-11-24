@@ -42,7 +42,7 @@ static char cshabsname[] = "/bin/csh";
 int usecshell;
 int useredit, userview;
 int showhidden = 1;
-char editname[40], viewname[40];
+char editname[160], viewname[160];
 
 static int metas(char *s);
 static int cmpfil(char *d1, char *f1, char *d2, char *f2);
@@ -239,9 +239,8 @@ void setviewname()
     }
     if (!(p = getstring(40, viewname, _(" View "), _("Viewer to use"))))
         return;
-    strncpy(viewname, p, 40);
-    viewname[39] = 0;
-    userview     = 1;
+    snprintf(viewname, sizeof(viewname), "%s", p);
+    userview = 1;
 }
 
 void setshellname()
@@ -272,9 +271,8 @@ void seteditname()
     }
     if (!(p = getstring(40, editname, _(" Edit "), _("Editor to use"))))
         return;
-    strncpy(editname, p, 40);
-    editname[39] = 0;
-    useredit     = 1;
+    snprintf(editname, sizeof(editname), "%s", p);
+    useredit = 1;
 }
 
 void view()
@@ -941,14 +939,13 @@ void tagall()
 {
     register char *p;
     register struct file *f;
-    static char pat[20];
+    static char pat[PATSZ];
 
     if (!pat[0])
         strcpy(pat, "*");
     if (!(p = getwstring(20, pat, _(" Select "), _("Select the files"))))
         return;
-    strncpy(pat, p, 20);
-    pat[19] = 0;
+    snprintf(pat, sizeof(pat), "%s", p);
     for (f = cur->cat; f < cur->cat + cur->num; ++f)
         if ((f->mode & S_IFMT) == (unsigned)S_IFREG && (!pat[0] || match(f->name, pat)))
             f->tag = 1;
@@ -959,14 +956,13 @@ void untagall()
 {
     register char *p;
     register struct file *f;
-    static char pat[20];
+    static char pat[PATSZ];
 
     if (!pat[0])
         strcpy(pat, "*");
     if (!(p = getwstring(20, pat, _(" Unselect "), _("Unselect the files"))))
         return;
-    strncpy(pat, p, 20);
-    pat[19] = 0;
+    snprintf(pat, sizeof(pat), "%s", p);
     for (f = cur->cat; f < cur->cat + cur->num; ++f)
         if ((f->mode & S_IFMT) == (unsigned)S_IFREG && (!pat[0] || match(f->name, pat)))
             f->tag = 0;
@@ -980,8 +976,7 @@ void setpattern(int k)
 
     if (!(p = getwstring(20, d->pattern, _(" Set pattern "), _("Set pattern for files"))))
         return;
-    strncpy(d->pattern, p, PATSZ);
-    d->pattern[PATSZ - 1] = 0;
+    snprintf(d->pattern, PATSZ, "%s", p);
     setdir(d, 0);
     chdir(cur->cwd);
 }

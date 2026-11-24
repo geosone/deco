@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -35,9 +36,16 @@ int hexview(char *filename) /* hexadecimal viewer */
     hexcursor = 0;
     sline = soff = -1;
     {
-        static const char *const keys[10] = { NC_("keybar", "Help"), "",           NC_("keybar", "Raw"),    NC_("keybar", "Hex"),
-                                              NC_("keybar", "Top"),  NC_("keybar", "Bottom"), NC_("keybar", "Search"), "",
-                                              "",         NC_("keybar", "Quit") };
+        static const char *const keys[10] = { NC_("keybar", "Help"),
+                                              "",
+                                              NC_("keybar", "Raw"),
+                                              NC_("keybar", "Hex"),
+                                              NC_("keybar", "Top"),
+                                              NC_("keybar", "Bottom"),
+                                              NC_("keybar", "Search"),
+                                              "",
+                                              "",
+                                              NC_("keybar", "Quit") };
 
         drawkeys(keys);
     }
@@ -119,10 +127,9 @@ int hexview(char *filename) /* hexadecimal viewer */
                 baseline = viewhlen - (LINES - 2);
                 break;
             case meta('G'): /* f7 - search */
-                if (!(p = getstring(SEARCHSZ - 1, viewsrch, _(" Search "),
-                                    _("Search for the string"))))
+                if (!(p = getstring(40, viewsrch, _(" Search "), _("Search for the string"))))
                     continue;
-                strcpy(viewsrch, p);
+                snprintf(viewsrch, sizeof(viewsrch), "%s", p);
                 viewsbsz = cvtsrch(viewsrch, viewsbuf);
                 if (sline < 0) {
                     sline = baseline;

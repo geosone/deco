@@ -39,7 +39,6 @@ struct trlang {
 extern const struct trlang trlangs[];
 void trsetlang(const char *code);
 const char *trgetlang(void);
-char *trlatin1(const char *s);
 int trchosen(void);
 void menuretranslate(void);
 void setlang_help(const char *code);
@@ -50,6 +49,12 @@ int getlist(char *head, char **items, int n, int sel);
 /* a text in a context, where the same English needs another translation
  * (the short labels of the F-key bar) */
 char *trc(const char *ctx, const char *msgid);
+
+/* UTF-8: a lead byte, a continuation byte */
+#define UTF8LEAD(c) (((c) & 0300) == 0300)
+#define UTF8CONT(c) (((c) & 0300) == 0200)
+int utf8len(const char *p, const char *e);
+char *viewutf8(char *p, char *e);
 #define NC_(c, s) (s)
 
 #define CMDLEN 512 /* length of command string */
@@ -58,24 +63,24 @@ struct dir;
 struct file;
 struct menu;
 
-extern struct dir left, right; /* left and right directories */
-extern struct dir *cur;        /* current directory */
-extern int widewin;            /* wide window mode */
-extern int H;                  /* file window height */
-extern int cmdreg;             /* command line mode */
-extern char command[];         /* command line */
-extern int cpos;               /* command line cursor */
-extern char *user;             /* user name */
-extern char *group;            /* user group name */
-extern char *tty;              /* tty name */
-extern char *machine;          /* machine name */
-extern int visualwin;          /* cursor in command line */
-extern int showhidden;         /* show hidden files ".*" */
-extern int uid;                /* real user id */
-extern int main_pid;           /* our process id */
-extern int ppid;               /* parent id */
-extern int lang;               /* language */
-extern char editname[40], viewname[40];
+extern struct dir left, right;            /* left and right directories */
+extern struct dir *cur;                   /* current directory */
+extern int widewin;                       /* wide window mode */
+extern int H;                             /* file window height */
+extern int cmdreg;                        /* command line mode */
+extern char command[];                    /* command line */
+extern int cpos;                          /* command line cursor */
+extern char *user;                        /* user name */
+extern char *group;                       /* user group name */
+extern char *tty;                         /* tty name */
+extern char *machine;                     /* machine name */
+extern int visualwin;                     /* cursor in command line */
+extern int showhidden;                    /* show hidden files ".*" */
+extern int uid;                           /* real user id */
+extern int main_pid;                      /* our process id */
+extern int ppid;                          /* parent id */
+extern int lang;                          /* language */
+extern char editname[160], viewname[160]; /* 40 cells of UTF-8 */
 extern int useredit, userview, usecshell;
 extern int viewraw, viewhex, viewtabs;
 extern char *home;

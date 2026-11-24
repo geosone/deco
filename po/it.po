@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: GonWare Commander 4.0\n"
 "Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/deco/"
 "issues\n"
-"POT-Creation-Date: 2026-11-24 20:41+0100\n"
+"POT-Creation-Date: 2026-11-24 20:56+0100\n"
 "PO-Revision-Date: 2026-11-24 21:00+0100\n"
 "Last-Translator: Mario Fetka\n"
 "Language-Team: none\n"
@@ -70,7 +70,7 @@ msgstr "Shell da usare:"
 msgid " Cshell "
 msgstr " Cshell "
 
-#: cmd.c:264 cmd.c:273 cmd.c:384 edit.c:94 edit.c:296
+#: cmd.c:264 cmd.c:273 cmd.c:384 edit.c:128 edit.c:335
 msgid " Edit "
 msgstr " Modifica "
 
@@ -419,7 +419,7 @@ msgstr "Il Commander non funziona su questo sistema -- arrivederci!"
 msgid "Cannot read '.' -- good bye !"
 msgstr "Impossibile leggere '.' -- arrivederci!"
 
-#: draw.c:212 draw.c:216 edit.c:104 hexview.c:38 view.c:63
+#: draw.c:212 draw.c:216 edit.c:138 hexview.c:38 view.c:63
 msgctxt "keybar"
 msgid "Help"
 msgstr "Aiuto"
@@ -464,7 +464,7 @@ msgctxt "keybar"
 msgid "Menu"
 msgstr "Barra"
 
-#: draw.c:215 draw.c:217 edit.c:106 hexview.c:40 menu.c:102 view.c:65
+#: draw.c:215 draw.c:217 edit.c:142 hexview.c:40 menu.c:106 view.c:67
 msgctxt "keybar"
 msgid "Quit"
 msgstr "Esci"
@@ -520,102 +520,97 @@ msgstr "%s in %s corrispondenti"
 msgid "%s in %s selected"
 msgstr "%s in %s selezionati"
 
-#: edit.c:45 hexview.c:157 view.c:212
+#: edit.c:58 hexview.c:157 view.c:214
 msgid "File "
 msgstr "File "
 
-#: edit.c:47
+#: edit.c:60
 #, c-format
 msgid "  Lines %d"
 msgstr "  Righe %d"
 
-#: edit.c:49 view.c:216
+#: edit.c:63
+msgid "Char U+%04X"
+msgstr "Car U+%04X"
+
+#: edit.c:64 view.c:218
 #, c-format
 msgid "Line %-5d Col %d"
 msgstr "Riga %-5d Col %d"
 
-#: edit.c:53
-#, c-format
-msgid "Char 0%-3o"
-msgstr "Car 0%-3o"
-
-#: edit.c:55
-msgid "Char 0"
-msgstr "Car 0"
-
-#: edit.c:94
+#: edit.c:128
 msgid "File contains too long lines."
 msgstr "Il file contiene righe troppo lunghe."
 
-#: edit.c:95
+#: edit.c:129
 msgid " Break lines "
 msgstr " Spezza le righe "
 
-#: edit.c:95
+#: edit.c:129
 msgid " Cancel editing "
 msgstr " Annulla la modifica "
 
-#: edit.c:104
+#: edit.c:138
 msgctxt "keybar"
 msgid "Save"
 msgstr "Salva"
 
-#: edit.c:104 hexview.c:38 view.c:63
+#: edit.c:139 hexview.c:38 view.c:64
 msgctxt "keybar"
 msgid "Raw"
 msgstr "Grezzo"
 
-#: edit.c:105 hexview.c:39 view.c:64
+#: edit.c:140 hexview.c:39 view.c:65
 msgctxt "keybar"
 msgid "Top"
 msgstr "Inizio"
 
-#: edit.c:105 hexview.c:39 view.c:64
+#: edit.c:140 hexview.c:39 view.c:65
 msgctxt "keybar"
 msgid "Bottom"
 msgstr "Fine"
 
-#: edit.c:105 hexview.c:39 view.c:64
+#: edit.c:141 hexview.c:39 view.c:66
 msgctxt "keybar"
 msgid "Search"
 msgstr "Cerca"
 
-#: edit.c:105
+#: edit.c:141
 msgctxt "keybar"
 msgid "Home"
 msgstr "Inizio"
 
-#: edit.c:106 view.c:65
+#: edit.c:142 view.c:67
 msgctxt "keybar"
 msgid "Spaces"
 msgstr "Spazi"
 
-#: edit.c:255 edit.c:297
+#: edit.c:294 edit.c:336
 msgid " Save "
 msgstr " Salva "
 
-#: edit.c:255
+#: edit.c:294
 #, c-format
 msgid "Saving file '%s'..."
 msgstr "Salvataggio del file '%s'..."
 
-#: edit.c:296
+#: edit.c:335
 msgid "You've made changes since the last save."
 msgstr "Hai fatto modifiche dall'ultimo salvataggio."
 
-#: edit.c:297
+#: edit.c:336
 msgid " Don't save "
 msgstr " Non salvare "
 
-#: edit.c:297
+#: edit.c:336
 msgid " Continue editing "
 msgstr " Continua a modificare "
 
-#: edit.c:312 hexview.c:122 view.c:107
+#: edit.c:351 hexview.c:122 view.c:109
 msgid " Search "
 msgstr " Cerca "
 
-#: edit.c:313 hexview.c:123 view.c:108
+#: edit.c:352 hexview.c:123 view.c:110
 msgid "Search for the string"
 msgstr "Cerca il testo"
 
@@ -644,7 +639,7 @@ msgstr " Impostazioni "
 msgid "Saving setup in %s ..."
 msgstr "Salvataggio delle impostazioni in %s ..."
 
-#: hexview.c:38 view.c:63
+#: hexview.c:38 view.c:64
 msgctxt "keybar"
 msgid "Hex"
 msgstr "Hex"
@@ -659,7 +654,7 @@ msgstr "Righe %-5d Byte %ld"
 msgid "Byte %ld"
 msgstr "Byte %ld"
 
-#: hexview.c:246 view.c:352
+#: hexview.c:246 view.c:383
 msgid "String not found"
 msgstr "Testo non trovato"
 
@@ -932,7 +927,9 @@ msgstr "lseek fallito in lettura, fd=%d, seek=%ld"
 msgid "Cannot read line"
 msgstr "Impossibile leggere la riga"
 
-#: view.c:214
+#: view.c:216
 #, c-format
 msgid "  Lines %-5d Bytes %ld"
 msgstr "  Righe %-5d Byte %ld"
+
+#, c-format

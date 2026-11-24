@@ -49,7 +49,7 @@ void drawcmd()
     int c;
     CURSOR cursor;
 
-    if (H == LINES - 7 && strlen(cur->shortcwd) + 3 + esclen(command) > COLS - 1) {
+    if (H == LINES - 7 && VStrLen(cur->shortcwd) + 3 + esclen(command) > COLS - 1) {
         fullscreen(0, 0);
         draw();
     }
@@ -141,11 +141,16 @@ void delcmd()
 {
     register int k;
 
+    int n;
+
     if (!command[cpos])
         return;
-    for (k = cpos + 1; command[k]; ++k)
-        command[k - 1] = command[k];
-    command[k - 1] = 0;
+    n = utf8len(command + cpos, command + strlen(command)); /* a character */
+    if (n < 1)
+        n = 1;
+    for (k = cpos + n; command[k]; ++k)
+        command[k - n] = command[k];
+    command[k - n] = 0;
 }
 
 void homecmd()
@@ -163,6 +168,8 @@ void rightcmd()
 {
     if (command[cpos]) {
         ++cpos;
+        while (command[cpos] && UTF8CONT(command[cpos])) /* the whole character */
+            ++cpos;
         if (cpos >= CMDLEN)
             cpos = CMDLEN - 1;
     }
@@ -172,6 +179,8 @@ void leftcmd()
 {
     if (--cpos < 0)
         cpos = 0;
+    while (cpos > 0 && UTF8CONT(command[cpos])) /* to the start of the character */
+        --cpos;
 }
 
 void upcmd()
@@ -316,7 +325,7 @@ void execmd(int hit, int savhist)
         VReopen();
         command[cpos = 0] = 0;
         for (;;) {
-            if (!inputcmd(strlen(cur->shortcwd) + 3) || !command[0])
+            if (!inputcmd(VStrLen(cur->shortcwd) + 3) || !command[0])
                 break;
             histcmd();
             hpos = -1;
@@ -349,7 +358,7 @@ static int inputcmd(int plen)
     command[cpos = 0] = 0;
     for (;;) {
         c = KeyGet();
-        if ((c >= ' ' && c <= '~') || (c >= 0300 && c <= 0377)) {
+        if ((c >= ' ' && c <= '~') || (c >= 0200 && c <= 0377)) { /* also UTF-8 */
             if (cpos || c != ' ') {
                 inscmd(c);
                 cc = c;
@@ -767,9 +776,12 @@ void histmenu()
 static int esclen(char *str)
 {
     register int c, count;
+    int n;
 
     for (count = 0; (c = 0377 & *str); ++count, ++str)
-        if (c < ' ' || c == 0177)
+        if (UTF8LEAD(c) && (n = utf8len(str, str + strlen(str))))
+            str += n - 1; /* a character in UTF-8: one cell */
+        else if (c < ' ' || c == 0177)
             ++count;
         else if ((c >= 0200 && c < 0300) || c == 0377)
             count += 3;
@@ -779,11 +791,18 @@ static int esclen(char *str)
 static void putescstr(char *str, int maxlen)
 {
     register int c;
+    int n;
 
     if (maxlen <= 0)
         maxlen = 9999;
     for (; (c = 0377 & *str); ++str)
-        if (c < ' ' || c == 0177) {
+        if (UTF8LEAD(c) && (n = utf8len(str, str + strlen(str)))) {
+            if (--maxlen < 0) /* a character in UTF-8: one cell */
+                break;
+            while (n-- > 0)
+                VPutChar(*str++);
+            --str;
+        } else if (c < ' ' || c == 0177) {
             maxlen -= 2;
             if (maxlen < 0)
                 break;
@@ -807,13 +826,19 @@ static void putescstr(char *str, int maxlen)
 
 static void wresccmd(char *str, int n)
 {
-    char buf[CMDLEN * 2];
+    char buf[CMDLEN * 4];
     register char *p;
     register int c;
+    int k;
 
     for (p = buf; --n >= 0; ++str) {
         c = 0377 & *str;
-        if (c < ' ' || c == 0177) {
+        if (UTF8LEAD(c) && (k = utf8len(str, str + n + 1))) {
+            n -= k - 1; /* a character in UTF-8 as it is */
+            while (k-- > 0)
+                *p++ = *str++;
+            --str;
+        } else if (c < ' ' || c == 0177) {
             *p++ = '^';
             *p++ = c ^ '@';
         } else if ((c >= 0200 && c < 0300) || c == 0377) {
@@ -837,13 +862,13 @@ static void wrescchar(int c)
     if (c < ' ' || c == 0177) {
         *p++ = '^';
         *p++ = c ^ '@';
-    } else if ((c >= 0200 && c < 0300) || c == 0377) {
+    } else if (c == 0377) {
         *p++ = '\\';
         *p++ = c >> 6 | '0';
         *p++ = (c >> 3 & 7) | '0';
         *p++ = (c & 7) | '0';
     } else
-        *p++ = c;
+        *p++ = c; /* a byte of UTF-8 too: the terminal joins them */
     write(1, buf, (unsigned)(p - buf));
 }
 
@@ -852,7 +877,7 @@ static void wrescback(int c)
     c &= 0377;
     if (c < ' ' || c == 0177)
         write(1, "\b\b  \b\b", 6);
-    else if ((c >= 0200 && c < 0300) || c == 0377)
+    else if (c == 0377)
         write(1, "\b\b\b\b    \b\b\b\b", 12);
     else
         write(1, "\b \b", 3);

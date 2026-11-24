@@ -201,12 +201,12 @@ void drawbanners()
     if (tty)
         VPutString(tty);
     if (user)
-        VMPutString(0, COLS / 2 - 1 - strlen(user), user);
+        VMPutString(0, COLS / 2 - 1 - VStrLen(user), user);
     VPutChar('.');
     if (group)
         VPutString(group);
     if ((curtime = timestr(time(NULL))))
-        VMPutString(0, COLS - 1 - strlen(curtime), curtime);
+        VMPutString(0, COLS - 1 - VStrLen(curtime), curtime);
     VStandEnd();
     static const char *const keys[2][10] = {
         { NC_("keybar", "Help"), NC_("keybar", "User"), NC_("keybar", "View"),
@@ -404,7 +404,7 @@ static void drawcwd(int col, char *wd)
         return;
     /* over the panel; in the wide window over its half */
     tw  = widewin ? (PAGEWID + 1) / 2 : PAGEWID;
-    len = strlen(wd);
+    len = VStrLen(wd);
     if (widewin && col)
         col = PAGEWID - tw;
     VMPutString(1, col + (tw - len) / 2, wd);
@@ -412,7 +412,7 @@ static void drawcwd(int col, char *wd)
 
 static void drawpat(int col, char *pat, int width)
 {
-    col += width - strlen(pat) - 1;
+    col += width - VStrLen(pat) - 1;
     VMove(H + 4, col);
     VPutString(pat);
 }
@@ -426,8 +426,8 @@ static void bytesinfiles(char *buf, size_t size, const char *fmt, long bytes, in
     snprintf(f, sizeof(f), P_("%d file", "%d files", files), files);
     snprintf(buf, size, fmt, b, f);
     /* on the frame of a panel: no longer than it */
-    if ((int)strlen(buf) > PAGEWID - 2 && PAGEWID > 2 && (size_t)(PAGEWID - 2) < size)
-        buf[PAGEWID - 2] = 0;
+    if (VStrLen(buf) > PAGEWID - 2 && PAGEWID > 2)
+        *VStrSkip(buf, PAGEWID - 2) = 0;
 }
 
 static void drawsdir(struct dir *c) /* draw status window */
@@ -628,36 +628,37 @@ static void drawlong(struct file *f)
  * end if the panel wants that */
 static char *filnam(const char *p, int tail, int n)
 {
-    static char buf[256];
-    register char *s;
-    const char *e, *q;
+    static char buf[1024]; /* n cells of UTF-8 */
+    int len = VStrLen(p), k;
+    const char *e;
+    char *s;
 
-    if ((int)strlen(p) > n) {
+    if (n > 250)
+        n = 250;
+    if (len > n) {
         if (tail) {
             buf[0] = '~';
-            strcpy(buf + 1, p + strlen(p) - (n - 1));
+            snprintf(buf + 1, sizeof(buf) - 1, "%s", VStrSkip(p, len - (n - 1)));
         } else {
-            strncpy(buf, p, n - 1);
-            buf[n - 1] = '~';
-            buf[n]     = 0;
+            e = VStrSkip(p, n - 1);
+            memcpy(buf, p, e - p);
+            strcpy(buf + (e - p), "~");
         }
         return (buf);
     }
-    for (s = buf; s < buf + n; *s++ = ' ')
-        ; /* clear buf */
     if (cdir->alignext) {
-        e = extension(p); /* make ptr to extension */
-        for (s = buf; p < e; *s++ = *p++)
-            ; /* copy file name */
-        for (q = e; *q; ++q)
-            ; /* search extension end */
-        for (s = buf + n - 1, --q; q >= e; *s-- = *q--)
-            ; /* copy extension */
+        e = extension(p); /* the name, spaces, the extension at the end */
+        memcpy(buf, p, e - p);
+        s = buf + (e - p);
+        for (k = len; k < n; ++k)
+            *s++ = ' ';
+        strcpy(s, e);
     } else {
-        e = p + n; /* make ptr to end */
-        for (s = buf; *p && p < e; *s++ = *p++)
-            ; /* copy file name */
+        strcpy(buf, p);
+        s = buf + strlen(buf);
+        for (k = len; k < n; ++k)
+            *s++ = ' ';
+        *s = 0;
     }
-    buf[n] = 0;
     return (buf);
 }

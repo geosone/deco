@@ -437,7 +437,7 @@ static int initudm(char *filename, char *scale)
         um[nm].wait = um[nm].hist = 1;
         um[nm].menu               = 0;
         um[nm].str                = getstr();
-        if (um[nm].str && (n = strlen(um[nm].str)) > menuwid)
+        if (um[nm].str && (n = VStrLen(um[nm].str)) > menuwid)
             menuwid = n;
         um[nm].cmd = getcmd();
         if (um[nm].cmd) {
@@ -716,7 +716,7 @@ void readinitfile()
                 userview = 1;
                 break;
             case 'n': /* name */
-                strcpy(viewname, line + 2);
+                snprintf(viewname, sizeof(viewname), "%s", line + 2);
                 break;
             }
             break;
@@ -726,7 +726,7 @@ void readinitfile()
                 useredit = 1;
                 break;
             case 'n': /* name */
-                strcpy(editname, line + 2);
+                snprintf(editname, sizeof(editname), "%s", line + 2);
                 break;
             case 'r': /* raw */
                 viewraw = 1;

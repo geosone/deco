@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: GonWare Commander 4.0\n"
 "Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/deco/"
 "issues\n"
-"POT-Creation-Date: 2026-11-24 20:41+0100\n"
+"POT-Creation-Date: 2026-11-24 20:56+0100\n"
 "PO-Revision-Date: 2026-11-24 21:00+0100\n"
 "Last-Translator: Mario Fetka\n"
 "Language-Team: none\n"
@@ -70,7 +70,7 @@ msgstr "Welche Shell verwenden?"
 msgid " Cshell "
 msgstr " Cshell "
 
-#: cmd.c:264 cmd.c:273 cmd.c:384 edit.c:94 edit.c:296
+#: cmd.c:264 cmd.c:273 cmd.c:384 edit.c:128 edit.c:335
 msgid " Edit "
 msgstr " Bearbeiten "
 
@@ -419,7 +419,7 @@ msgstr "Der Commander läuft auf diesem System nicht -- auf Wiedersehen!"
 msgid "Cannot read '.' -- good bye !"
 msgstr "Kann '.' nicht lesen -- auf Wiedersehen!"
 
-#: draw.c:212 draw.c:216 edit.c:104 hexview.c:38 view.c:63
+#: draw.c:212 draw.c:216 edit.c:138 hexview.c:38 view.c:63
 msgctxt "keybar"
 msgid "Help"
 msgstr "Hilfe"
@@ -464,7 +464,7 @@ msgctxt "keybar"
 msgid "Menu"
 msgstr "Leiste"
 
-#: draw.c:215 draw.c:217 edit.c:106 hexview.c:40 menu.c:102 view.c:65
+#: draw.c:215 draw.c:217 edit.c:142 hexview.c:40 menu.c:106 view.c:67
 msgctxt "keybar"
 msgid "Quit"
 msgstr "Ende"
@@ -520,102 +520,97 @@ msgstr "%s in %s passend"
 msgid "%s in %s selected"
 msgstr "%s in %s ausgewählt"
 
-#: edit.c:45 hexview.c:157 view.c:212
+#: edit.c:58 hexview.c:157 view.c:214
 msgid "File "
 msgstr "Datei "
 
-#: edit.c:47
+#: edit.c:60
 #, c-format
 msgid "  Lines %d"
 msgstr "  Zeilen %d"
 
-#: edit.c:49 view.c:216
+#: edit.c:63
+msgid "Char U+%04X"
+msgstr "Zeichen U+%04X"
+
+#: edit.c:64 view.c:218
 #, c-format
 msgid "Line %-5d Col %d"
 msgstr "Zeile %-5d Sp %d"
 
-#: edit.c:53
-#, c-format
-msgid "Char 0%-3o"
-msgstr "Zeichen 0%-3o"
-
-#: edit.c:55
-msgid "Char 0"
-msgstr "Zeichen 0"
-
-#: edit.c:94
+#: edit.c:128
 msgid "File contains too long lines."
 msgstr "Die Datei hat zu lange Zeilen."
 
-#: edit.c:95
+#: edit.c:129
 msgid " Break lines "
 msgstr " Zeilen umbrechen "
 
-#: edit.c:95
+#: edit.c:129
 msgid " Cancel editing "
 msgstr " Bearbeiten abbrechen "
 
-#: edit.c:104
+#: edit.c:138
 msgctxt "keybar"
 msgid "Save"
 msgstr "Sichern"
 
-#: edit.c:104 hexview.c:38 view.c:63
+#: edit.c:139 hexview.c:38 view.c:64
 msgctxt "keybar"
 msgid "Raw"
 msgstr "Roh"
 
-#: edit.c:105 hexview.c:39 view.c:64
+#: edit.c:140 hexview.c:39 view.c:65
 msgctxt "keybar"
 msgid "Top"
 msgstr "Anfang"
 
-#: edit.c:105 hexview.c:39 view.c:64
+#: edit.c:140 hexview.c:39 view.c:65
 msgctxt "keybar"
 msgid "Bottom"
 msgstr "Ende"
 
-#: edit.c:105 hexview.c:39 view.c:64
+#: edit.c:141 hexview.c:39 view.c:66
 msgctxt "keybar"
 msgid "Search"
 msgstr "Suchen"
 
-#: edit.c:105
+#: edit.c:141
 msgctxt "keybar"
 msgid "Home"
 msgstr "Pos1"
 
-#: edit.c:106 view.c:65
+#: edit.c:142 view.c:67
 msgctxt "keybar"
 msgid "Spaces"
 msgstr "Leerz"
 
-#: edit.c:255 edit.c:297
+#: edit.c:294 edit.c:336
 msgid " Save "
 msgstr " Speichern "
 
-#: edit.c:255
+#: edit.c:294
 #, c-format
 msgid "Saving file '%s'..."
 msgstr "Speichere Datei '%s'..."
 
-#: edit.c:296
+#: edit.c:335
 msgid "You've made changes since the last save."
 msgstr "Sie haben seit dem letzten Speichern etwas geändert."
 
-#: edit.c:297
+#: edit.c:336
 msgid " Don't save "
 msgstr " Nicht speichern "
 
-#: edit.c:297
+#: edit.c:336
 msgid " Continue editing "
 msgstr " Weiter bearbeiten "
 
-#: edit.c:312 hexview.c:122 view.c:107
+#: edit.c:351 hexview.c:122 view.c:109
 msgid " Search "
 msgstr " Suchen "
 
-#: edit.c:313 hexview.c:123 view.c:108
+#: edit.c:352 hexview.c:123 view.c:110
 msgid "Search for the string"
 msgstr "Nach dem Text suchen"
 
@@ -644,7 +639,7 @@ msgstr " Einstellungen "
 msgid "Saving setup in %s ..."
 msgstr "Speichere Einstellungen in %s ..."
 
-#: hexview.c:38 view.c:63
+#: hexview.c:38 view.c:64
 msgctxt "keybar"
 msgid "Hex"
 msgstr "Hex"
@@ -659,7 +654,7 @@ msgstr "Zeilen %-5d Bytes %ld"
 msgid "Byte %ld"
 msgstr "Byte %ld"
 
-#: hexview.c:246 view.c:352
+#: hexview.c:246 view.c:383
 msgid "String not found"
 msgstr "Text nicht gefunden"
 
@@ -932,7 +927,9 @@ msgstr "lseek beim Lesen fehlgeschlagen, fd=%d, seek=%ld"
 msgid "Cannot read line"
 msgstr "Kann die Zeile nicht lesen"
 
-#: view.c:214
+#: view.c:216
 #, c-format
 msgid "  Lines %-5d Bytes %ld"
 msgstr "  Zeilen %-5d Bytes %ld"
+
+#, c-format

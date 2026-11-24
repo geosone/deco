@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 
 #include "deco.h"
@@ -60,8 +61,10 @@ static int textview(char *filename)
     ccol  = 0;
     sline = soff = -1;
     {
-        static const char *const keys[10] = { NC_("keybar", "Help"),   "",           NC_("keybar", "Raw"),    NC_("keybar", "Hex"),
-                                              NC_("keybar", "Top"),    NC_("keybar", "Bottom"), NC_("keybar", "Search"), "",
+        static const char *const keys[10] = { NC_("keybar", "Help"),   "",
+                                              NC_("keybar", "Raw"),    NC_("keybar", "Hex"),
+                                              NC_("keybar", "Top"),    NC_("keybar", "Bottom"),
+                                              NC_("keybar", "Search"), "",
                                               NC_("keybar", "Spaces"), NC_("keybar", "Quit") };
 
         drawkeys(keys);
@@ -104,10 +107,9 @@ static int textview(char *filename)
             case meta('G'): { /* f7 - search */
                 register char *p;
 
-                if (!(p = getstring(SEARCHSZ - 1, viewsrch, _(" Search "),
-                                    _("Search for the string"))))
+                if (!(p = getstring(40, viewsrch, _(" Search "), _("Search for the string"))))
                     continue;
-                strcpy(viewsrch, p);
+                snprintf(viewsrch, sizeof(viewsrch), "%s", p);
                 if (sline < 0) {
                     sline = baseline;
                     soff  = offset(baseline, basecol) - 1;
@@ -267,7 +269,9 @@ void viewline(int line, int col, int scrline)
             VSetBold();
             viewchar(*p++);
             VSetNormal();
-        } else
+        } else if (UTF8LEAD(*p) && !viewraw)
+            p = viewutf8(p, e); /* a character in UTF-8 */
+        else
             viewchar(*p++); /* else print char */
     if (p < e) {            /* put tag */
         if (len < 0)
@@ -280,6 +284,33 @@ void viewline(int line, int col, int scrline)
         VPutChar('\\'); /* "broken" */
         VSetNormal();
     }
+}
+
+/* the length of the UTF-8 character at p (before e), 0 if it is none */
+int utf8len(const char *p, const char *e)
+{
+    int n = (*p & 0340) == 0300 ? 2 : (*p & 0360) == 0340 ? 3 : (*p & 0370) == 0360 ? 4 : 0, i;
+
+    if (!n || e - p < n)
+        return 0;
+    for (i = 1; i < n; ++i)
+        if (!UTF8CONT(p[i]))
+            return 0;
+    return n;
+}
+
+/* the character in UTF-8 at p as one cell, a broken one byte by byte */
+char *viewutf8(char *p, char *e)
+{
+    int n = utf8len(p, e);
+
+    if (!n) {
+        viewchar(*p++);
+        return p;
+    }
+    while (n-- > 0)
+        VPutChar(*p++);
+    return p;
 }
 
 void viewchar(int c)
@@ -368,6 +399,8 @@ int offset(int l, int n)
     s = p->ptr;
     e = s + p->len;
     for (len = 0; len < n && s < e; ++s) {
+        if (UTF8CONT(*s) && !viewraw) /* in a character, no column of its own */
+            continue;
         if (*s == '\t') { /* handle tabs correctly */
             len = (len + 8) / 8 * 8;
             continue;
@@ -380,6 +413,8 @@ int offset(int l, int n)
         if (len > n)
             break;
     }
+    while (s < e && UTF8CONT(*s) && !viewraw) /* not in the middle of a character */
+        ++s;
     return (s - p->ptr);
 }
 
@@ -401,7 +436,9 @@ int column(int l, int n)
     e = s + n;
     /* count length of string as it appears on screen */
     for (len = 0; s < e; ++s)
-        if (*s == '\t') /* handle tabs correctly */
+        if (UTF8CONT(*s) && !viewraw)
+            continue;
+        else if (*s == '\t') /* handle tabs correctly */
             len = (len + 8) / 8 * 8;
         else if (*s == '\b' && !viewtabs && len > 0 && s < e - 1 && s[-1] != '\b' && s[1] != '\b')
             --len;

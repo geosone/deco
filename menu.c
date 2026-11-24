@@ -34,17 +34,21 @@ static void trmenu(struct menu *m)
         else if (sm->key2)
             free(sm->name); /* the padded one of the last language */
         sm->name = _(sm->id);
-        n        = strlen(sm->name) + (sm->key2 ? 2 + strlen(sm->key2) : 0);
+        n        = VStrLen(sm->name) + (sm->key2 ? 2 + VStrLen(sm->key2) : 0);
         if (n > w)
             w = n;
     }
     for (sm = m->submenu; sm->name; ++sm) {
         if (!sm->name[0] || !sm->key2)
             continue;
-        s = malloc(w + 1);
+        /* the label, spaces, the key at the right: w cells */
+        n = w - VStrLen(sm->name) - VStrLen(sm->key2);
+        s = malloc(strlen(sm->name) + n + strlen(sm->key2) + 1);
         if (!s)
             continue;
-        sprintf(s, "%-*s%s", w - (int)strlen(sm->key2), sm->name, sm->key2);
+        strcpy(s, sm->name);
+        memset(s + strlen(s), ' ', n);
+        strcpy(s + strlen(sm->name) + n, sm->key2);
         sm->name = s;
     }
 }
@@ -65,14 +69,14 @@ static void initmenu()
         trmenu(m);
     col = 3;
     for (m = menu; m->name; ++m) {
-        m->len = 4 + strlen(m->name);
+        m->len = 4 + VStrLen(m->name);
         m->col = col;
         col += m->len;
         m->hgh = 0;
         m->wid = 0;
         for (sm = m->submenu; sm->name; ++sm) {
             sm->row = m->hgh;
-            w       = 4 + strlen(sm->name);
+            w       = 4 + VStrLen(sm->name);
             if (w > m->wid)
                 m->wid = w;
             ++m->hgh;
@@ -201,18 +205,23 @@ static void clrmenu(struct menu *m)
 static void puthot(const char *s, int w, int key, int active, const char *key2)
 {
     int hot  = active && key > ' ' && key < 0177;
-    int text = strlen(s) - (key2 ? strlen(key2) : 0); /* not in "^F" */
-    unsigned char c;
+    int text = VStrLen(s) - (key2 ? VStrLen(key2) : 0); /* not in "^F" */
+    const char *e;
 
-    for (; w > 0; --w, --text, s += *s != 0) {
-        c = *s ? (unsigned char)*s : ' ';
-        if (hot && *s && text > 0 && (c | 040) == (key | 040)) {
+    for (; w > 0; --w, --text) {
+        if (!*s) {
+            VPutChar(' ');
+            continue;
+        }
+        e = VStrSkip(s, 1); /* one character, in UTF-8 */
+        if (hot && text > 0 && e - s == 1 && ((unsigned char)*s | 040) == (key | 040)) {
             VSetBold();
-            VPutChar(c);
+            VPutChar(*s++);
             VSetNormal();
             hot = 0;
         } else
-            VPutChar(c);
+            while (s < e)
+                VPutChar(*s++);
     }
 }
 

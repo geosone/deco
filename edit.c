@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,12 +31,24 @@ static int charcode(int l, int n)
         return (0);
     if (n >= p->len)
         return ('\n');
+    if (!viewraw) { /* the code point of a character in UTF-8 */
+        const unsigned char *s = (const unsigned char *)p->ptr + n;
+        int k                  = utf8len(p->ptr + n, p->ptr + p->len), c;
+
+        if (k) {
+            c = *s & (0177 >> k);
+            while (--k > 0)
+                c = c << 6 | (*++s & 077);
+            return c;
+        }
+    }
     return (p->ptr[n] & 0xff);
 }
 
 static void edithead(char *filename, int line, int col, int off)
 {
     register int i;
+    char lc[64], cc[32];
 
     VSetDim();
     VStandOut();
@@ -45,16 +58,37 @@ static void edithead(char *filename, int line, int col, int off)
     VMPutString(0, 1, _("File "));
     VPutString(filename);
     VPrint(_("  Lines %d"), viewrec->len);
-    VMove(0, COLS - 30); /* at the right, 50 of 80 */
-    VPrint(_("Line %-5d Col %d"), line + 1, col);
+    /* at the right: "Line 1     Col 0  Char U+00F6", whatever the language */
     i = charcode(line, off);
-    VMove(0, COLS - 10); /* 70 of 80 */
-    if (i)
-        VPrint(_("Char 0%-3o"), i);
-    else
-        VPrint(_("Char 0"));
+    snprintf(cc, sizeof(cc), _("Char U+%04X"), i);
+    snprintf(lc, sizeof(lc), _("Line %-5d Col %d"), line + 1, col);
+    VMPutString(0, COLS - 1 - VStrLen(cc), cc);
+    VMPutString(0, COLS - 3 - VStrLen(cc) - VStrLen(lc), lc);
     VSetNormal();
     VStandEnd();
+}
+
+/* the start of the character off is in (UTF-8) */
+static int charstart(int line, int off)
+{
+    LINE *l = RecGet(viewrec, line);
+
+    if (l && !viewraw)
+        while (off > 0 && off < l->len && UTF8CONT(l->ptr[off]))
+            --off;
+    return off;
+}
+
+/* the bytes of the character at off (UTF-8) */
+static int charlen(int line, int off)
+{
+    LINE *l = RecGet(viewrec, line);
+    int n;
+
+    if (!l || viewraw || off >= l->len)
+        return 1;
+    n = utf8len(l->ptr + off, l->ptr + l->len);
+    return n ? n : 1;
 }
 
 static int lastpos(int n)
@@ -101,8 +135,10 @@ static void edit1(int d, char *filename, char *basename)
     sline = ccol = 0;
     VClearBox(1, 0, LINES - 2, COLS);
     {
-        static const char *const keys[10] = { NC_("keybar", "Help"),   NC_("keybar", "Save"),   NC_("keybar", "Raw"),    "",
-                                              NC_("keybar", "Top"),    NC_("keybar", "Bottom"), NC_("keybar", "Search"), NC_("keybar", "Home"),
+        static const char *const keys[10] = { NC_("keybar", "Help"),   NC_("keybar", "Save"),
+                                              NC_("keybar", "Raw"),    "",
+                                              NC_("keybar", "Top"),    NC_("keybar", "Bottom"),
+                                              NC_("keybar", "Search"), NC_("keybar", "Home"),
                                               NC_("keybar", "Spaces"), NC_("keybar", "Quit") };
 
         drawkeys(keys);
@@ -140,9 +176,11 @@ static void edit1(int d, char *filename, char *basename)
                 goto inschar;
             case meta('b'): /* back space */
                 if (soff) {
-                    ccol       = column(sline, --soff);
+                    soff       = charstart(sline, soff - 1);
+                    ccol       = column(sline, soff);
                     editmodflg = 1;
-                    RecDelChar(viewrec, sline, soff);
+                    for (c = charlen(sline, soff); c > 0; --c)
+                        RecDelChar(viewrec, sline, soff);
                     viewline(sline, basecol, sline - baseline + 1);
                     continue;
                 }
@@ -189,7 +227,8 @@ static void edit1(int d, char *filename, char *basename)
                     goto join;
                 }
                 editmodflg = 1;
-                RecDelChar(viewrec, sline, soff);
+                for (c = charlen(sline, soff); c > 0; --c)
+                    RecDelChar(viewrec, sline, soff);
                 viewline(sline, basecol, sline - baseline + 1);
                 continue;
             case cntrl('K'): /* clear to end of line */
@@ -309,10 +348,9 @@ static void edit1(int d, char *filename, char *basename)
             case meta('G'): { /* f7 - search */
                 register char *p;
 
-                if (!(p = getstring(SEARCHSZ - 1, viewsrch, _(" Search "),
-                                    _("Search for the string"))))
+                if (!(p = getstring(40, viewsrch, _(" Search "), _("Search for the string"))))
                     continue;
-                strcpy(viewsrch, p);
+                snprintf(viewsrch, sizeof(viewsrch), "%s", p);
                 if (!search(p, sline, soff + 1, &sline, &soff))
                     continue;
                 if (baseline > sline || baseline + LINES - 2 <= sline)
@@ -397,7 +435,8 @@ static void edit1(int d, char *filename, char *basename)
                     }
                     continue;
                 }
-                ccol = column(sline, --soff);
+                soff = charstart(sline, soff - 1);
+                ccol = column(sline, soff);
                 continue;
             case cntrl('B'):
             case meta('n'): /* next page */

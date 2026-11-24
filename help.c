@@ -274,7 +274,7 @@ void runhelp(char *name)
             VStandEnd();
         }
         if (!p->col)
-            VMPutString(r + p->row, c + (w - strlen(p->str)) / 2, p->str);
+            VMPutString(r + p->row, c + (w - VStrLen(p->str)) / 2, p->str);
         else
             VMPutString(r + p->row, c + p->col, p->str);
         if (p->bold) {

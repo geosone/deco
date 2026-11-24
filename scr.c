@@ -131,12 +131,13 @@
 #include "deco.h"
 #include "env.h"
 
-#define STANDOUT  0400
-#define BOLD      01000
-#define DIM       02000
-#define GRAPH     04000
-#define ROLESHIFT 12
-#define ROLEMASK  070000 /* VCOL_*: 3 bits, the sign bit stays free */
+/* above the code point of a cell (CHARMASK) */
+#define STANDOUT  (1 << 21)
+#define BOLD      (1 << 22)
+#define DIM       (1 << 23)
+#define GRAPH     (1 << 24)
+#define ROLESHIFT 25
+#define ROLEMASK  (7 << ROLESHIFT) /* VCOL_*: 3 bits, the sign bit stays free */
 #define NOCHANGE  -1
 #define OUTBUFSZ  256
 
@@ -461,13 +462,13 @@ static void delwin(WINDOW *win)
 
 static int newwin(WINDOW *win)
 {
-    register short *sp;
+    register CELL *sp;
     register int i;
 
     if (!makenew(win))
         return (0);
     for (i = 0; i < LINES; i++) {
-        win->y[i] = (short *)malloc((int)(COLS * sizeof(short)));
+        win->y[i] = (CELL *)malloc((int)(COLS * sizeof(CELL)));
         if (!win->y[i]) {
             register int j;
 
@@ -490,7 +491,7 @@ static int makenew(WINDOW *win)
 {
     register int i;
 
-    if (!(win->y = (short **)malloc((int)(LINES * sizeof(short *)))))
+    if (!(win->y = (CELL **)malloc((int)(LINES * sizeof(CELL *)))))
         return (0);
     if (!(win->firstch = (short *)malloc((int)(LINES * sizeof(short)))))
         goto b;
@@ -536,7 +537,7 @@ void VRedraw()
 #ifndef DECO_NEWT
 static void makerch(int y)
 {
-    register short *new;
+    register CELL *new;
     register short x;
 
     new = &curscr.y[y][0];
@@ -576,7 +577,7 @@ void VSync()
         curscr.cury   = 0;
         curscr.curx   = 0;
         for (wy = 0; wy < LINES; wy++) {
-            register short *sp, *end;
+            register CELL *sp, *end;
 
             end = &curscr.y[wy][COLS];
             for (sp = curscr.y[wy]; sp < end; sp++)
@@ -608,7 +609,7 @@ void VSync()
 #ifndef DECO_NEWT
 static void makech(int y)
 {
-    register short *new, *old;
+    register CELL *new, *old;
     register short x, lastch;
 
     x      = VScreen.firstch[y];
@@ -739,7 +740,7 @@ static void doscrool()
 #ifndef DECO_NEWT
 static void sclln(int y1, int y2, int n)
 {
-    register short *end, *temp;
+    register CELL *end, *temp;
     register int y;
 
     if (n > 0) {
@@ -772,9 +773,9 @@ static void sclln(int y1, int y2, int n)
 
 void VDelLine(int n)
 {
-    register short *temp;
+    register CELL *temp;
     register int y;
-    register short *end;
+    register CELL *end;
 
     if (n < 0 || n >= LINES)
         return;
@@ -800,9 +801,9 @@ void VDelLine(int n)
 
 void VInsLine(int n)
 {
-    register short *temp;
+    register CELL *temp;
     register int y;
-    register short *end;
+    register CELL *end;
 
     if (n < 0 || n >= LINES)
         return;
@@ -832,11 +833,11 @@ static void domvcur(int y, int x)
     if (curscr.curx == x && curscr.cury == y)
         return;
     if (curscr.cury == y && x - curscr.curx > 0 && x - curscr.curx < 7) {
-        register short i;
+        register CELL i;
 
         while (curscr.curx < x) {
             i = curscr.y[curscr.cury][curscr.curx];
-            if ((i & ~0377 & ~ROLEMASK) == curscr.flgs)
+            if ((i & ~CHARMASK & ~ROLEMASK) == curscr.flgs)
                 putch((int)i);
             else
                 break;
@@ -863,12 +864,12 @@ void VMove(int y, int x)
 
 void VClearLine()
 {
-    register short *sp, *end;
+    register CELL *sp, *end;
     register int y, x;
-    register short *maxx;
+    register CELL *maxx;
     register int minx;
 
-    short blank = ' ' | (VScreen.flgs & ROLEMASK); /* in the current colours */
+    CELL blank = ' ' | (VScreen.flgs & ROLEMASK); /* in the current colours */
 
     y    = VScreen.cury;
     x    = VScreen.curx;
@@ -899,7 +900,7 @@ void VClear()
 static void screrase()
 {
     register int y;
-    register short *sp, *end, *maxx;
+    register CELL *sp, *end, *maxx;
     register int minx;
 
     for (y = 0; y < LINES; y++) {
@@ -928,6 +929,35 @@ void VPutString(char *str)
 {
     while (*str)
         VPutChar(*str++);
+}
+
+/* the length of a UTF-8 string in cells: its code points */
+int VStrLen(const char *s)
+{
+    int n = 0;
+
+    for (; *s; ++s)
+        if ((*s & 0300) != 0200)
+            ++n;
+    return n;
+}
+
+/* the string past its first n cells */
+char *VStrSkip(const char *s, int n)
+{
+    for (; *s; ++s)
+        if ((*s & 0300) != 0200 && --n < 0)
+            break;
+    return (char *)s;
+}
+
+/* at most n cells of a string */
+void VPutStringN(const char *s, int n)
+{
+    const char *e = VStrSkip(s, n);
+
+    while (s < e)
+        VPutChar(*s++);
 }
 
 #ifndef DECO_NEWT
@@ -1258,13 +1288,41 @@ int VSetBold()
     return (1);
 }
 
+/* the UTF-8 sequence VPutChar is in the middle of */
+static int utf8need, utf8cp;
+
+/*
+ * A character: a code point, or a byte of UTF-8 (0200-0377, also as a
+ * negative char), gathered to its code point; the control characters
+ * below ' ' set attributes and move.
+ */
 void VPutChar(int c)
 {
     register int x, y;
 
+    if (c < 0)
+        c &= 0377;
+    if (c >= 0200 && c <= 0377) {
+        if (c >= 0300) { /* a lead byte */
+            utf8need = c >= 0360 ? 3 : c >= 0340 ? 2 : 1;
+            utf8cp   = c & (c >= 0360 ? 007 : c >= 0340 ? 017 : 037);
+            return;
+        }
+        if (!utf8need) /* a continuation byte alone */
+            c = 0xfffd;
+        else {
+            utf8cp = utf8cp << 6 | (c & 077);
+            if (--utf8need)
+                return;
+            c = utf8cp;
+        }
+    } else
+        utf8need = 0;
+    if (c > CHARMASK)
+        c = 0xfffd;
     x = VScreen.curx;
     y = VScreen.cury;
-    switch (c &= 0377) {
+    switch (c) {
     case '\16':
         VStandOut();
         return;
@@ -1366,23 +1424,28 @@ static void cyr(int on)
 #ifndef DECO_NEWT
 static void putch(int c)
 {
-    c &= 0377;
-    if (TtyUpperCase) {
-        if (c >= 'a' && c <= 'z')
-            c += 'A' - 'a';
-        else if (c >= 0300 && c <= 0336)
-            c += 040;
-        else if (c == 0337)
-            c = '\'';
-    }
-    if (Cy) {
-        if (c >= 0300 && c <= 0377) {
-            cyr(1);
-            c = VCyrOutputTable[c - 0300];
-        } else if (c > ' ' && c <= '~')
+    c &= CHARMASK;
+    if (TtyUpperCase && c >= 'a' && c <= 'z')
+        c += 'A' - 'a';
+    if (c < 0200) {
+        if (Cy && c > ' ' && c <= '~')
             cyr(0);
+        qputch(c);
+        return;
     }
-    qputch(c);
+    /* the terminal speaks UTF-8; the KOI8 switching (CY) is history */
+    if (c < 0x800) {
+        qputch(0300 | c >> 6);
+    } else {
+        if (c < 0x10000)
+            qputch(0340 | c >> 12);
+        else {
+            qputch(0360 | c >> 18);
+            qputch(0200 | (c >> 12 & 077));
+        }
+        qputch(0200 | (c >> 6 & 077));
+    }
+    qputch(0200 | (c & 077));
 }
 #endif
 
@@ -1415,7 +1478,7 @@ void VSetCursor(CURSOR c)
 BOX *VGetBox(int y, int x, int ny, int nx)
 {
     register int xx, yy;
-    register short *p, *q;
+    register CELL *p, *q;
     BOX *box;
 
     box      = (BOX *)malloc((int)(sizeof(BOX)));
@@ -1423,7 +1486,7 @@ BOX *VGetBox(int y, int x, int ny, int nx)
     box->x   = x;
     box->ny  = ny;
     box->nx  = nx;
-    box->mem = (short *)malloc((int)(ny * nx * sizeof(short)));
+    box->mem = (CELL *)malloc((int)(ny * nx * sizeof(CELL)));
 
     for (yy = 0; yy < ny; ++yy) {
         p = &VScreen.y[yy + y][x];
@@ -1437,7 +1500,7 @@ BOX *VGetBox(int y, int x, int ny, int nx)
 void VUngetBox(BOX *box)
 {
     register int xx, yy;
-    register short *q;
+    register CELL *q;
 
     for (yy = 0; yy < box->ny; ++yy) {
         q = &box->mem[yy * box->nx];
@@ -1449,12 +1512,12 @@ void VUngetBox(BOX *box)
 void VPrintBox(BOX *box)
 {
     register int xx, yy;
-    register short *q;
+    register CELL *q;
 
     for (yy = 0; yy < box->ny; ++yy) {
         q = &box->mem[yy * box->nx];
         for (xx = 0; xx < box->nx; ++xx)
-            pokechr(box->y + yy, box->x + xx, (*q++ & 0377) | VScreen.flgs);
+            pokechr(box->y + yy, box->x + xx, (*q++ & CHARMASK) | VScreen.flgs);
     }
 }
 
@@ -1486,7 +1549,7 @@ void VHorLine(int r, int c, int nc)
 {
     register int sym;
 
-    sym = (linedraw[0] & 0377) | GRAPH | VScreen.flgs;
+    sym = (linedraw[0] & CHARMASK) | GRAPH | VScreen.flgs;
     while (--nc >= 0)
         pokechr(r, c++, sym);
 }
@@ -1495,7 +1558,7 @@ void VVertLine(int c, int r, int nr)
 {
     register int sym;
 
-    sym = (linedraw[1] & 0377) | GRAPH | VScreen.flgs;
+    sym = (linedraw[1] & CHARMASK) | GRAPH | VScreen.flgs;
     while (--nr >= 0)
         pokechr(r++, c, sym);
 }
@@ -1514,7 +1577,7 @@ void VCorner(int r, int c, int n)
     case 7:
     case 8:
     case 9:
-        n = (linedraw[map[n - 1]] & 0377) | GRAPH;
+        n = (linedraw[map[n - 1]] & CHARMASK) | GRAPH;
         break;
     default:
         n = '?';
@@ -1617,7 +1680,8 @@ void _prscreen(void)
     static char filename[] = "screenX", fname[128];
     static count           = 0;
     register FILE *fd;
-    register short y, x, c, a, m;
+    register int y, x;
+    CELL c, a, m;
     char *toname;
 
     filename[6] = 'A' + count;
@@ -1806,7 +1870,7 @@ static int color_of(int c)
 static void newt_line(int y)
 {
     int x, last, attr = -1, graph = 0;
-    short c;
+    CELL c;
 
     x    = VScreen.firstch[y];
     last = VScreen.lastch[y];
@@ -1823,7 +1887,7 @@ static void newt_line(int y)
             graph = (c & GRAPH) != 0;
             SLsmg_set_char_set(graph);
         }
-        SLsmg_write_char((unsigned char)(c & 0377));
+        SLsmg_write_char((SLwchar_Type)(c & CHARMASK));
     }
     if (graph)
         SLsmg_set_char_set(0);

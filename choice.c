@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define EDITSZ 324 /* 80 cells of UTF-8 */
+
 #include "deco.h"
 #include "dir.h"
 #include "scr.h"
@@ -81,22 +83,22 @@ static int getchoice1(int bold, char *head, char *msg, char *mesg2, char *c1, ch
 
     strncpy(mesg, msg, sizeof(mesg));
     mesg[sizeof(mesg) - 1] = 0;
-    w                      = strlen(mesg);
+    w                      = VStrLen(mesg);
     if (mesg2) {
-        len = strlen(mesg2);
+        len = VStrLen(mesg2);
         if (len > w)
             w = len;
     }
-    len = strlen(head);
+    len = VStrLen(head);
     if (len > w)
         w = len;
     len = 0;
     if (c1)
-        len += strlen(c1);
+        len += VStrLen(c1);
     if (c2)
-        len += strlen(c2);
+        len += VStrLen(c2);
     if (c3)
-        len += strlen(c3);
+        len += VStrLen(c3);
     if (len > w)
         w = len;
     h = 6;
@@ -113,14 +115,14 @@ static int getchoice1(int bold, char *head, char *msg, char *mesg2, char *c1, ch
         VSetBold();
     else
         VSetDim();
-    VFillBox(r - 1, c - 2, h + 2, w + 4, ' ');        /* clear */
-    VDrawBox(r, c, h, w);                             /* draw margins */
-    VMPutString(r, c + (w - strlen(head)) / 2, head); /* head */
+    VFillBox(r - 1, c - 2, h + 2, w + 4, ' ');         /* clear */
+    VDrawBox(r, c, h, w);                              /* draw margins */
+    VMPutString(r, c + (w - VStrLen(head)) / 2, head); /* head */
     if (mesg2) {
-        VMPutString(r + 1, c + (w - strlen(mesg)) / 2, mesg);
-        VMPutString(r + 2, c + (w - strlen(mesg2)) / 2, mesg2);
+        VMPutString(r + 1, c + (w - VStrLen(mesg)) / 2, mesg);
+        VMPutString(r + 2, c + (w - VStrLen(mesg2)) / 2, mesg2);
     } else
-        VMPutString(r + 2, c + (w - strlen(mesg)) / 2, mesg);
+        VMPutString(r + 2, c + (w - VStrLen(mesg)) / 2, mesg);
 
     if (c1) {
         if (isattr) {
@@ -162,7 +164,7 @@ static void initchoice(int row, int col, char *c1, char *c2, char *c3)
     tab[2].name = c3;
     w           = cnum - 1;
     for (i = 0; i < cnum; ++i) {
-        w += tab[i].namlen = strlen(tab[i].name);
+        w += tab[i].namlen = VStrLen(tab[i].name);
         tab[i].r           = row;
     }
     tab[0].c = col - w / 2;
@@ -218,7 +220,7 @@ static void drawchoice(int ch)
             VMPutString(tab[i].r, tab[i].c, tab[i].name);
             if (!attron) {
                 VMPutChar(tab[i].r, tab[i].c, '[');
-                VMPutChar(tab[i].r, tab[i].c + strlen(tab[i].name) - 1, ']');
+                VMPutChar(tab[i].r, tab[i].c + VStrLen(tab[i].name) - 1, ']');
             }
             if (attroff)
                 (*attroff)();
@@ -227,48 +229,69 @@ static void drawchoice(int ch)
     }
 }
 
+/* the bytes of the character at s (UTF-8), at least 1 */
+static int chlen(const char *s)
+{
+    int n = utf8len(s, s + strlen(s));
+
+    return n ? n : 1;
+}
+
+/* the start of the character before p (UTF-8) */
+static int chprev(const char *s, int p)
+{
+    if (p > 0)
+        --p;
+    while (p > 0 && UTF8CONT(s[p]))
+        --p;
+    return p;
+}
+
+/* a line of w cells to edit, str (EDITSZ bytes) in UTF-8; cp: the cursor
+ * at the end, else the first key replaces the text */
 static char *editstring(int r, int c, int w, char *str, int cp)
 {
-    register int key, k;
+    register int key, k, n;
     int firstkey = 1;
+    char save;
 
     if (cp) {
-        for (cp = 0; str[cp]; ++cp)
-            ;
+        cp       = strlen(str);
         firstkey = 0;
     }
     for (;; firstkey = 0) {
         VClearBox(r, c, 1, w);
-        VMPutString(r, c, str);
-        VMove(r, c + cp);
+        VMove(r, c);
+        VPutStringN(str, w);
+        save    = str[cp];
+        str[cp] = 0;
+        VMove(r, c + VStrLen(str));
+        str[cp] = save;
         VSync();
         switch (key = KeyGet()) {
         default:
-            if (key < ' ' || (key > '~' && key < 0300) || key > 0377) {
+            /* a byte of UTF-8 goes in like a character; whole
+             * characters are kept to w cells */
+            if (key < ' ' || key == 0177 || key > 0377) {
                 VBeep();
                 continue;
             }
-            if (firstkey) {
-                str[0] = key;
-                str[1] = 0;
-                cp     = 1;
+            if (firstkey)
+                str[cp = 0] = 0;
+            n = strlen(str);
+            if (n >= EDITSZ - 1 || (!UTF8CONT(key) && VStrLen(str) >= w)) {
+                VBeep();
                 continue;
             }
-            for (k = cp; str[k]; ++k)
-                SWAP(key, str[k]);
-            str[k] = key;
-            str[w] = str[k + 1] = 0;
-            /* fall through */
+            memmove(str + cp + 1, str + cp, n - cp + 1);
+            str[cp++] = key;
+            continue;
         case meta('r'): /* right */
-            if (str[cp]) {
-                ++cp;
-                if (cp >= w)
-                    cp = w - 1;
-            }
+            if (str[cp])
+                cp += chlen(str + cp);
             continue;
         case meta('l'): /* left */
-            if (--cp < 0)
-                cp = 0;
+            cp = chprev(str, cp);
             continue;
         case cntrl(']'): /* redraw screen */
             VRedraw();
@@ -281,32 +304,25 @@ static char *editstring(int r, int c, int w, char *str, int cp)
         case cntrl('J'):
             return (str);
         case cntrl('I'):
-            if (str[cp])
-                while (str[++cp])
-                    ;
-            else
-                cp = 0;
+            cp = str[cp] ? (int)strlen(str) : 0;
             continue;
         case meta('h'): /* home */
             cp = 0;
             continue;
         case meta('e'): /* end */
-            while (str[cp])
-                ++cp;
+            cp = strlen(str);
             continue;
         case meta('b'): /* back space */
             if (cp) {
-                for (k = cp--; str[k]; ++k)
-                    str[k - 1] = str[k];
-                str[k - 1] = 0;
+                k = chprev(str, cp);
+                memmove(str + k, str + cp, strlen(str + cp) + 1);
+                cp = k;
             }
             continue;
         case cntrl('G'): /* delete */
-            if (!str[cp])
-                continue;
-            for (k = cp + 1; str[k]; ++k)
-                str[k - 1] = str[k];
-            str[k - 1] = 0;
+            if (str[cp])
+                memmove(str + cp, str + cp + chlen(str + cp),
+                        strlen(str + cp + chlen(str + cp)) + 1);
             continue;
         case cntrl('Y'): /* clear line */
             str[cp = 0] = 0;
@@ -332,12 +348,12 @@ static char *getstring1(int w, char *str, char *head, char *mesg)
     register int r, c, h;
     int len;
     BOX *box;
-    static char buf[81];
+    static char buf[EDITSZ];
 
-    len = strlen(mesg);
+    len = VStrLen(mesg);
     if (len > w)
         w = len;
-    len = strlen(head);
+    len = VStrLen(head);
     if (len > w)
         w = len;
     h = 4;
@@ -348,14 +364,14 @@ static char *getstring1(int w, char *str, char *head, char *mesg)
     box = VGetBox(r - 1, c - 2, h + 2, w + 4); /* save box */
     VStandOut();
     VSetDim();
-    VFillBox(r - 1, c - 2, h + 2, w + 4, ' ');        /* clear */
-    VDrawBox(r, c, h, w);                             /* draw margins */
-    VMPutString(r, c + (w - strlen(head)) / 2, head); /* head */
-    VMPutString(r + 1, c + 2, mesg);                  /* message */
+    VFillBox(r - 1, c - 2, h + 2, w + 4, ' ');         /* clear */
+    VDrawBox(r, c, h, w);                              /* draw margins */
+    VMPutString(r, c + (w - VStrLen(head)) / 2, head); /* head */
+    VMPutString(r + 1, c + 2, mesg);                   /* message */
     VStandEnd();
     VSetNormal();
 
-    strncpy(buf, str ? str : "", 80);
+    snprintf(buf, sizeof(buf), "%s", str ? str : "");
 
     str = editstring(r + 2, c + 2, w - 4, buf, 0);
     VUngetBox(box);
@@ -380,12 +396,12 @@ static char *getwstring1(int w, char *str, char *head, char *mesg)
     register int r, c, h;
     int len;
     BOX *box;
-    static char buf[81];
+    static char buf[EDITSZ];
 
-    len = strlen(mesg);
+    len = VStrLen(mesg);
     if (len > w)
         w = len;
-    len = strlen(head);
+    len = VStrLen(head);
     if (len > w)
         w = len;
     h = 4;
@@ -400,14 +416,14 @@ static char *getwstring1(int w, char *str, char *head, char *mesg)
     box = VGetBox(r - 1, c - 2, h + 2, w + 4); /* save box */
     VStandOut();
     VSetDim();
-    VFillBox(r - 1, c - 2, h + 2, w + 4, ' ');        /* clear */
-    VDrawBox(r, c, h, w);                             /* draw margins */
-    VMPutString(r, c + (w - strlen(head)) / 2, head); /* head */
-    VMPutString(r + 1, c + 2, mesg);                  /* message */
+    VFillBox(r - 1, c - 2, h + 2, w + 4, ' ');         /* clear */
+    VDrawBox(r, c, h, w);                              /* draw margins */
+    VMPutString(r, c + (w - VStrLen(head)) / 2, head); /* head */
+    VMPutString(r + 1, c + 2, mesg);                   /* message */
     VStandEnd();
     VSetNormal();
 
-    strncpy(buf, str ? str : "", 80);
+    snprintf(buf, sizeof(buf), "%s", str ? str : "");
 
     str = editstring(r + 2, c + 2, w - 4, buf, 1);
     VUngetBox(box);
@@ -421,12 +437,12 @@ static char *getwstring1(int w, char *str, char *head, char *mesg)
  */
 int getlist(char *head, char **items, int n, int sel)
 {
-    int w = strlen(head), r, c, i, key, oldc;
+    int w = VStrLen(head), r, c, i, key, oldc;
     BOX *box, *curbox;
 
     for (i = 0; i < n; ++i)
-        if ((int)strlen(items[i]) > w)
-            w = strlen(items[i]);
+        if ((int)VStrLen(items[i]) > w)
+            w = VStrLen(items[i]);
     w += 4;
     r = (LINES - n) / 2;
     c = (COLS - w) / 2;
@@ -439,7 +455,7 @@ int getlist(char *head, char **items, int n, int sel)
     VStandOut();
     VFillBox(r - 2, c - 4, n + 4, w + 8, ' ');
     VDrawBox(r - 1, c - 1, n + 2, w + 2);
-    VMPutString(r - 1, c + (w - (int)strlen(head)) / 2, head);
+    VMPutString(r - 1, c + (w - (int)VStrLen(head)) / 2, head);
     for (i = 0; i < n; ++i)
         VMPutString(r + i, c + 2, items[i]);
     VSetNormal();

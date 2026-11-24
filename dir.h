@@ -5,7 +5,7 @@
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024 /* max length of directory name */
 #endif
-#define PATSZ 20 /* max length of pattern */
+#define PATSZ 80 /* pattern: 20 cells of UTF-8 */
 
 #define SORTNAME 1 /* sort by name */
 #define SORTEXT  2 /* sort by extension */

@@ -144,7 +144,7 @@ int main(int argc, char **argv, char **envp)
                 continue;
             }
         default:
-            if ((c >= ' ' && c <= '~') || (c >= 0300 && c <= 0377)) {
+            if ((c >= ' ' && c <= '~') || (c >= 0200 && c <= 0377)) { /* also UTF-8 */
                 if (cpos || c != ' ')
                     inscmd(c);
                 continue;
@@ -631,7 +631,7 @@ void setlang()
     int n, sel = 0;
 
     for (n = 0; trlangs[n].code && n < 16; ++n) {
-        items[n] = trlatin1(trlangs[n].name);
+        items[n] = (char *)trlangs[n].name;
         if (!strncmp(now, trlangs[n].code, 2))
             sel = n;
     }
@@ -650,7 +650,7 @@ void hidecursor()
 
 void mvcaddstr(int r, int c, char *s)
 {
-    VMPutString(r, c - (strlen(s) + 1) / 2, s);
+    VMPutString(r, c - (VStrLen(s) + 1) / 2, s);
 }
 
 int quote()
