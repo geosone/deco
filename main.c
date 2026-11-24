@@ -112,6 +112,8 @@ static struct KeyMap keymap[] = {
     { 0, "\033\033[[A", meta('1') },
     { 0, "\033\033[[B", meta('2') },
 
+    { 0, "\033[<", MOUSEREPORT }, /* the mouse: the rest in KeyGet */
+
     { 0, "\033\033", cntrl('C') },
     { 0, 0, 0 },
 };
@@ -121,6 +123,7 @@ static void inithome(void);
 static void initlang(void);
 static void execute(void);
 static void docmdreg(int c);
+static int mouseclick(void);
 static void doscrreg(int c);
 
 int main(int argc, char **argv, char **envp)
@@ -254,6 +257,10 @@ int main(int argc, char **argv, char **envp)
             genhelp();
             draw();
             continue;
+        case MOUSEKEY: /* a click: a key to do, or the cursor moved */
+            if ((c = mouseclick()))
+                KeyUnget(c);
+            continue;
         case meta('1'): /* Alt-F1, Shift-F1: the left panel's drive */
         case meta('2'): /* Alt-F2, Shift-F2: the right one's */
             setdrive(c == meta('1') ? 'l' : 'r', 0);
@@ -354,6 +361,62 @@ int main(int argc, char **argv, char **envp)
             continue;
         }
     }
+}
+
+/*
+ * A click (MouseRow, MouseCol) on the panels: the top line opens the menu
+ * there; in a panel the cursor goes to the file clicked, into that panel;
+ * a double click is Enter (with an empty command line), the right button
+ * tags a file. The key to do next, or 0.
+ */
+static int mouseclick(void)
+{
+    struct dir *d;
+    int x, y, k, n, i;
+
+    if (MouseRow == 0) {
+        k = menuat(MouseCol);
+        runmenu(k ? k : cur == &left ? 'l' : 'r');
+        draw();
+        return 0;
+    }
+    if (!visualwin || cmdreg || MouseRow < 1 || MouseRow > H + 4)
+        return 0;
+    d = widewin ? cur : MouseCol < right.basecol ? &left : &right;
+    if (d != cur) {
+        if (cur->status || d->status)
+            return 0;
+        switchpanels();
+    }
+    if (d->status)
+        return 0;
+    y = MouseRow - 2;
+    x = MouseCol - BASECOL(d);
+    if (y < 0 || y >= H) {
+        drawdir(cur, 1);
+        return 0;
+    }
+    n = ncolumns(d->view);
+    for (k = 0; k < n && x > colsep(k + 1, d->view); ++k)
+        ;
+    if (k >= n || x <= colsep(k, d->view))
+        return 0;
+    i = d->topfile + k * H + y;
+    if (i >= d->num) {
+        drawdir(cur, 1);
+        return 0;
+    }
+    d->curfile = i;
+    if (MouseButton == 2) {
+        if ((d->cat[i].mode & S_IFMT) == (unsigned)S_IFREG) {
+            d->cat[i].tag ^= 1;
+            counttag(d);
+        }
+    }
+    drawdir(cur, 1);
+    if (MouseButton == 0 && MouseDouble && !command[0])
+        return cntrl('M');
+    return 0;
 }
 
 static void doscrreg(int c)

@@ -403,6 +403,8 @@ void VOpen()
         tputs(KS);
     if (EA)
         tputs(EA);
+    VFlush();
+    VMouse(1);
 }
 #endif
 
@@ -416,6 +418,8 @@ void VReopen()
         tputs(KS);
     if (ME)
         tputs(ME);
+    VFlush();
+    VMouse(1);
 }
 #endif
 
@@ -435,6 +439,7 @@ void VClose()
     if (KE)
         tputs(KE);
     VFlush();
+    VMouse(0);
     TtyReset();
 }
 #endif
@@ -449,6 +454,7 @@ void VRestore()
     if (KE)
         tputs(KE);
     VFlush();
+    VMouse(0);
     TtyReset();
 }
 #endif
@@ -1870,6 +1876,16 @@ static const char *const colornames[16] = {
 
 static int newt_on;
 
+/* newt with GonWare's mouse patch would take the mouse reports itself
+ * (presses only); the commander reads them (mouse.c) */
+static void newtnomouse(int on)
+{
+    if (on)
+        setenv("NEWT_NOMOUSE", "1", 1);
+    else
+        unsetenv("NEWT_NOMOUSE");
+}
+
 static void newt_color(int obj, int fg, int bg)
 {
     SLtt_set_color(obj, NULL, (char *)colornames[fg & 15], (char *)colornames[bg & 15]);
@@ -1878,7 +1894,10 @@ static void newt_color(int obj, int fg, int bg)
 int VInit()
 {
     if (!newt_on) {
+        newtnomouse(1);
         newtInit();
+        newtnomouse(0);
+        VMouse(1);
         newt_on = 1;
     }
     newtGetScreenSize(&COLS, &LINES);
@@ -1909,7 +1928,10 @@ void VOpen()
 void VReopen()
 {
     if (!newt_on) {
+        newtnomouse(1);
         newtResume();
+        newtnomouse(0);
+        VMouse(1);
         newt_on = 1;
     }
     VScreen.clear = 1;
@@ -1918,6 +1940,7 @@ void VReopen()
 void VClose()
 {
     if (newt_on) {
+        VMouse(0);
         newtFinished();
         newt_on = 0;
     }
@@ -1927,6 +1950,7 @@ void VClose()
 void VRestore()
 {
     if (newt_on) {
+        VMouse(0);
         newtSuspend();
         newt_on = 0;
     }

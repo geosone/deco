@@ -226,6 +226,8 @@ nextkey:
     oldalarm = alarm(2);
     c        = nmgetch(kp);
     alarm(oldalarm);
+    if (c == MOUSEREPORT && !(c = mouseread(KeyGetChar)))
+        goto nextkey; /* a release, a move */
     return (c);
 }
 

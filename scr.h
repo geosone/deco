@@ -2,7 +2,8 @@
 #define cntrl(c) (c & 037)
 #endif
 #ifndef meta
-#define meta(c) (c | 0400)
+#define meta(c)     (c | 0400)
+#define MOUSEREPORT meta('@') /* the key table: ESC [ <, a mouse report follows */
 #endif
 
 /*
@@ -114,6 +115,11 @@ struct KeyMap {
 
 void KeyInit(struct KeyMap *map, void (*flushproc)(void));
 int KeyGetChar(void);
+
+/* the mouse (mouse.c) */
+void VMouse(int on);
+int mouseread(int (*get)(void));
+int mousestr(const char *s);
 int KeyGet(void);
 void KeyUnget(int key);
 

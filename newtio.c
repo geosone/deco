@@ -67,9 +67,10 @@ void KeyInit(struct KeyMap *map, void (*flushproc)(void))
  * panel (on GonWare Alt-F1... switch the screens). Other keys of this form
  * are dropped; anything else goes back and the ESC stays an ESC.
  */
+/* also: the mouse reports ESC [ < b ; x ; y M (mouse.c) */
 static int modkey(void)
 {
-    unsigned char b[16];
+    unsigned char b[32];
     int n = 0, alt = 0, num = 0, mod = 1, c, f = 0, i;
 
     if (SLang_input_pending(0) <= 0)
@@ -81,10 +82,14 @@ static int modkey(void)
     }
     if (c != '[' && c != 'O')
         goto back;
-    while (n < (int)sizeof(b) && SLang_input_pending(1) > 0) {
+    while (n < (int)sizeof(b) - 1 && SLang_input_pending(1) > 0) {
         b[n++] = c = SLang_getkey();
         if (c >= 0x40 && c <= 0x7e && !(c == '[' && b[n - 2] == '['))
             break;
+    }
+    if (!alt && b[0] == '[' && b[1] == '<') { /* a mouse report */
+        b[n] = 0;
+        return mousestr((char *)b + 2);
     }
     i = alt + 1; /* the parameters after [ or O */
     if (b[i] == '[' && b[alt] == '[') {
@@ -154,7 +159,9 @@ static int newt_key(void)
     case NEWT_KEY_BKSPC:
         return (meta('b'));
     case NEWT_KEY_ESCAPE:
-        if ((k = modkey()) >= 0)
+        if ((k = modkey()) == 0)
+            return (newt_key()); /* dropped: a mouse release, ... */
+        if (k > 0)
             return (k);
         return (cntrl('C'));
     case NEWT_KEY_RESIZE:

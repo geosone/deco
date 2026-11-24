@@ -22,6 +22,7 @@ add_executable(${PROJECT_NAME}
     hexview.c
     main.c
     menu.c
+    mouse.c
     mh.c
     pw.c
     rec.c

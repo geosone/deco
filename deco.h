@@ -44,6 +44,11 @@ void menuretranslate(void);
 void setlang_help(const char *code);
 void helpreset(void);
 void setdrive(int k, int sk);
+
+/* the mouse (mouse.c) */
+#define MOUSEKEY meta('M') /* a press that is not a key: MouseRow, MouseCol ... */
+extern int MouseRow, MouseCol, MouseButton, MouseDouble;
+int menuat(int col);
 int getlist(char *head, char **items, int n, int sel);
 int getlistat(char *head, char **items, int n, int sel, int mid);
 #define _(s)        tr(s)

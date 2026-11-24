@@ -14,6 +14,7 @@ static void clrmenu(struct menu *m);
 static void drawmenu(struct menu *m);
 static void upmenu(struct menu *m);
 static int hotkey(int c, struct menu *m);
+static int menuclick(struct menu *m);
 
 /* the label of an item translated, its key (after a gap of spaces) kept
  * and aligned to the right of the widest label of the menu */
@@ -152,6 +153,14 @@ int getmenu()
                     --nmenu;
                 }
                 break;
+            case MOUSEKEY:
+                k = menuclick(&menu[nmenu]);
+                if (k == -2) /* a line, an item not to be had */
+                    continue;
+                if (k < 0) /* another menu */
+                    break;
+                clrmenu(&menu[nmenu]);
+                return (k);
             case meta('u'): /* up */
                 upmenu(&menu[nmenu]);
                 continue;
@@ -162,6 +171,47 @@ int getmenu()
             break;
         }
     }
+}
+
+/* the key of the menu whose name is at column col of the top line, 0
+ * for none */
+int menuat(int col)
+{
+    struct menu *m;
+
+    if (!menu[0].len)
+        initmenu();
+    for (m = menu; m->name; ++m)
+        if (col >= m->col - 1 && col < m->col - 1 + m->len)
+            return m->key;
+    return 0;
+}
+
+/* a click (MouseRow, MouseCol) while menu m is open: 1 an item of it is
+ * chosen (m->nsm), -1 another menu's name (nmenu), -2 a line or an
+ * inactive item (nothing), 0 elsewhere: closed */
+static int menuclick(struct menu *m)
+{
+    struct menu *o;
+    int i = MouseRow - 2;
+
+    if (MouseRow == 0) {
+        for (o = menu; o->name; ++o)
+            if (MouseCol >= o->col - 1 && MouseCol < o->col - 1 + o->len) {
+                if (o == m)
+                    return 0;
+                clrmenu(m);
+                nmenu = o - menu;
+                return -1;
+            }
+        return 0;
+    }
+    if (i < 0 || i >= m->hgh || MouseCol < m->col + 1 || MouseCol > m->col + m->wid)
+        return 0;
+    if (!m->submenu[i].name[0] || !m->submenu[i].active)
+        return -2;
+    m->nsm = i;
+    return 1;
 }
 
 static void drawhead(int nm)
