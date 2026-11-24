@@ -1,10 +1,11 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <fcntl.h>
+
 #include "deco.h"
 #include "dir.h"
 #include "env.h"
@@ -15,10 +16,28 @@
 
 #define MAXARGV 400
 
+#ifdef __GONWARE__
+/* GDOS: the shell is COMMAND.EXE (COMSPEC); /C runs one command line, no
+ * argument is the interactive shell */
+static char shname[]  = "COMMAND";
+static char cshname[] = "COMMAND";
+#define shabsname  comspec()
+#define cshabsname comspec()
+#define SHELL_C    "/C"
+#define SHELL_I    0
+static char *comspec(void)
+{
+    char *s = EnvGet("COMSPEC");
+    return s && *s ? s : "\\GONWARE\\COMMAND.EXE";
+}
+#else
 static char shname[]     = "sh";
 static char cshname[]    = "csh";
 static char shabsname[]  = "/bin/sh";
 static char cshabsname[] = "/bin/csh";
+#define SHELL_C "-c"
+#define SHELL_I "-i"
+#endif
 
 int usecshell;
 int useredit, userview;
@@ -420,8 +439,12 @@ void quit()
         VClear();
         VSync();
         VClose();
+#ifdef __GONWARE__
+        exit(runl(0, ABSSHELL, SHELL, SHELL_I, 0) >> 8);
+#else
         execle(ABSSHELL, SHELL, "-i", NULL, EnvVector);
         exit(0);
+#endif
     }
     /* else stay here */
 }
@@ -458,7 +481,7 @@ void shell()
     VClear();
     VSync();
     VRestore();
-    runl(0, ABSSHELL, SHELL, "-i", 0);
+    runl(0, ABSSHELL, SHELL, SHELL_I, 0);
     VReopen();
     VClear();
     setdir(cur == &left ? &right : &left, 0);
@@ -527,7 +550,7 @@ void copy()
             return;
         }
         message(" Copy ", "Copying %d file%s to %s ...", c, c > 1 ? "s" : "", name);
-        done = rundone("/bin/cp", "cp", "-f", "-p");
+        done = filesdone(FO_COPY);
         if (done) {
             endmesg();
             message(" Copy ", "Done");
@@ -553,7 +576,7 @@ void copy()
             error("%s is a directory", buf);
             return;
         }
-        if (runl(1, "/bin/cp", "cp", "-f", "-p", p->name, name, 0)) {
+        if (fileop(FO_COPY, p->name, name)) {
             error("Cannot copy %s to %s", p->name, name);
             return;
         }
@@ -596,7 +619,7 @@ void makelink()
                 p->tag = 0;
             }
         message(" Link ", "Linking %d file%s to %s ...", c, c > 1 ? "s" : "", name);
-        done = rundone("/bin/ln", "ln", "-f", 0);
+        done = filesdone(FO_LINK);
         if (done) {
             endmesg();
             message(" Link ", "Done");
@@ -622,7 +645,7 @@ void makelink()
             error("%s is a directory", buf);
             return;
         }
-        if (runl(1, "/bin/ln", "ln", "-f", p->name, name, 0)) {
+        if (fileop(FO_LINK, p->name, name)) {
             error("Cannot link %s to %s", p->name, name);
             return;
         }
@@ -666,7 +689,7 @@ void makeslink()
                 p->tag = 0;
             }
         message(" Symlink ", "Linking %d file%s to %s ...", c, c > 1 ? "s" : "", name);
-        done = rundone("/bin/ln", "ln", "-s", "-f");
+        done = filesdone(FO_SYMLINK);
         if (done) {
             endmesg();
             message(" Symlink ", "Done");
@@ -692,7 +715,7 @@ void makeslink()
             error("%s is a directory", buf);
             return;
         }
-        if (runl(1, "/bin/ln", "ln", "-s", "-f", p->name, name, 0)) {
+        if (fileop(FO_SYMLINK, p->name, name)) {
             error("Cannot symlink %s to %s", p->name, name);
             return;
         }
@@ -744,7 +767,7 @@ void renmove()
                 runarg(p->name);
             }
         message(" Move ", "Moving %d file%s to %s ...", c, c > 1 ? "s" : "", name);
-        done = rundone("/bin/mv", "mv", "-f", 0);
+        done = filesdone(FO_MOVE);
         if (done) {
             endmesg();
             message(" Move ", "Done");
@@ -769,7 +792,7 @@ void renmove()
             error("Directory %s exists", buf);
             return;
         }
-        if (runl(1, "/bin/mv", "mv", "-f", p->name, name, 0)) {
+        if (fileop(FO_MOVE, p->name, name)) {
             error("Cannot move %s to %s", p->name, name);
             return;
         }
@@ -790,7 +813,7 @@ void renmove()
             error("%s is a directory", buf);
             return;
         }
-        if (runl(1, "/bin/mv", "mv", "-f", p->name, name, 0)) {
+        if (fileop(FO_MOVE, p->name, name)) {
             error("Cannot move %s to %s", p->name, name);
             return;
         }
@@ -816,7 +839,7 @@ void makedir()
         error("Directory %s already exists", p);
         break;
     case 0:
-        if (runl(1, "/bin/mkdir", "mkdir", p, 0)) {
+        if (mkdir(p, 0777) < 0) {
             error("Cannot create directory %s", p);
             break;
         }
@@ -852,7 +875,7 @@ void delete()
         if (getchoice(0, " Delete ", "Do you wish to delete directory", p->name, " Delete ",
                       " Cancel ", 0))
             return;
-        if (runl(1, "/bin/rmdir", "rmdir", p->name, 0)) {
+        if (rmdir(p->name) < 0) {
             error("Cannot delete directory %s", p->name);
             return;
         }
@@ -1021,6 +1044,11 @@ void syscmd(char *s)
 {
     register int status, sig;
 
+#ifdef __GONWARE__
+    /* the shell has the commands (DIR, COPY ...) and finds the programs */
+    runl(0, shabsname, shname, SHELL_C, s, 0);
+    return;
+#endif
     if (metas(s)) {
         if (usecshell)
             runl(0, cshabsname, cshname, "-f", "-c", s, 0);

@@ -1,4 +1,6 @@
 #include <sys/param.h>
+#include <sys/types.h>
+#include <time.h>
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024 /* max length of directory name */

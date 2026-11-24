@@ -1,15 +1,23 @@
 #define _POSIX_C_SOURCE 1L
-#define _XOPEN_SOURCE 500
+#define _XOPEN_SOURCE   500
 #include <errno.h>
+#include <fcntl.h>
 #include <setjmp.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
-#include <fcntl.h>
+#include <unistd.h>
+#include <utime.h>
+#ifdef __GONWARE__
+#include <gonware/syscall.h>
+#endif
 #include "deco.h"
+#include "dir.h"
 #include "env.h"
 
 #define QUANT 16
@@ -52,6 +60,91 @@ int rundone(char *name, char *a0, char *a1, char *a2)
     ret = runv(1, name, arg) == 0;
     free(arg);
     return (ret);
+}
+
+/* to as a directory: to/<last part of from> */
+static char *target(char *from, char *to, char *buf, size_t size)
+{
+    struct stat st;
+    char *base;
+
+    if (stat(to, &st) < 0 || !S_ISDIR(st.st_mode))
+        return to;
+    base = strrchr(from, '/');
+    snprintf(buf, size, "%s/%s", to, base ? base + 1 : from);
+    return buf;
+}
+
+static int copyfile(char *from, char *to)
+{
+    char buf[8192];
+    struct stat st;
+    struct utimbuf times;
+    int in, out, err = 0;
+    ssize_t n;
+
+    if ((in = open(from, O_RDONLY)) < 0)
+        return -1;
+    if (fstat(in, &st) < 0 ||
+        (out = open(to, O_WRONLY | O_CREAT | O_TRUNC, st.st_mode & 07777)) < 0) {
+        close(in);
+        return -1;
+    }
+    while ((n = read(in, buf, sizeof(buf))) > 0)
+        if (write(out, buf, n) != n) {
+            err = -1;
+            break;
+        }
+    if (n < 0)
+        err = -1;
+    close(in);
+    if (close(out) < 0)
+        err = -1;
+    if (err) {
+        unlink(to);
+        return -1;
+    }
+    /* like cp -p, as far as the file system keeps it */
+    (void)chmod(to, st.st_mode & 07777);
+    times.actime  = st.st_atime;
+    times.modtime = st.st_mtime;
+    (void)utime(to, &times);
+    return 0;
+}
+
+int fileop(int op, char *from, char *to)
+{
+    char buf[MAXPATHLEN];
+
+    to = target(from, to, buf, sizeof(buf));
+    switch (op) {
+    case FO_COPY:
+        return copyfile(from, to);
+    case FO_MOVE:
+        if (rename(from, to) == 0)
+            return 0;
+        if (errno != EXDEV || copyfile(from, to) < 0)
+            return -1;
+        return unlink(from);
+    case FO_LINK:
+        (void)unlink(to);
+        return link(from, to);
+    case FO_SYMLINK:
+        (void)unlink(to);
+        return symlink(from, to);
+    }
+    return -1;
+}
+
+int filesdone(int op)
+{
+    int i, ok = 1;
+
+    for (i = 1; i < argp; ++i)
+        if (fileop(op, arg[i], arg[0]) < 0)
+            ok = 0;
+    free(arg);
+    return ok;
 }
 
 void runcancel()
@@ -145,7 +238,7 @@ int runl(int silent, char *name, ...)
     /* Collect all arguments. */
     va_start(ap, name);
     for (;;) {
-        char *a = va_arg(ap, char *);
+        char *a          = va_arg(ap, char *);
         args[num_args++] = a;
         if (!a) {
             break;
@@ -197,7 +290,24 @@ void sigdfl()
 #endif
 }
 
-static int run(char *name, char **a0, int (*exe)(char*, char**, char**), int silent)
+#ifdef __GONWARE__
+/* GDOS starts a program and returns when it has ended (GDOS_SPAWN): no
+ * fork, no process groups; the status comes back as wait() would give it */
+static int run(char *name, char **a0, int (*exe)(char *, char **, char **), int silent)
+{
+    long r;
+
+    (void)exe;
+    r = gdos_call3(GDOS_SPAWN, name, a0, EnvVector);
+    if (r < 0) {
+        if (!silent)
+            outerr("%s: Command not found.\n", name);
+        return 0x7f00;
+    }
+    return (int)(r & 0xff) << 8;
+}
+#else
+static int run(char *name, char **a0, int (*exe)(char *, char **, char **), int silent)
 {
     register int t;
     int status = 0;
@@ -247,3 +357,4 @@ static int run(char *name, char **a0, int (*exe)(char*, char**, char**), int sil
         return -t;
     return (status);
 }
+#endif

@@ -1,3 +1,4 @@
+#include <errno.h>
 /* width of directory window */
 
 #define PAGEWID (widewin ? 77 : 39)
@@ -35,7 +36,6 @@ extern char editname[40], viewname[40];
 extern int useredit, userview, usecshell;
 extern int viewraw, viewhex, viewtabs;
 extern char *home;
-extern int errno;
 extern struct palette palette, dflt_palette;
 
 #define ENG 0 /* English */
@@ -110,6 +110,14 @@ int doexec(char *str);
 void runset(char *dest);
 void runarg(char *name);
 int rundone(char *name, char *a0, char *a1, char *a2);
+
+/* copying, moving and linking files without external programs (run.c) */
+#define FO_COPY    0 /* contents, mode and times */
+#define FO_MOVE    1 /* rename(), or copy and delete to another file system */
+#define FO_LINK    2
+#define FO_SYMLINK 3
+int fileop(int op, char *from, char *to); /* to: a name or a directory; 0 or -1 */
+int filesdone(int op); /* the files collected with runset()/runarg() */
 void runcancel(void);
 int runl(int silent, char *name, ...);
 void findfile(struct dir *d, char *name);
