@@ -227,7 +227,8 @@ void drawbanners()
 void drawkeys(const char *const labels[10])
 {
     char buf[1024], *p = buf;
-    int i, w;
+    const char *l, *e;
+    int i, w, n;
     int slot = COLS / 10;
     int oldc = VSetColor(VCOL_KEYS);
 
@@ -238,7 +239,11 @@ void drawkeys(const char *const labels[10])
         w = (i == 9 ? COLS - 9 * slot : slot) - (i == 9 ? 2 : 1) - (i ? 1 : 0);
         if (w < 1)
             w = 1;
-        p += sprintf(p, "%s%d\16%-*.*s\17", i ? " " : "", i + 1, w, w, trc("keybar", labels[i]));
+        /* the label in w cells (UTF-8), cut or filled */
+        l = trc("keybar", labels[i]);
+        e = VStrSkip(l, w);
+        n = w - VStrLen(l);
+        p += sprintf(p, "%s%d\16%.*s%*s\17", i ? " " : "", i + 1, (int)(e - l), l, n > 0 ? n : 0, "");
     }
     *p++ = '\2';
     *p   = 0;

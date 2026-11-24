@@ -71,6 +71,9 @@ install(FILES deco.1 deco-ru.1
 install(FILES menu profile
     DESTINATION lib/deco
 )
-install(FILES help/e.general help/e.edit help/e.view help/e.hexview
+# the help of the languages without a catalogue yet (Russian, Ukrainian);
+# the others come through gettext
+install(FILES help/r.general help/r.edit help/r.view help/r.hexview
+              help/u.general help/u.edit help/u.view help/u.hexview
     DESTINATION lib/deco/help
 )

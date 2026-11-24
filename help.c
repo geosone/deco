@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -7,6 +8,7 @@
 #include "scr.h"
 
 #define CS         34
+#define HELPW      72 /* the width of the help box */
 #define HELPDIR    "/usr/lib/deco/help/"
 #define LCLHELPDIR "/usr/local/lib/deco/help/"
 
@@ -14,52 +16,57 @@ struct helptab {
     char row;
     char col;
     char bold;
-    char *str;
+    char *str; /* the line as shown, made by inithelp */
+};
+
+/* a line of help: the text (translated), the keys after it (not) */
+struct hline {
+    const char *text, *keys;
 };
 
 struct help {
     char *name;
     struct helptab *htab;
-    char **mesg;
+    struct hline *mesg;
+    char *file; /* the help file read, if it was */
 };
 
 static void inithelp(struct help *hp);
-static void initnewhelp(char **q, char *p);
 
-static char *genmesg[] = {
-    CMDR_NAME ", " CMDR_SHORTCOPY,
-    " Cursor Arrows ",
-    "Left             ^[ l",
-    "Right            ^[ r",
-    "Up               ^[ u",
-    "Down             ^[ d",
-    " Cursor Movement ",
-    "Char left        ^S or ^A",
-    "Char right       ^D",
-    " Panels ",
-    "Switch panels    ^I or <Tab>",
-    "Panels on/off    ^O or ^P",
-    "Swap panels      ^U",
-    "Toggle status    ^L",
-    "Full screen      ^F",
-    "Double width     ^W",
-    "The \"+\" and \"-\" keys select and unselect groups of files.",
-    " Delete ",
-    "Char left        ^H or <BS>",
-    "Under cursor     ^G or <Del>",
-    "Line             ^Y",
-    " Other ",
-    "History          ^B",
-    "Home directory   ^\\",
-    "Reread directory ^R",
-    "Select/Unselect  ^T or <Ins>",
-    "Previous command ^E",
-    "Next command     ^X",
-    "Run file or",
-    "Enter directory  ^M or <Ret>",
-    "Use file name    ^J or <LF>",
-    "Function keys    ^[ + digit",
-    0,
+static struct hline genmesg[] = {
+    { CMDR_NAME ", " CMDR_SHORTCOPY, 0 },
+    { N_(" Cursor Arrows "), 0 },
+    { N_("Left"), "^[ l" },
+    { N_("Right"), "^[ r" },
+    { N_("Up"), "^[ u" },
+    { N_("Down"), "^[ d" },
+    { N_(" Cursor Movement "), 0 },
+    { N_("Char left"), "^S, ^A" },
+    { N_("Char right"), "^D" },
+    { N_(" Panels "), 0 },
+    { N_("Switch panels"), "^I, <Tab>" },
+    { N_("Panels on/off"), "^O, ^P" },
+    { N_("Swap panels"), "^U" },
+    { N_("Toggle status"), "^L" },
+    { N_("Full screen"), "^F" },
+    { N_("Double width"), "^W" },
+    { N_("The \"+\" and \"-\" keys select and unselect groups of files."), 0 },
+    { N_(" Delete "), 0 },
+    { N_("Char left"), "^H, <BS>" },
+    { N_("Under cursor"), "^G, <Del>" },
+    { N_("Line"), "^Y" },
+    { N_(" Other "), 0 },
+    { N_("History"), "^B" },
+    { N_("Home directory"), "^\\" },
+    { N_("Reread directory"), "^R" },
+    { N_("Select/Unselect"), "^T, <Ins>" },
+    { N_("Previous command"), "^E" },
+    { N_("Next command"), "^X" },
+    { N_("Run file or"), 0 },
+    { N_("Enter directory"), "^M, <Ret>" },
+    { N_("Use file name"), "^J, <LF>" },
+    { N_("Function keys"), "^[ 0..9" },
+    { 0, 0 },
 };
 
 static struct helptab gentab[] = {
@@ -101,38 +108,38 @@ static struct helptab gentab[] = {
     { 0, 0, 0, 0 },
 };
 
-static char *editmesg[] = {
-    CMDR_NAME " Editor, " CMDR_SHORTCOPY,
-    " Cursor Movement ",
-    "Char Left        ^A",
-    "Char Right       ^D",
-    "Line Up          ^E",
-    "Line Down        ^X",
-    "Word Left        ^W",
-    "Word Right       ^F",
-    "Prev Page        ^R",
-    "Next Page        ^B",
-    "Begin of line    Home",
-    "End of line      End",
-    "Top of file      F5",
-    "End of file      F6",
-    "Top of screen    F8",
-    " Search ",
-    "Search string    F7",
-    " Delete ",
-    "Char left        ^H or <BS>",
-    "Under cursor     ^G or <Del>",
-    "Line             ^Y",
-    "To end of line   ^K",
-    " Other ",
-    "Redraw screen    ^]",
-    "Quote next char  ^V",
-    "Save file        F2",
-    "Exit             ^C",
-    " Modes ",
-    "Raw mode         F3",
-    "Visible spaces   F9",
-    0,
+static struct hline editmesg[] = {
+    { CMDR_NAME " Editor, " CMDR_SHORTCOPY, 0 },
+    { N_(" Cursor Movement "), 0 },
+    { N_("Char Left"), "^A" },
+    { N_("Char Right"), "^D" },
+    { N_("Line Up"), "^E" },
+    { N_("Line Down"), "^X" },
+    { N_("Word Left"), "^W" },
+    { N_("Word Right"), "^F" },
+    { N_("Prev Page"), "^R" },
+    { N_("Next Page"), "^B" },
+    { N_("Begin of line"), "Home" },
+    { N_("End of line"), "End" },
+    { N_("Top of file"), "F5" },
+    { N_("End of file"), "F6" },
+    { N_("Top of screen"), "F8" },
+    { N_(" Search "), 0 },
+    { N_("Search string"), "F7" },
+    { N_(" Delete "), 0 },
+    { N_("Char left"), "^H, <BS>" },
+    { N_("Under cursor"), "^G, <Del>" },
+    { N_("Line"), "^Y" },
+    { N_("To end of line"), "^K" },
+    { N_(" Other "), 0 },
+    { N_("Redraw screen"), "^]" },
+    { N_("Quote next char"), "^V" },
+    { N_("Save file"), "F2" },
+    { N_("Exit"), "^C" },
+    { N_(" Modes "), 0 },
+    { N_("Raw mode"), "F3" },
+    { N_("Visible spaces"), "F9" },
+    { 0, 0 },
 };
 
 static struct helptab edittab[] = {
@@ -146,30 +153,30 @@ static struct helptab edittab[] = {
     { 16, CS + 6, 0, 0 }, { 17, CS + 6, 0, 0 }, { 0, 0, 0, 0 },
 };
 
-static char *viewmesg[] = {
-    CMDR_NAME " Viewer, " CMDR_SHORTCOPY,
-    " Cursor Movement ",
-    "Page Left        ^A",
-    "Page Right       ^D",
-    "Line Up          ^E",
-    "Line Down        ^X",
-    "Prev Page        ^R",
-    "Next Page        ^B",
-    "Top of file      Home or F5",
-    "End of file      End or F6",
-    " Search ",
-    "Search string    F7",
-    " Other ",
-    "Redraw screen    ^]",
-    "Exit             ^C",
-    " Modes ",
-    "Raw mode         F3",
-    "Visible spaces   F9",
-    "Lines longer than 1024 bytes",
-    "are broken and marked with \"\\\"",
-    "Spaces are displayed as \".\"",
-    "and tabs as \"_\"",
-    0,
+static struct hline viewmesg[] = {
+    { CMDR_NAME " Viewer, " CMDR_SHORTCOPY, 0 },
+    { N_(" Cursor Movement "), 0 },
+    { N_("Page Left"), "^A" },
+    { N_("Page Right"), "^D" },
+    { N_("Line Up"), "^E" },
+    { N_("Line Down"), "^X" },
+    { N_("Prev Page"), "^R" },
+    { N_("Next Page"), "^B" },
+    { N_("Top of file"), "Home, F5" },
+    { N_("End of file"), "End, F6" },
+    { N_(" Search "), 0 },
+    { N_("Search string"), "F7" },
+    { N_(" Other "), 0 },
+    { N_("Redraw screen"), "^]" },
+    { N_("Exit"), "^C" },
+    { N_(" Modes "), 0 },
+    { N_("Raw mode"), "F3" },
+    { N_("Visible spaces"), "F9" },
+    { N_("Lines longer than 1024 bytes"), 0 },
+    { N_("are broken and marked with \"\\\""), 0 },
+    { N_("Spaces are displayed as \".\""), 0 },
+    { N_("and tabs as \"_\""), 0 },
+    { 0, 0 },
 };
 
 static struct helptab viewtab[] = {
@@ -181,30 +188,30 @@ static struct helptab viewtab[] = {
     { 17, CS + 3, 0, 0 }, { 18, CS + 3, 0, 0 }, { 0, 0, 0, 0 },
 };
 
-static char *hviewmesg[] = {
-    CMDR_NAME " Hex Viewer, " CMDR_SHORTCOPY,
-    " Cursor Movement ",
-    "Page Left        ^A",
-    "Page Right       ^D",
-    "Line Up          ^E",
-    "Line Down        ^X",
-    "Prev Page        ^R",
-    "Next Page        ^B",
-    "Top of file      Home or F5",
-    "End of file      End or F6",
-    " Search ",
-    "Search string    F7",
-    " Other ",
-    "Redraw screen    ^]",
-    "Exit             ^C",
-    " Modes ",
-    "Raw mode         F3",
-    "Visible spaces   F9",
-    "Spaces are displayed as \".\"",
-    "and tabs as \"_\"",
-    "For hexadecimal search",
-    "type char codes as \"\\xx\"",
-    0,
+static struct hline hviewmesg[] = {
+    { CMDR_NAME " Hex Viewer, " CMDR_SHORTCOPY, 0 },
+    { N_(" Cursor Movement "), 0 },
+    { N_("Page Left"), "^A" },
+    { N_("Page Right"), "^D" },
+    { N_("Line Up"), "^E" },
+    { N_("Line Down"), "^X" },
+    { N_("Prev Page"), "^R" },
+    { N_("Next Page"), "^B" },
+    { N_("Top of file"), "Home, F5" },
+    { N_("End of file"), "End, F6" },
+    { N_(" Search "), 0 },
+    { N_("Search string"), "F7" },
+    { N_(" Other "), 0 },
+    { N_("Redraw screen"), "^]" },
+    { N_("Exit"), "^C" },
+    { N_(" Modes "), 0 },
+    { N_("Raw mode"), "F3" },
+    { N_("Visible spaces"), "F9" },
+    { N_("Spaces are displayed as \".\""), 0 },
+    { N_("and tabs as \"_\""), 0 },
+    { N_("For hexadecimal search"), 0 },
+    { N_("type char codes as \"\\xx\""), 0 },
+    { 0, 0 },
 };
 
 static struct helptab hviewtab[] = {
@@ -253,7 +260,7 @@ void runhelp(char *name)
     p = hp->htab;
     if (!p->str)
         inithelp(hp);
-    w = 72;
+    w = HELPW;
     h = 21;
     r = 2;
     c = (COLS - w) / 2;
@@ -262,9 +269,9 @@ void runhelp(char *name)
     box  = VGetBox(r, c - 1, h, w + 2); /* save box */
     VStandOut();
     VSetDim();
-    VFillBox(r, c - 1, h, w + 2, ' ');         /* clear */
-    VDrawBox(r, c, h, w);                      /* draw margins */
-    VMPutString(r, c + (w - 6) / 2, " Help "); /* head */
+    VFillBox(r, c - 1, h, w + 2, ' ');                               /* clear */
+    VDrawBox(r, c, h, w);                                            /* draw margins */
+    VMPutString(r, c + (w - VStrLen(_(" Help "))) / 2, _(" Help ")); /* head */
 
     for (; p->row; ++p) {
         if (p->row >= h)
@@ -334,39 +341,104 @@ static int findhelpfile(char *filename, char *name, char *dir)
     return (!access(filename, 4)); /* can I read it ? */
 }
 
+/* the width of the text before the keys, at least */
+#define KEYCOL 17
+
+/*
+ * The lines of a help in the language now: the built-in ones through
+ * gettext, the text padded to KEYCOL cells before its keys; Russian and
+ * Ukrainian (no catalogue yet) from their help files, a line each, '@'
+ * a space.
+ */
 static void inithelp(struct help *hp)
 {
-    register struct helptab *p;
-    register int n, fd;
-    register char **q;
-    char filename[60];
-    char buf[1024];
+    struct helptab *p;
+    struct hline *q;
+    char filename[80], *b, *t;
+    int n, fd, k, ncols = 0, cols[4], keycol[4], keys[4];
 
-    if (!findhelpfile(filename, hp->name, LCLHELPDIR))
-        findhelpfile(filename, hp->name, HELPDIR);
-    fd = open(filename, 0);
-    if (fd >= 0) {
-        n = read(fd, buf, sizeof(buf) - 1);
-        if (n > 0) {
-            buf[n] = 0;
-            initnewhelp(hp->mesg, mdup(buf));
+    if (lang == RUS || lang == UKR) {
+        if (!findhelpfile(filename, hp->name, LCLHELPDIR))
+            findhelpfile(filename, hp->name, HELPDIR);
+        fd = open(filename, 0);
+        if (fd >= 0 && (hp->file = malloc(4096))) {
+            n                       = read(fd, hp->file, 4095);
+            hp->file[n > 0 ? n : 0] = 0;
+            b                       = hp->file;
+            for (p = hp->htab; p->row && *b; ++p) {
+                for (p->str = b; *b && *b != '\n'; ++b)
+                    if (*b == '@')
+                        *b = ' ';
+                if (*b)
+                    *b++ = 0;
+            }
+            for (; p->row; ++p)
+                p->str = "";
+            close(fd);
+            return;
         }
-        close(fd);
+        if (fd >= 0)
+            close(fd);
     }
-    q = hp->mesg;
-    for (p = hp->htab; p->row && *q; ++p, ++q)
-        p->str = *q;
+    /* the keys of a column after its longest text, at least at KEYCOL */
+    for (p = hp->htab, q = hp->mesg; p->row && q->text; ++p, ++q)
+        if (q->keys) {
+            n = VStrLen(_(q->text)) + 1;
+            for (k = 0; k < ncols && cols[k] != p->col; ++k)
+                ;
+            if (k == ncols && ncols < 4) {
+                cols[ncols]     = p->col;
+                keys[ncols]     = 0;
+                keycol[ncols++] = KEYCOL;
+            }
+            if (k < ncols && n > keycol[k])
+                keycol[k] = n;
+            if (k < ncols && (int)strlen(q->keys) > keys[k])
+                keys[k] = strlen(q->keys);
+        }
+    for (k = 0; k < ncols; ++k) /* the keys inside the frame of HELPW */
+        if (cols[k] + keycol[k] + keys[k] > HELPW - 2)
+            keycol[k] = HELPW - 2 - cols[k] - keys[k];
+    for (p = hp->htab, q = hp->mesg; p->row && q->text; ++p, ++q) {
+        t = _(q->text);
+        if (!q->keys) {
+            p->str = t;
+            continue;
+        }
+        for (k = 0; k < ncols && cols[k] != p->col; ++k)
+            ;
+        n = (k < ncols ? keycol[k] : KEYCOL) - VStrLen(t);
+        if (n < 1)
+            n = 1;
+        p->str = malloc(strlen(t) + n + strlen(q->keys) + 1);
+        if (!p->str) {
+            p->str = t;
+            continue;
+        }
+        strcpy(p->str, t);
+        memset(p->str + strlen(t), ' ', n);
+        strcpy(p->str + strlen(t) + n, q->keys);
+    }
 }
 
-static void initnewhelp(char **q, char *p)
+/* the language changed: the help lines anew when shown next */
+void helpreset()
 {
-    for (; *q; ++q) {
-        for (*q = p; *p && *p != '\n'; ++p)
-            if (*p == '@')
-                *p = ' ';
-        if (!*p)
-            break;
-        *p++ = 0;
+    struct help *hp;
+    struct helptab *p;
+    struct hline *q;
+
+    for (hp = help; hp->name; ++hp) {
+        if (!hp->htab->str)
+            continue;
+        for (p = hp->htab, q = hp->mesg; p->row; ++p) {
+            if (!hp->file && q->text && q->keys)
+                free(p->str);
+            if (q->text)
+                ++q;
+            p->str = 0;
+        }
+        free(hp->file);
+        hp->file = 0;
     }
-    *q = 0;
 }

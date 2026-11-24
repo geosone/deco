@@ -621,6 +621,7 @@ void setlang_help(const char *code)
            : !strncmp(code, "ru", 2) ? RUS
            : !strncmp(code, "uk", 2) ? UKR
                                      : ENG;
+    helpreset();
 }
 
 /* Options/Language: the language of the commander, at once */

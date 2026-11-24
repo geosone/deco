@@ -42,6 +42,7 @@ const char *trgetlang(void);
 int trchosen(void);
 void menuretranslate(void);
 void setlang_help(const char *code);
+void helpreset(void);
 int getlist(char *head, char **items, int n, int sel);
 #define _(s)        tr(s)
 #define P_(s, p, n) ntr(s, p, (unsigned long)(n))

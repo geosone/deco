@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: GonWare Commander 4.0\n"
 "Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/deco/"
 "issues\n"
-"POT-Creation-Date: 2026-11-24 21:11+0100\n"
+"POT-Creation-Date: 2026-11-24 21:16+0100\n"
 "PO-Revision-Date: 2026-11-24 21:00+0100\n"
 "Last-Translator: Mario Fetka\n"
 "Language-Team: none\n"
@@ -316,7 +316,7 @@ msgid_plural "You have selected %d files."
 msgstr[0] "Sie haben %d Datei ausgewählt."
 msgstr[1] "Sie haben %d Dateien ausgewählt."
 
-#: cmd.c:872 cmd.c:878 cmd.c:886 cmd.c:887 cmd.c:896
+#: cmd.c:872 cmd.c:878 cmd.c:886 cmd.c:887 cmd.c:896 help.c:54 help.c:129
 msgid " Delete "
 msgstr " Löschen "
 
@@ -469,57 +469,57 @@ msgctxt "keybar"
 msgid "Quit"
 msgstr "Ende"
 
-#: draw.c:282 draw.c:285
+#: draw.c:287 draw.c:290
 #, c-format
 msgid " %s in %s "
 msgstr " %s in %s "
 
-#: draw.c:416
+#: draw.c:421
 #, c-format
 msgid "%s byte"
 msgid_plural "%s bytes"
 msgstr[0] "%s Byte"
 msgstr[1] "%s Bytes"
 
-#: draw.c:417
+#: draw.c:422
 #, c-format
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d Datei"
 msgstr[1] "%d Dateien"
 
-#: draw.c:432
+#: draw.c:437
 msgid " Status "
 msgstr " Status "
 
-#: draw.c:439
+#: draw.c:444
 msgid "after the Demos Commander, S.Vakulenko"
 msgstr "nach dem Demos Commander, S.Vakulenko"
 
-#: draw.c:440
+#: draw.c:445
 msgid "Directory"
 msgstr "Verzeichnis"
 
-#: draw.c:442
+#: draw.c:447
 #, c-format
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d Datei"
 msgstr[1] "%d Dateien"
 
-#: draw.c:444
+#: draw.c:449
 #, c-format
 msgid "%s byte"
 msgid_plural "%s bytes"
 msgstr[0] "%s Byte"
 msgstr[1] "%s Bytes"
 
-#: draw.c:447
+#: draw.c:452
 #, c-format
 msgid "%s in %s matched"
 msgstr "%s in %s passend"
 
-#: draw.c:451
+#: draw.c:456
 #, c-format
 msgid "%s in %s selected"
 msgstr "%s in %s ausgewählt"
@@ -611,7 +611,7 @@ msgstr " Nicht speichern "
 msgid " Continue editing "
 msgstr " Weiter bearbeiten "
 
-#: edit.c:351 hexview.c:130 view.c:110
+#: edit.c:351 help.c:127 help.c:167 help.c:202 hexview.c:130 view.c:110
 msgid " Search "
 msgstr " Suchen "
 
@@ -644,6 +644,266 @@ msgstr " Einstellungen "
 msgid "Saving setup in %s ..."
 msgstr "Speichere Einstellungen in %s ..."
 
+#: help.c:38
+msgid " Cursor Arrows "
+msgstr " Pfeiltasten "
+
+#: help.c:39 mh.c:131
+msgid "Left"
+msgstr "Links"
+
+#: help.c:40 mh.c:135
+msgid "Right"
+msgstr "Rechts"
+
+#: help.c:41
+msgid "Up"
+msgstr "Hoch"
+
+#: help.c:42
+msgid "Down"
+msgstr "Runter"
+
+#
+#: help.c:43 help.c:113 help.c:158 help.c:193
+msgid " Cursor Movement "
+msgstr " Cursorbewegung "
+
+#: help.c:44 help.c:55 help.c:130
+msgid "Char left"
+msgstr "Zeichen links"
+
+#: help.c:45
+msgid "Char right"
+msgstr "Zeichen rechts"
+
+#
+#: help.c:46
+msgid " Panels "
+msgstr " Panels "
+
+#: help.c:47 mh.c:112
+msgid "Switch panels"
+msgstr "Panel wechseln"
+
+#: help.c:48
+msgid "Panels on/off"
+msgstr "Panels ein/aus"
+
+#: help.c:49 mh.c:113
+msgid "Swap panels"
+msgstr "Panels tauschen"
+
+#: help.c:50
+msgid "Toggle status"
+msgstr "Statuspanel"
+
+#: help.c:51 mh.c:114
+msgid "Full screen"
+msgstr "Volle Höhe"
+
+#: help.c:52 mh.c:115
+msgid "Double width"
+msgstr "Doppelte Breite"
+
+#: help.c:53
+msgid "The \"+\" and \"-\" keys select and unselect groups of files."
+msgstr "Die Tasten \"+\" und \"-\" wählen Gruppen von Dateien aus und ab."
+
+#: help.c:56 help.c:131
+msgid "Under cursor"
+msgstr "Unter Cursor"
+
+#: help.c:57 help.c:132
+msgid "Line"
+msgstr "Zeile"
+
+#: help.c:58 help.c:134 help.c:169 help.c:204
+msgid " Other "
+msgstr " Sonstiges "
+
+#: help.c:59 mh.c:98
+msgid "History"
+msgstr "Verlauf"
+
+#: help.c:60 mh.c:100
+msgid "Home directory"
+msgstr "Home-Verzeichnis"
+
+#
+#: help.c:61
+msgid "Reread directory"
+msgstr "Neu einlesen"
+
+#
+#: help.c:62
+msgid "Select/Unselect"
+msgstr "Aus-/abwählen"
+
+#: help.c:63
+msgid "Previous command"
+msgstr "Voriger Befehl"
+
+#
+#: help.c:64
+msgid "Next command"
+msgstr "Nächster Befehl"
+
+#
+#: help.c:65
+msgid "Run file or"
+msgstr "Datei starten oder"
+
+#
+#: help.c:66
+msgid "Enter directory"
+msgstr "ins Verzeichnis"
+
+#
+#: help.c:67
+msgid "Use file name"
+msgstr "Dateiname nehmen"
+
+#: help.c:68
+msgid "Function keys"
+msgstr "Funktionstasten"
+
+#
+#: help.c:114
+msgid "Char Left"
+msgstr "Zeichen links"
+
+#
+#: help.c:115
+msgid "Char Right"
+msgstr "Zeichen rechts"
+
+#: help.c:116 help.c:161 help.c:196
+msgid "Line Up"
+msgstr "Zeile hoch"
+
+#: help.c:117 help.c:162 help.c:197
+msgid "Line Down"
+msgstr "Zeile runter"
+
+#
+#: help.c:118
+msgid "Word Left"
+msgstr "Wort links"
+
+#
+#: help.c:119
+msgid "Word Right"
+msgstr "Wort rechts"
+
+#: help.c:120 help.c:163 help.c:198
+msgid "Prev Page"
+msgstr "Seite zurück"
+
+#: help.c:121 help.c:164 help.c:199
+msgid "Next Page"
+msgstr "Seite vor"
+
+#: help.c:122
+msgid "Begin of line"
+msgstr "Zeilenanfang"
+
+#: help.c:123
+msgid "End of line"
+msgstr "Zeilenende"
+
+#
+#: help.c:124 help.c:165 help.c:200
+msgid "Top of file"
+msgstr "Dateianfang"
+
+#
+#: help.c:125 help.c:166 help.c:201
+msgid "End of file"
+msgstr "Dateiende"
+
+#: help.c:126
+msgid "Top of screen"
+msgstr "Bildschirmanfang"
+
+#
+#: help.c:128 help.c:168 help.c:203
+msgid "Search string"
+msgstr "Text suchen"
+
+#
+#: help.c:133
+msgid "To end of line"
+msgstr "Bis Zeilenende"
+
+#: help.c:135 help.c:170 help.c:205 mh.c:102
+msgid "Redraw screen"
+msgstr "Bildschirm neu zeichnen"
+
+#: help.c:136
+msgid "Quote next char"
+msgstr "Zeichen direkt"
+
+#
+#: help.c:137
+msgid "Save file"
+msgstr "Speichern"
+
+#: help.c:138 help.c:171 help.c:206
+msgid "Exit"
+msgstr "Beenden"
+
+#: help.c:139 help.c:172 help.c:207
+msgid " Modes "
+msgstr " Modi "
+
+#: help.c:140 help.c:173 help.c:208
+msgid "Raw mode"
+msgstr "Rohmodus"
+
+#: help.c:141 help.c:174 help.c:209
+msgid "Visible spaces"
+msgstr "Leerz. sichtbar"
+
+#
+#: help.c:159 help.c:194
+msgid "Page Left"
+msgstr "Seite links"
+
+#
+#: help.c:160 help.c:195
+msgid "Page Right"
+msgstr "Seite rechts"
+
+#: help.c:175
+msgid "Lines longer than 1024 bytes"
+msgstr "Zeilen über 1024 Bytes"
+
+#: help.c:176
+msgid "are broken and marked with \"\\\""
+msgstr "werden umbrochen und mit \"\\\" markiert"
+
+#: help.c:177 help.c:210
+msgid "Spaces are displayed as \".\""
+msgstr "Leerzeichen erscheinen als \".\""
+
+#: help.c:178 help.c:211
+msgid "and tabs as \"_\""
+msgstr "und Tabulatoren als \"_\""
+
+#: help.c:212
+msgid "For hexadecimal search"
+msgstr "Für die Hex-Suche"
+
+#: help.c:213
+msgid "type char codes as \"\\xx\""
+msgstr "Zeichencodes als \"\\xx\" eingeben"
+
+#
+#: help.c:274
+msgid " Help "
+msgstr " Hilfe "
+
 #: hexview.c:42 view.c:65
 msgctxt "keybar"
 msgid "Hex"
@@ -663,7 +923,7 @@ msgstr "Byte %ld"
 msgid "String not found"
 msgstr "Text nicht gefunden"
 
-#: main.c:638
+#: main.c:639
 msgid " Language "
 msgstr " Sprache "
 
@@ -803,21 +1063,9 @@ msgstr "Verzeichnisse vergleichen"
 msgid "Find file"
 msgstr "Datei suchen"
 
-#: mh.c:98
-msgid "History"
-msgstr "Verlauf"
-
-#: mh.c:100
-msgid "Home directory"
-msgstr "Home-Verzeichnis"
-
 #: mh.c:101
 msgid "Root directory"
 msgstr "Stammverzeichnis"
-
-#: mh.c:102
-msgid "Redraw screen"
-msgstr "Bildschirm neu zeichnen"
 
 #: mh.c:104
 msgid "Menu file edit"
@@ -826,22 +1074,6 @@ msgstr "Menüdatei bearbeiten"
 #: mh.c:105
 msgid "Extensions file edit"
 msgstr "Endungsdatei bearbeiten"
-
-#: mh.c:112
-msgid "Switch panels"
-msgstr "Panel wechseln"
-
-#: mh.c:113
-msgid "Swap panels"
-msgstr "Panels tauschen"
-
-#: mh.c:114
-msgid "Full screen"
-msgstr "Volle Höhe"
-
-#: mh.c:115
-msgid "Double width"
-msgstr "Doppelte Breite"
 
 #: mh.c:116
 msgid "Command line mode"
@@ -871,10 +1103,6 @@ msgstr "Shell..."
 msgid "Save setup"
 msgstr "Einstellungen speichern"
 
-#: mh.c:131
-msgid "Left"
-msgstr "Links"
-
 #: mh.c:132
 msgid "Files"
 msgstr "Dateien"
@@ -886,10 +1114,6 @@ msgstr "Befehle"
 #: mh.c:134
 msgid "Options"
 msgstr "Optionen"
-
-#: mh.c:135
-msgid "Right"
-msgstr "Rechts"
 
 #: rec.c:72
 msgid "Cannot read file"
