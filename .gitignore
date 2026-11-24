@@ -1,8 +1,2 @@
-*.o
-deco
-Makefile
-config.cache
-config.log
-config.status
 build
 build-*
