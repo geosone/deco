@@ -159,6 +159,29 @@ static struct helptab edittab[] = {
     { 17, CS + 6, 0, 0 }, { 18, CS + 6, 0, 0 }, { 19, CS + 6, 0, 0 }, { 0, 0, 0, 0 },
 };
 
+static struct hline edithexmesg[] = {
+    { CMDR_NAME " Editor, " CMDR_SHORTCOPY, 0 },
+    { N_(" Hex Mode "), 0 },
+    { N_("Hex or text field"), "Tab" },
+    { N_("Byte left, right"), "<-, ->" },
+    { N_("16 bytes up, down"), "Up, Down" },
+    { N_("Row start, end"), "Home, End" },
+    { N_("Page up, down"), "PgUp, PgDn" },
+    { N_("Top, end of file"), "^Home, ^End" },
+    { N_("Save file"), "F2" },
+    { N_("Text mode"), "F4" },
+    { N_("Exit"), "F10, Esc" },
+    { N_("Typing overwrites the byte: 0-9 and a-f in the hex field,"), 0 },
+    { N_("any character in the text field. Line ends stay as they are."), 0 },
+    { 0, 0 },
+};
+
+static struct helptab edithextab[] = {
+    { 1, 0, 0, 0 },  { 3, 2, 1, 0 },  { 4, 6, 0, 0 },  { 5, 6, 0, 0 },  { 6, 6, 0, 0 },
+    { 7, 6, 0, 0 },  { 8, 6, 0, 0 },  { 9, 6, 0, 0 },  { 10, 6, 0, 0 }, { 11, 6, 0, 0 },
+    { 12, 6, 0, 0 }, { 14, 2, 0, 0 }, { 15, 2, 0, 0 }, { 0, 0, 0, 0 },
+};
+
 static struct hline viewmesg[] = {
     { CMDR_NAME " Viewer, " CMDR_SHORTCOPY, 0 },
     { N_(" Cursor Movement "), 0 },
@@ -230,11 +253,9 @@ static struct helptab hviewtab[] = {
 };
 
 static struct help help[] = {
-    { "general", gentab, genmesg },
-    { "edit", edittab, editmesg },
-    { "view", viewtab, viewmesg },
-    { "hexview", hviewtab, hviewmesg },
-    { 0, 0, 0 },
+    { "general", gentab, genmesg },         { "edit", edittab, editmesg },
+    { "edithex", edithextab, edithexmesg }, { "view", viewtab, viewmesg },
+    { "hexview", hviewtab, hviewmesg },     { 0, 0, 0 },
 };
 
 struct help *findhelp(char *name)

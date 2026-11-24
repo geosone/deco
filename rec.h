@@ -46,6 +46,7 @@ REC *RecOpen(int fd, int wmode);
 void RecClose(REC *r);
 int RecSave(REC *r, char *filename);
 int RecSaveAs(REC *r, char *filename);
+int RecLen(REC *r, int n);
 void RecBreak(REC *r);
 LINE *RecGet(REC *r, int n);
 void RecPut(LINE *p, int newlen);

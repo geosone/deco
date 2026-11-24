@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: GonWare Commander 4.0\n"
 "Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/deco/"
 "issues\n"
-"POT-Creation-Date: 2026-11-24 22:37+0100\n"
+"POT-Creation-Date: 2026-11-24 23:07+0100\n"
 "PO-Revision-Date: 2026-11-24 21:00+0100\n"
 "Last-Translator: Mario Fetka\n"
 "Language-Team: none\n"
@@ -70,7 +70,7 @@ msgstr "Shell da usare:"
 msgid " Cshell "
 msgstr " Cshell "
 
-#: cmd.c:275 cmd.c:284 cmd.c:394 edit.c:148 edit.c:436
+#: cmd.c:275 cmd.c:284 cmd.c:394 edit.c:426 edit.c:721
 msgid " Edit "
 msgstr " Modifica "
 
@@ -82,7 +82,7 @@ msgstr "Editor da usare con F4:"
 msgid "Editor to use"
 msgstr "Editor"
 
-#: cmd.c:309 cmd.c:336 rec.c:304
+#: cmd.c:309 cmd.c:336 rec.c:322
 #, c-format
 msgid "Cannot open %s"
 msgstr "Impossibile aprire %s"
@@ -91,7 +91,7 @@ msgstr "Impossibile aprire %s"
 msgid "Cannot edit special files"
 msgstr "Impossibile modificare i file speciali"
 
-#: cmd.c:358 ex.c:834 rec.c:254 rec.c:289
+#: cmd.c:358 ex.c:834 rec.c:272 rec.c:307
 #, c-format
 msgid "Cannot create %s"
 msgstr "Impossibile creare %s"
@@ -154,12 +154,12 @@ msgid " Copy "
 msgstr " Copia "
 
 #: cmd.c:538 cmd.c:586 cmd.c:625 cmd.c:657 cmd.c:697 cmd.c:729 cmd.c:771
-#: cmd.c:808 cmd.c:829 edit.c:378
+#: cmd.c:808 cmd.c:829 edit.c:648
 msgid "File exists"
 msgstr "Il file esiste"
 
 #: cmd.c:539 cmd.c:587 cmd.c:626 cmd.c:658 cmd.c:698 cmd.c:730 cmd.c:772
-#: cmd.c:809 cmd.c:830 edit.c:378
+#: cmd.c:809 cmd.c:830 edit.c:648
 msgid " Overwrite "
 msgstr " Sovrascrivi "
 
@@ -168,7 +168,7 @@ msgid " All "
 msgstr " Tutti "
 
 #: cmd.c:539 cmd.c:587 cmd.c:626 cmd.c:658 cmd.c:698 cmd.c:730 cmd.c:772
-#: cmd.c:809 cmd.c:830 cmd.c:884 cmd.c:890 cmd.c:899 cmd.c:909 edit.c:379
+#: cmd.c:809 cmd.c:830 cmd.c:884 cmd.c:890 cmd.c:899 cmd.c:909 edit.c:649
 msgid " Cancel "
 msgstr " Annulla "
 
@@ -423,7 +423,7 @@ msgstr "Il Commander non funziona su questo sistema -- arrivederci!"
 msgid "Cannot read '.' -- good bye !"
 msgstr "Impossibile leggere '.' -- arrivederci!"
 
-#: draw.c:212 draw.c:216 edit.c:158 hexview.c:39 view.c:64
+#: draw.c:212 draw.c:216 edit.c:121 edit.c:235 hexview.c:39 view.c:64
 msgctxt "keybar"
 msgid "Help"
 msgstr "Aiuto"
@@ -468,7 +468,8 @@ msgctxt "keybar"
 msgid "Menu"
 msgstr "Barra"
 
-#: draw.c:215 draw.c:217 edit.c:162 hexview.c:48 menu.c:107 view.c:68
+#: draw.c:215 draw.c:217 edit.c:125 edit.c:244 hexview.c:48 menu.c:107
+#: view.c:68
 msgctxt "keybar"
 msgid "Quit"
 msgstr "Esci"
@@ -528,7 +529,7 @@ msgstr "%s in %s corrispondenti"
 msgid "%s in %s selected"
 msgstr "%s in %s selezionati"
 
-#: edit.c:75 hexview.c:164 view.c:214
+#: edit.c:75 edit.c:226 hexview.c:164 view.c:214
 msgid "File "
 msgstr "File "
 
@@ -547,87 +548,106 @@ msgstr "Car U+%04X"
 msgid "Line %-5d Col %d"
 msgstr "Riga %-5d Col %d"
 
-#: edit.c:148
-msgid "File contains too long lines."
-msgstr "Il file contiene righe troppo lunghe."
-
-#: edit.c:149
-msgid " Break lines "
-msgstr " Spezza le righe "
-
-#: edit.c:149
-msgid " Cancel editing "
-msgstr " Annulla la modifica "
-
-#: edit.c:158
+#: edit.c:121 edit.c:236
 msgctxt "keybar"
 msgid "Save"
 msgstr "Salva"
 
-#: edit.c:159 hexview.c:41 view.c:65
+#: edit.c:122 hexview.c:41 view.c:65
 msgctxt "keybar"
 msgid "Raw"
 msgstr "Grezzo"
 
-#: edit.c:160 hexview.c:43 view.c:66
+#: edit.c:122 hexview.c:42 view.c:65
+msgctxt "keybar"
+msgid "Hex"
+msgstr "Hex"
+
+#: edit.c:123 edit.c:239 hexview.c:43 view.c:66
 msgctxt "keybar"
 msgid "Top"
 msgstr "Inizio"
 
-#: edit.c:160 hexview.c:44 view.c:66
+#: edit.c:123 edit.c:240 hexview.c:44 view.c:66
 msgctxt "keybar"
 msgid "Bottom"
 msgstr "Fine"
 
-#: edit.c:161 hexview.c:45 view.c:67
+#: edit.c:124 hexview.c:45 view.c:67
 msgctxt "keybar"
 msgid "Search"
 msgstr "Cerca"
 
-#: edit.c:161
+#: edit.c:124
 msgctxt "keybar"
 msgid "Home"
 msgstr "Inizio"
 
-#: edit.c:162 view.c:68
+#: edit.c:125 view.c:68
 msgctxt "keybar"
 msgid "Spaces"
 msgstr "Spazi"
 
-#: edit.c:367 edit.c:382 edit.c:437
+#: edit.c:228
+msgid "Hex"
+msgstr "Hex"
+
+#: edit.c:229
+#, c-format
+msgid "Byte %ld of %ld  %02x"
+msgstr "Byte %ld di %ld  %02x"
+
+#: edit.c:238
+msgctxt "keybar"
+msgid "Text"
+msgstr "Testo"
+
+#: edit.c:291 edit.c:637 edit.c:652 edit.c:722
 msgid " Save "
 msgstr " Salva "
 
-#: edit.c:367 edit.c:382
+#: edit.c:291 edit.c:637 edit.c:652
 #, c-format
 msgid "Saving file '%s'..."
 msgstr "Salvataggio del file '%s'..."
 
-#: edit.c:373 edit.c:378
+#: edit.c:426
+msgid "File contains too long lines."
+msgstr "Il file contiene righe troppo lunghe."
+
+#: edit.c:427
+msgid " Break lines "
+msgstr " Spezza le righe "
+
+#: edit.c:427
+msgid " Cancel editing "
+msgstr " Annulla la modifica "
+
+#: edit.c:643 edit.c:648
 msgid " Save as "
 msgstr " Salva come "
 
-#: edit.c:373
+#: edit.c:643
 msgid "Save the file as"
 msgstr "Salva il file come"
 
-#: edit.c:436
+#: edit.c:721
 msgid "You've made changes since the last save."
 msgstr "Hai fatto modifiche dall'ultimo salvataggio."
 
-#: edit.c:437
+#: edit.c:722
 msgid " Don't save "
 msgstr " Non salvare "
 
-#: edit.c:437
+#: edit.c:722
 msgid " Continue editing "
 msgstr " Continua a modificare "
 
-#: edit.c:455 help.c:127 help.c:173 help.c:208 hexview.c:130 view.c:110
+#: edit.c:740 help.c:127 help.c:196 help.c:231 hexview.c:130 view.c:110
 msgid " Search "
 msgstr " Cerca "
 
-#: edit.c:455 hexview.c:130 view.c:110
+#: edit.c:740 hexview.c:130 view.c:110
 msgid "Search for the string"
 msgstr "Cerca il testo"
 
@@ -677,7 +697,7 @@ msgid "Down"
 msgstr "Giù"
 
 #
-#: help.c:43 help.c:113 help.c:164 help.c:199
+#: help.c:43 help.c:113 help.c:187 help.c:222
 msgid " Cursor Movement "
 msgstr " Movimento "
 
@@ -730,7 +750,7 @@ msgstr "Sotto il cursore"
 msgid "Line"
 msgstr "Riga"
 
-#: help.c:58 help.c:138 help.c:175 help.c:210
+#: help.c:58 help.c:138 help.c:198 help.c:233
 msgid " Other "
 msgstr " Altro "
 
@@ -790,11 +810,11 @@ msgstr "Car. a sinistra"
 msgid "Char Right"
 msgstr "Car. a destra"
 
-#: help.c:116 help.c:167 help.c:202
+#: help.c:116 help.c:190 help.c:225
 msgid "Line Up"
 msgstr "Riga su"
 
-#: help.c:117 help.c:168 help.c:203
+#: help.c:117 help.c:191 help.c:226
 msgid "Line Down"
 msgstr "Riga giù"
 
@@ -808,11 +828,11 @@ msgstr "Parola a sin."
 msgid "Word Right"
 msgstr "Parola a des."
 
-#: help.c:120 help.c:169 help.c:204
+#: help.c:120 help.c:192 help.c:227
 msgid "Prev Page"
 msgstr "Pagina prec."
 
-#: help.c:121 help.c:170 help.c:205
+#: help.c:121 help.c:193 help.c:228
 msgid "Next Page"
 msgstr "Pagina succ."
 
@@ -825,12 +845,12 @@ msgid "End of line"
 msgstr "Fine riga"
 
 #
-#: help.c:124 help.c:171 help.c:206
+#: help.c:124 help.c:194 help.c:229
 msgid "Top of file"
 msgstr "Inizio file"
 
 #
-#: help.c:125 help.c:172 help.c:207
+#: help.c:125 help.c:195 help.c:230
 msgid "End of file"
 msgstr "Fine file"
 
@@ -839,7 +859,7 @@ msgid "Top of screen"
 msgstr "Inizio schermo"
 
 #
-#: help.c:128 help.c:174 help.c:209
+#: help.c:128 help.c:197 help.c:232
 msgid "Search string"
 msgstr "Cerca testo"
 
@@ -867,7 +887,7 @@ msgstr "Fino a fine riga"
 msgid "Undelete"
 msgstr "Ripristina"
 
-#: help.c:139 help.c:176 help.c:211 mh.c:109
+#: help.c:139 help.c:199 help.c:234 mh.c:109
 msgid "Redraw screen"
 msgstr "Ridisegna lo schermo"
 
@@ -876,7 +896,7 @@ msgid "Quote next char"
 msgstr "Car. letterale"
 
 #
-#: help.c:141
+#: help.c:141 help.c:171
 msgid "Save file"
 msgstr "Salva"
 
@@ -888,65 +908,101 @@ msgstr "Salva come"
 msgid "Save and exit"
 msgstr "Salva ed esci"
 
-#: help.c:144 help.c:177 help.c:212
+#: help.c:144 help.c:173 help.c:200 help.c:235
 msgid "Exit"
 msgstr "Esci"
 
-#: help.c:145 help.c:179 help.c:214
+#: help.c:145 help.c:202 help.c:237
 msgid "Raw mode"
 msgstr "Modo grezzo"
 
-#: help.c:146 help.c:180 help.c:215
+#: help.c:146 help.c:203 help.c:238
 msgid "Visible spaces"
 msgstr "Spazi visibili"
 
+#: help.c:164
+msgid " Hex Mode "
+msgstr " Modo esadecimale "
+
+#: help.c:165
+msgid "Hex or text field"
+msgstr "Campo hex o testo"
+
+#: help.c:166
+msgid "Byte left, right"
+msgstr "Byte a sin., des."
+
+#: help.c:167
+msgid "16 bytes up, down"
+msgstr "16 byte su, giù"
+
+#: help.c:168
+msgid "Row start, end"
+msgstr "Inizio, fine riga"
+
+#: help.c:169
+msgid "Page up, down"
+msgstr "Pagina su, giù"
+
 #
-#: help.c:165 help.c:200
+#: help.c:170
+msgid "Top, end of file"
+msgstr "Inizio, fine del file"
+
+#: help.c:172
+msgid "Text mode"
+msgstr "Modo testo"
+
+#: help.c:174
+msgid "Typing overwrites the byte: 0-9 and a-f in the hex field,"
+msgstr "Digitando si sovrascrive il byte: 0-9 e a-f nel campo hex,"
+
+#: help.c:175
+msgid "any character in the text field. Line ends stay as they are."
+msgstr "ogni carattere nel campo testo. I fine riga restano come sono."
+
+#
+#: help.c:188 help.c:223
 msgid "Page Left"
 msgstr "Pagina a sin."
 
 #
-#: help.c:166 help.c:201
+#: help.c:189 help.c:224
 msgid "Page Right"
 msgstr "Pagina a des."
 
-#: help.c:178 help.c:213
+#: help.c:201 help.c:236
 msgid " Modes "
 msgstr " Modi "
 
-#: help.c:181
+#: help.c:204
 msgid "Lines longer than 1024 bytes"
 msgstr "Le righe oltre 1024 byte"
 
-#: help.c:182
+#: help.c:205
 msgid "are broken and marked with \"\\\""
 msgstr "sono spezzate e marcate con \"\\\""
 
-#: help.c:183 help.c:216
+#: help.c:206 help.c:239
 msgid "Spaces are displayed as \".\""
 msgstr "Gli spazi appaiono come \".\""
 
-#: help.c:184 help.c:217
+#: help.c:207 help.c:240
 msgid "and tabs as \"_\""
 msgstr "e le tabulazioni come \"_\""
 
-#: help.c:218
+#: help.c:241
 msgid "For hexadecimal search"
 msgstr "Per cercare in esadecimale"
 
-#: help.c:219
+#: help.c:242
 msgid "type char codes as \"\\xx\""
 msgstr "scrivi i codici come \"\\xx\""
 
 #
-#: help.c:280
+#: help.c:301
 msgid " Help "
 msgstr " Aiuto "
-
-#: hexview.c:42 view.c:65
-msgctxt "keybar"
-msgid "Hex"
-msgstr "Hex"
 
 #: hexview.c:167
 #, c-format
@@ -1158,49 +1214,45 @@ msgstr "Comandi"
 msgid "Options"
 msgstr "Opzioni"
 
-#: rec.c:74
+#: rec.c:73
 msgid "Cannot read file"
 msgstr "Impossibile leggere il file"
 
-#: rec.c:83
+#: rec.c:82
 msgid "Cannot write file"
 msgstr "Impossibile scrivere il file"
 
-#: rec.c:116
+#: rec.c:115
 msgid "No temp space"
 msgstr "Nessuno spazio temporaneo"
 
-#: rec.c:132
+#: rec.c:131
 msgid "Cannot lseek on writing temp file"
 msgstr "lseek fallito scrivendo il file temporaneo"
 
-#: rec.c:134
+#: rec.c:133
 msgid "Cannot write temporary file"
 msgstr "Impossibile scrivere il file temporaneo"
 
-#: rec.c:174
+#: rec.c:198
 msgid "Cannot open temporary file"
 msgstr "Impossibile aprire il file temporaneo"
 
-#: rec.c:180
-msgid "Cannot reopen temporary file"
-msgstr "Impossibile riaprire il file temporaneo"
-
-#: rec.c:219
+#: rec.c:237
 msgid "file too long"
 msgstr "file troppo lungo"
 
-#: rec.c:267
+#: rec.c:285
 #, c-format
 msgid "Cannot write %s"
 msgstr "Impossibile scrivere %s"
 
-#: rec.c:352
+#: rec.c:370
 #, c-format
 msgid "Cannot lseek on reading fd=%d, seek=%ld"
 msgstr "lseek fallito in lettura, fd=%d, seek=%ld"
 
-#: rec.c:356
+#: rec.c:374
 msgid "Cannot read line"
 msgstr "Impossibile leggere la riga"
 
@@ -1208,3 +1260,6 @@ msgstr "Impossibile leggere la riga"
 #, c-format
 msgid "  Lines %-5d Bytes %ld"
 msgstr "  Righe %-5d Byte %ld"
+
+#~ msgid "Cannot reopen temporary file"
+#~ msgstr "Impossibile riaprire il file temporaneo"

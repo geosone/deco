@@ -442,6 +442,17 @@ LINE *RecGet(REC *r, int n)
     return (p);
 }
 
+/* the length of line n without reading it */
+int RecLen(REC *r, int n)
+{
+    struct index *x;
+
+    if (n < 0 || n >= r->len)
+        return (0);
+    x = &r->lindex[n];
+    return x->poolindex != NOINDEX ? r->pool[x->poolindex].len : x->len;
+}
+
 void RecPut(LINE *p, int newlen)
 {
     if (!p->mod)

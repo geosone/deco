@@ -118,6 +118,284 @@ static int lastpos(int n)
     return (p->len);
 }
 
+static const char *const editkeys[10] = { NC_("keybar", "Help"),   NC_("keybar", "Save"),
+                                          NC_("keybar", "Raw"),    NC_("keybar", "Hex"),
+                                          NC_("keybar", "Top"),    NC_("keybar", "Bottom"),
+                                          NC_("keybar", "Search"), NC_("keybar", "Home"),
+                                          NC_("keybar", "Spaces"), NC_("keybar", "Quit") };
+
+/*
+ * The hex mode (F4): the text as the bytes it is saved as, each line and
+ * its end (0a), sixteen to a row as the hex viewer shows them. Typing
+ * overwrites a byte, in the hex field as two hex digits, in the text
+ * field as the character; the line ends stay, and no byte becomes one,
+ * so the lines under the editor do not move. Tab changes the field, F4
+ * goes back to the text at the same place.
+ */
+static long *hstart; /* the offset of each line, and the end */
+static long hsize;   /* the bytes */
+
+static void hexindex(void)
+{
+    int i;
+
+    free(hstart);
+    hstart = malloc((viewrec->len + 1) * sizeof(long));
+    hsize  = 0;
+    for (i = 0; hstart && i < viewrec->len; ++i) {
+        hstart[i] = hsize;
+        hsize += RecLen(viewrec, i) + 1;
+    }
+    if (hstart)
+        hstart[i] = hsize;
+}
+
+/* the line of byte o and the offset in it */
+static int hexline(long o, int *off)
+{
+    int lo = 0, hi = viewrec->len - 1, m;
+
+    while (lo < hi) {
+        m = (lo + hi + 1) / 2;
+        if (hstart[m] <= o)
+            lo = m;
+        else
+            hi = m - 1;
+    }
+    *off = (int)(o - hstart[lo]);
+    return lo;
+}
+
+static int hexget(long o)
+{
+    int off, l = hexline(o, &off);
+    LINE *p = RecGet(viewrec, l);
+
+    return !p || off >= p->len ? '\n' : p->ptr[off] & 0xff;
+}
+
+/* byte o is v now; -1 for a line end or a new one */
+static int hexput(long o, int v)
+{
+    int off, l = hexline(o, &off);
+    LINE *p = RecGet(viewrec, l);
+
+    if (!p || off >= p->len || v == '\n')
+        return -1;
+    p->ptr[off] = (char)v;
+    RecPut(p, p->len);
+    editmodflg = 1;
+    return 0;
+}
+
+static void hexrow(long row, int y)
+{
+    long o = row * 16;
+    int i, n = hsize - o > 16 ? 16 : (int)(hsize - o);
+
+    VMove(y, 0);
+    for (i = 0; i < 16; ++i)
+        if (i < n) {
+            int c = hexget(o + i);
+
+            VPutChar("0123456789abcdef"[c >> 4]);
+            VPutChar("0123456789abcdef"[c & 0xf]);
+            VPutChar(' ');
+        } else
+            VPrint("   ");
+    for (i = 0; i < n; ++i) {
+        viewchar(hexget(o + i));
+        if (i < n - 1)
+            VPutChar(' ');
+    }
+    VClearLine();
+}
+
+static void hexhead(char *name, long pos)
+{
+    char b[64];
+    int i, c = pos < hsize ? hexget(pos) : 0;
+
+    VSetDim();
+    VStandOut();
+    VMove(0, 0);
+    for (i = COLS; --i >= 0; VPutChar(' '))
+        ;
+    if (editmodflg)
+        VMPutString(0, 0, "*");
+    VMPutString(0, 1, _("File "));
+    VPutString(name);
+    VPrint("  %s", _("Hex"));
+    snprintf(b, sizeof(b), _("Byte %ld of %ld  %02x"), pos, hsize, c);
+    VMPutString(0, COLS - 1 - VStrLen(b), b);
+    VSetNormal();
+    VStandEnd();
+}
+
+static const char *const hexkeys[10] = { NC_("keybar", "Help"),
+                                         NC_("keybar", "Save"),
+                                         "",
+                                         NC_("keybar", "Text"),
+                                         NC_("keybar", "Top"),
+                                         NC_("keybar", "Bottom"),
+                                         "",
+                                         "",
+                                         "",
+                                         NC_("keybar", "Quit") };
+
+/* the hex mode from line *pl, offset *po, and where it left them; the key
+ * that ended it */
+static int hexedit(char *filename, char *basename, int *pl, int *po)
+{
+    int rows = LINES - 2, field = 0, nib = 0, c, d, y;
+    long pos, base = -1, newbase, row;
+
+    hexindex();
+    if (!hstart)
+        return meta('D');
+    pos = *pl < viewrec->len ? hstart[*pl] + *po : 0;
+    if (pos >= hsize)
+        pos = hsize ? hsize - 1 : 0;
+    drawkeys(hexkeys);
+    newbase = pos / 16 - rows / 2;
+    for (;;) {
+        row = pos / 16;
+        if (newbase > (hsize + 15) / 16 - rows)
+            newbase = (hsize + 15) / 16 - rows;
+        if (newbase < 0)
+            newbase = 0;
+        if (row < newbase)
+            newbase = row;
+        if (row >= newbase + rows)
+            newbase = row - rows + 1;
+        if (newbase != base) {
+            base = newbase;
+            for (y = 0; y < rows; ++y)
+                hexrow(base + y, y + 1);
+        }
+        hexhead(basename, pos);
+        VMove((int)(row - base) + 1, field ? 48 + (int)(pos % 16) * 2 : (int)(pos % 16) * 3 + nib);
+        VSync();
+        switch (c = KeyGet()) {
+        case meta('A'): /* f1 */
+            runhelp("edithex");
+            continue;
+        case cntrl(']'):
+            VRedraw();
+            continue;
+        case cntrl('I'): /* the other field */
+            field ^= 1;
+            nib = 0;
+            continue;
+        case meta('B'): /* f2 - save */
+            message(_(" Save "), _("Saving file '%s'..."), basename);
+            if (RecSave(viewrec, filename) == 0)
+                editmodflg = 0;
+            endmesg();
+            continue;
+        case meta('l'):
+            if (nib)
+                nib = 0;
+            else if (pos > 0)
+                --pos;
+            continue;
+        case meta('r'):
+            if (pos < hsize - 1)
+                ++pos;
+            nib = 0;
+            continue;
+        case meta('u'):
+            if (pos >= 16)
+                pos -= 16;
+            continue;
+        case meta('d'):
+            if (pos + 16 < hsize)
+                pos += 16;
+            continue;
+        case meta('p'):
+            pos -= 16L * (rows - 1);
+            if (pos < 0)
+                pos = 0;
+            newbase -= rows - 1;
+            continue;
+        case meta('n'):
+            pos += 16L * (rows - 1);
+            if (pos >= hsize)
+                pos = hsize ? hsize - 1 : 0;
+            newbase += rows - 1;
+            continue;
+        case meta('h'):
+            pos -= pos % 16;
+            nib = 0;
+            continue;
+        case meta('e'):
+            pos = pos - pos % 16 + 15;
+            if (pos >= hsize)
+                pos = hsize ? hsize - 1 : 0;
+            nib = 0;
+            continue;
+        case KEY_CHOME:
+        case KEY_CPGUP:
+        case meta('E'):
+            pos = nib = 0;
+            continue;
+        case KEY_CEND:
+        case KEY_CPGDN:
+        case meta('F'):
+            pos = hsize ? hsize - 1 : 0;
+            nib = 0;
+            continue;
+        default:
+            /* F4 back; F10, Esc and the other keys of the text: back,
+             * and the text does them */
+            if (c > 0377 || c == cntrl('[') || c == cntrl('C'))
+                break;
+            if (c < ' ' || c == 0177 || pos >= hsize) {
+                VBeep();
+                continue;
+            }
+            if (field) { /* the text field: the character */
+                d = c;
+                if (hexput(pos, d) < 0) {
+                    VBeep();
+                    continue;
+                }
+                hexrow(row, (int)(row - base) + 1);
+                if (pos < hsize - 1)
+                    ++pos;
+                continue;
+            }
+            if (c >= '0' && c <= '9')
+                d = c - '0';
+            else if ((c | 040) >= 'a' && (c | 040) <= 'f')
+                d = (c | 040) - 'a' + 10;
+            else {
+                VBeep();
+                continue;
+            }
+            d = nib ? (hexget(pos) & 0xf0) | d : (hexget(pos) & 0x0f) | d << 4;
+            if (hexput(pos, d) < 0) {
+                VBeep();
+                continue;
+            }
+            hexrow(row, (int)(row - base) + 1);
+            if (!nib)
+                nib = 1;
+            else {
+                nib = 0;
+                if (pos < hsize - 1)
+                    ++pos;
+            }
+            continue;
+        }
+        break;
+    }
+    *pl = hsize ? hexline(pos, po) : 0;
+    if (!hsize)
+        *po = 0;
+    return c;
+}
+
 static void edit1(int d, char *filename, char *basename);
 
 /* the editor, in its colours */
@@ -154,15 +432,7 @@ static void edit1(int d, char *filename, char *basename)
     baseline = basecol = 0;
     sline = ccol = 0;
     VClearBox(1, 0, LINES - 2, COLS);
-    {
-        static const char *const keys[10] = { NC_("keybar", "Help"),   NC_("keybar", "Save"),
-                                              NC_("keybar", "Raw"),    "",
-                                              NC_("keybar", "Top"),    NC_("keybar", "Bottom"),
-                                              NC_("keybar", "Search"), NC_("keybar", "Home"),
-                                              NC_("keybar", "Spaces"), NC_("keybar", "Quit") };
-
-        drawkeys(keys);
-    }
+    drawkeys(editkeys);
     for (;;) {
         viewpage(baseline, basecol);
         for (;;) {
@@ -389,6 +659,21 @@ static void edit1(int d, char *filename, char *basename)
                 editmodflg          = 0;
                 continue;
             }
+            case meta('D'): /* f4 - hex */
+                c = hexedit(filename, basename, &sline, &soff);
+                drawkeys(editkeys);
+                ccol = column(sline, soff);
+                if (sline < baseline || sline >= baseline + LINES - 2) {
+                    baseline = sline - (LINES - 2) / 2;
+                    if (baseline > viewrec->len - (LINES - 2))
+                        baseline = viewrec->len - (LINES - 2);
+                    if (baseline < 0)
+                        baseline = 0;
+                }
+                basecol = ccol < 40 ? 0 : ((ccol - 40) / 40 * 40);
+                if (c != meta('D'))
+                    KeyUnget(c); /* F10, Esc ...: the text does it */
+                break;
             case meta('C'): /* f3 - raw */
                 viewraw ^= 1;
                 break;
