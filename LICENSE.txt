@@ -1,6 +1,7 @@
 MIT License
 
 Copyright (c) 2023 Serge Vakulenko
+Copyright (c) 2026 Mario Fetka (the GonWare Commander changes)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

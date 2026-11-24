@@ -1593,7 +1593,7 @@ void VPrint(char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    vsprintf(buf, fmt, ap);
+    vsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
     VPutString(buf);
 }

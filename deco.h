@@ -20,6 +20,14 @@ void initcolors(void);                       /* the VC colour scheme */
 int ncolumns(int view);                      /* columns of names in a panel in this view */
 int colsep(int k, int view); /* column separator k (0 ... ncolumns) from the panel's left frame */
 
+/* The GonWare Commander, grown from the Demos Commander (MIT): keep its
+ * copyright next to ours wherever ours is shown. */
+#define CMDR_NAME      "GonWare Commander"
+#define CMDR_VERSION   "4.0"
+#define CMDR_COPYRIGHT "Copyright (C) 2026 Mario Fetka"
+#define DECO_ORIGIN    "based on the Demos Commander, Copyright (C) 1989-2000 Serge Vakulenko"
+#define CMDR_SHORTCOPY "(C) 2026 M.Fetka, 1989-2000 S.Vakulenko" /* where room is short */
+
 #define CMDLEN 512 /* length of command string */
 
 struct dir;

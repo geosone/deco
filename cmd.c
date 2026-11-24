@@ -429,8 +429,8 @@ void quit()
     int choice;
 
     choice = getchoice(
-        ppid == 1, " Demos Commander ",
-        ppid == 1 ? "Do you want to log out ?" : "Do you want to quit the Demos Commander ?", 0,
+        ppid == 1, " " CMDR_NAME " ",
+        ppid == 1 ? "Do you want to log out ?" : "Do you want to quit the " CMDR_NAME " ?", 0,
         " Yes ", " No ", " Exec shell ");
     if (choice == 0)
         quitdeco();

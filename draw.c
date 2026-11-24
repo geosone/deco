@@ -7,8 +7,6 @@
 #include "dir.h"
 #include "scr.h"
 
-#define DECOVERSION "Version 3.10"
-
 static BOX *cbox;        /* box under cursor */
 static struct dir *cdir; /* drawed directory */
 
@@ -430,9 +428,8 @@ static void drawsdir(struct dir *c) /* draw status window */
     VClearBox(2, BASECOL(c) + 1, 2, PAGEWID - 2);
     VClearBox(5, BASECOL(c) + 1, 6, PAGEWID - 2);
     VClearBox(12, BASECOL(c) + 1, H - 8, PAGEWID - 2);
-    sprintf(buf, "The Demos Commander, %s", DECOVERSION);
-    mvcaddstr(2, BASECOL(c) + PAGEWID / 2 + 1, buf);
-    mvcaddstr(3, BASECOL(c) + PAGEWID / 2 + 1, "Copyright (C) 1989-2000 S.Vakulenko");
+    mvcaddstr(2, BASECOL(c) + PAGEWID / 2 + 1, "The " CMDR_NAME " " CMDR_VERSION);
+    mvcaddstr(3, BASECOL(c) + PAGEWID / 2 + 1, "after the Demos Commander, S.Vakulenko");
     mvcaddstr(5, BASECOL(c) + PAGEWID / 2 + 1, "Directory");
     mvcaddstr(6, BASECOL(c) + PAGEWID / 2 + 1, d->shortcwd);
     sprintf(buf, "\3%d\2 file%s", d->nfiles, d->nfiles == 1 ? "" : "s");

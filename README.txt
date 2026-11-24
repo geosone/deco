@@ -1,3 +1,8 @@
+The GonWare Commander is the file manager of GonWare (CMDR.EXE), grown
+from the Demos Commander (deco) by Serge Vakulenko: panels that follow
+the screen size, a VC-like colour scheme, a newt/S-Lang screen backend
+and GDOS support. It still builds for Unix systems as `deco`.
+
 Demos Commander (deco) is an text-mode file manager for Unix systems.
 
 The main interface consists of two panels, which display the file system.

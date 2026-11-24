@@ -1,6 +1,7 @@
+#include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
+
 #include "deco.h"
 #include "env.h"
 #include "scr.h"
@@ -26,7 +27,7 @@ static void inithelp(struct help *hp);
 static void initnewhelp(char **q, char *p);
 
 static char *genmesg[] = {
-    "The Demos Commander, Copyright (C) 1989-1997 Serge Vakulenko",
+    CMDR_NAME ", " CMDR_SHORTCOPY,
     " Cursor Arrows ",
     "Left             ^[ l",
     "Right            ^[ r",
@@ -101,7 +102,7 @@ static struct helptab gentab[] = {
 };
 
 static char *editmesg[] = {
-    "The Demos Commander Text Editor, Copyright (C) 1990-1997 Serge Vakulenko",
+    CMDR_NAME " Editor, " CMDR_SHORTCOPY,
     " Cursor Movement ",
     "Char Left        ^A",
     "Char Right       ^D",
@@ -146,7 +147,7 @@ static struct helptab edittab[] = {
 };
 
 static char *viewmesg[] = {
-    "The Demos Commander Viewer, Copyright (C) 1990-1997 Serge Vakulenko",
+    CMDR_NAME " Viewer, " CMDR_SHORTCOPY,
     " Cursor Movement ",
     "Page Left        ^A",
     "Page Right       ^D",
@@ -181,7 +182,7 @@ static struct helptab viewtab[] = {
 };
 
 static char *hviewmesg[] = {
-    "The Demos Commander Hexadecimal Viewer, Copyright (C) 1990-1997 Serge Vakulenko",
+    CMDR_NAME " Hex Viewer, " CMDR_SHORTCOPY,
     " Cursor Movement ",
     "Page Left        ^A",
     "Page Right       ^D",
@@ -244,6 +245,7 @@ void runhelp(char *name)
     BOX *box;
     register struct helptab *p;
     struct help *hp;
+    int oldc;
 
     hp = findhelp(name);
     if (!hp)
@@ -254,9 +256,10 @@ void runhelp(char *name)
     w = 72;
     h = 21;
     r = 2;
-    c = 4;
+    c = (COLS - w) / 2;
 
-    box = VGetBox(r, c - 1, h, w + 2); /* save box */
+    oldc = VSetColor(VCOL_DIALOG);
+    box  = VGetBox(r, c - 1, h, w + 2); /* save box */
     VStandOut();
     VSetDim();
     VFillBox(r, c - 1, h, w + 2, ' ');         /* clear */
@@ -295,6 +298,7 @@ void runhelp(char *name)
     }
     VUngetBox(box);
     VFreeBox(box);
+    VSetColor(oldc);
 }
 
 static int findhelpfile(char *filename, char *name, char *dir)

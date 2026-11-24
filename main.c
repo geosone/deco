@@ -85,7 +85,7 @@ int main(int argc, char **argv, char **envp)
 #ifdef GC
     /*GC_set_warn_proc (outerr);*/
 #endif
-    outerr("Demos Commander, Copyright (C) 1989-1997 Serge Vakulenko\n");
+    outerr(CMDR_NAME " " CMDR_VERSION ", " CMDR_COPYRIGHT "\n" DECO_ORIGIN "\n");
     palette = dflt_palette;
     if (argc > 1)
         chdir(argv[1]);
