@@ -56,6 +56,5 @@ copy) and an entry in `trlangs` in `intl.c` for Options/Language.
 
 ## License
 
-MIT, see [LICENSE.txt](LICENSE.txt): Copyright (C) 1989-2000 Serge
-Vakulenko for the Demos Commander, Copyright (C) 2026 Mario Fetka for the
-GonWare Commander changes.
+MIT, see [LICENSE.txt](LICENSE.txt): Serge Vakulenko for the Demos
+Commander, Mario Fetka for the GonWare Commander changes.
